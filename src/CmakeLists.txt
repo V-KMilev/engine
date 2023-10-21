@@ -1,0 +1,16 @@
+set(SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/window/window.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/input/input_handler.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/input/input_key.cpp
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/window
+	${CMAKE_CURRENT_SOURCE_DIR}/logger
+	${CMAKE_CURRENT_SOURCE_DIR}/utils
+	${CMAKE_CURRENT_SOURCE_DIR}/input
+)
+
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
+
