@@ -1,5 +1,8 @@
 #include "input_key.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 namespace Engine{
 	STATE getState(GLFWwindow *window, int key) {
 		if(glfwGetKey(window, key) == GLFW_PRESS) {
@@ -15,18 +18,21 @@ namespace Engine{
 	}
 
 	std::string stateToString(STATE state) {
+		std::string state_str = "Invalid";
+
 		if(state == STATE::PRESS) {
-			return "PRESS";
+			state_str = "PRESS";
 		}
 		else if(state == STATE::RELEASE) {
-			return "RELEASE";
+			state_str = "RELEASE";
 		}
 		else if(state == STATE::REPEAT) {
-			return "REPEAT";
+			state_str = "REPEAT";
 		}
 		else if(state == STATE::IDLE) {
-			return "Invalid State";
+			state_str = "IDLE";
 		}
+		return state_str;
 	}
 
 	bool InputKey::operator == (const InputKey& other) const {

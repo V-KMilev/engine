@@ -1,10 +1,10 @@
 #pragma once
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include <functional>
 #include <string>
+
+// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
+class GLFWwindow;
 
 namespace Engine {
 	enum class STATE {

@@ -1,16 +1,17 @@
+set(ENGINE_SRC_DIR ${ENGINE_SOURCE_DIR}/src)
+
 set(SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/window/window.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/input/input_handler.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/input/input_key.cpp
+	${ENGINE_SRC_DIR}/input/input_handler.cpp
+	${ENGINE_SRC_DIR}/input/input_key.cpp
+	${ENGINE_SRC_DIR}/logger/logger.cpp
+	${ENGINE_SRC_DIR}/window/window.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/window
-	${CMAKE_CURRENT_SOURCE_DIR}/logger
-	${CMAKE_CURRENT_SOURCE_DIR}/utils
-	${CMAKE_CURRENT_SOURCE_DIR}/input
+	${ENGINE_SRC_DIR}/window
+	${ENGINE_SRC_DIR}/logger
+	${ENGINE_SRC_DIR}/utils
+	${ENGINE_SRC_DIR}/input
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
-

@@ -1,12 +1,12 @@
 #pragma once
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include <unordered_map>
 #include <functional>
 
 #include "input_key.h"
+
+// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
+class GLFWwindow;
 
 namespace Engine {
 	class InputHandle {
