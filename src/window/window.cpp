@@ -4,7 +4,15 @@
 	#include <windows.h>
 #endif
 
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "logger.h"
+
+#include "gl_render.h"
+#include "gl_shader.h"
+#include "gl_triangle.h"
 
 namespace Engine {
 	Window::Window(
@@ -65,18 +73,7 @@ namespace Engine {
 		// FPS cap
 		glfwSwapInterval(0);
 
-		// TODO: Find better hack for this to work
-		glfwSetKeyCallback(_window, _input.keyCallback);
-		glfwSetWindowUserPointer(_window, &_input);
-
-		// Mapping exit button
-		_input.mapKeyandStatetoEvent(
-			GLFW_KEY_C,
-			STATE::PRESS,
-			std::function<void()>(
-				[this] { set_close(true); }
-			)
-		);
+		input_config();
 
 		return true;
 	}
@@ -91,8 +88,35 @@ namespace Engine {
 		_close = flag;
 	}
 
+	void Window::input_config() {
+		// TODO: Find better "hack" for this to work
+		glfwSetKeyCallback(_window, _input.keyCallback);
+		glfwSetWindowUserPointer(_window, &_input);
+
+		// Mapping exit button
+		_input.mapKeyandStatetoEvent(
+			GLFW_KEY_C,
+			STATE::PRESS,
+			std::function<void()>(
+				[this] { set_close(true); }
+			),
+			"Close main loop"
+		);
+	}
+
 	void Window::main_loop() {
+		Core::Renderer render;
+
+		Core::Shader shader("F:\\cpp\\engine\\src\\shaders\\triangle\\");
+
+		Core::Triangle triangle;
+
 		while(!glfwWindowShouldClose(_window)) {
+			render.clearColor();
+			render.clear();
+
+			triangle.draw(render, shader);
+
 			/* Swap front and back buffers */
 			glfwSwapBuffers(_window);
 

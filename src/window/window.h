@@ -1,12 +1,11 @@
 #pragma once
 
-#include <glad/gl.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include <string>
 
 #include "input_handler.h"
+
+// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
+class GLFWwindow;
 
 namespace Engine {
 	class Window {
@@ -33,6 +32,8 @@ namespace Engine {
 
 		private:
 			void set_close(bool flag);
+
+			void input_config();
 
 		private:
 			GLFWwindow* _window;
