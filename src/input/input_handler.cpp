@@ -8,20 +8,16 @@
 namespace Engine{
 	InputHandle::InputHandle() : _mapOfEvents({}) {}
 
-	void InputHandle::processInput(GLFWwindow* window, int key) const {
-		STATE state = getState(window, key);
-
-		// Check if an event is mapped for this key and state.
-		auto it = _mapOfEvents.find({key, state});
-
-		// If an event is found, execute it.
-		if (it != _mapOfEvents.end()) {
-			it->second();
-		}
+	const Mouse& InputHandle::getMouse() const {
+		return _mMouse;
 	}
 
-	void InputHandle::mapKeyandStatetoEvent(int key, STATE state, std::function<void()> event, const std::string& event_hint) {
-		if (state == STATE::IDLE) {
+	Mouse& InputHandle::getMouse() {
+		return _mMouse;
+	}
+
+	void InputHandle::mapKeyandStatetoEvent(int key, State state, std::function<void()> event, const std::string& event_hint) {
+		if (state == State::IDLE) {
 			LOG("Mapping '%c' to '%s' state is not allowed", LOG_LEVEL::L_WARN, key, stateToString(state).c_str());
 			return;
 		}
@@ -37,7 +33,32 @@ namespace Engine{
 		InputHandle* inputHandle = static_cast<InputHandle*>(glfwGetWindowUserPointer(window));
 
 		if (inputHandle) {
-			inputHandle->processInput(window, key);
+			inputHandle->processKey(window, key, KeyType::KEYBORD);
 		}
+	}
+
+	void InputHandle::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+		// You can retrieve the user pointer to get the InputHandle instance
+		InputHandle* inputHandle = static_cast<InputHandle*>(glfwGetWindowUserPointer(window));
+
+		if (inputHandle) {
+			inputHandle->processKey(window, button, KeyType::MOUSE);
+		}
+	}
+
+	void InputHandle::processKey(GLFWwindow* window, int key, KeyType tpye) const {
+		State state = getState(window, key, tpye);
+
+		// Check if an event is mapped for this key and state.
+		auto it = _mapOfEvents.find({key, state});
+
+		// If an event is found, execute it.
+		if (it != _mapOfEvents.end()) {
+			it->second();
+		}
+	}
+
+	void InputHandle::processPos(GLFWwindow* window) {
+		glfwGetCursorPos(window, &_mMouse.x, &_mMouse.y);
 	}
 };

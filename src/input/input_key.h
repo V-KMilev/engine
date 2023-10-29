@@ -7,16 +7,22 @@
 class GLFWwindow;
 
 namespace Engine {
-	enum class STATE {
+	enum class KeyType {
+		NONE    = 0,
+		KEYBORD = 1,
+		MOUSE   = 2
+	};
+
+	enum class State {
 		IDLE    = 0,
 		PRESS   = 1,
 		RELEASE = 2,
 		REPEAT  = 3
 	};
 
-	STATE getState(GLFWwindow *window, int key);
+	State getState(GLFWwindow *window, int key, KeyType type);
 
-	std::string stateToString(STATE state);
+	std::string stateToString(State state);
 
 	class InputKey {
 		public:
@@ -24,7 +30,7 @@ namespace Engine {
 
 		public:
 			int key;
-			STATE state;
+			State state;
 	};
 };
 
@@ -34,7 +40,7 @@ namespace std {
 	template <>
 	struct hash<Engine::InputKey> {
 		std::size_t operator()(const Engine::InputKey& k) const {
-			return std::hash<int>()(k.key) ^ std::hash<Engine::STATE>()(k.state);
+			return std::hash<int>()(k.key) ^ std::hash<Engine::State>()(k.state);
 		}
 	};
 }

@@ -4,32 +4,42 @@
 #include <GLFW/glfw3.h>
 
 namespace Engine{
-	STATE getState(GLFWwindow *window, int key) {
-		if(glfwGetKey(window, key) == GLFW_PRESS) {
-			return STATE::PRESS;
+	State getState(GLFWwindow *window, int key, KeyType type) {
+		if (type == KeyType::KEYBORD) {
+			if(glfwGetKey(window, key) == GLFW_PRESS) {
+				return State::PRESS;
+			}
+			else if(glfwGetKey(window, key) == GLFW_RELEASE) {
+				return State::RELEASE;
+			}
+			else if (glfwGetKey(window, key) == GLFW_REPEAT) {
+				return State::REPEAT;
+			}
 		}
-		else if(glfwGetKey(window, key) == GLFW_RELEASE) {
-			return STATE::RELEASE;
+		else if(type == KeyType::MOUSE) {
+			if(glfwGetMouseButton(window, key) == GLFW_PRESS) {
+				return State::PRESS;
+			}
+			else if(glfwGetMouseButton(window, key) == GLFW_RELEASE) {
+				return State::RELEASE;
+			}
 		}
-		else if (glfwGetKey(window, key) == GLFW_REPEAT) {
-			return STATE::REPEAT;
-		}
-		return STATE::IDLE;
+		return State::IDLE;
 	}
 
-	std::string stateToString(STATE state) {
+	std::string stateToString(State state) {
 		std::string state_str = "Invalid";
 
-		if(state == STATE::PRESS) {
+		if(state == State::PRESS) {
 			state_str = "PRESS";
 		}
-		else if(state == STATE::RELEASE) {
+		else if(state == State::RELEASE) {
 			state_str = "RELEASE";
 		}
-		else if(state == STATE::REPEAT) {
+		else if(state == State::REPEAT) {
 			state_str = "REPEAT";
 		}
-		else if(state == STATE::IDLE) {
+		else if(state == State::IDLE) {
 			state_str = "IDLE";
 		}
 		return state_str;

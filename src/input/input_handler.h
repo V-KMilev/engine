@@ -9,6 +9,16 @@
 class GLFWwindow;
 
 namespace Engine {
+	struct Mouse {
+		bool isLeftPressed  = false;
+		bool isRightPressed = false;
+
+		double x = 0.0f;
+		double y = 0.0f;
+
+		double speed = 0.1f;
+	};
+
 	class InputHandle {
 		public:
 			InputHandle();
@@ -20,17 +30,21 @@ namespace Engine {
 			InputHandle(InputHandle && other) = delete;
 			InputHandle& operator =(InputHandle && other) = delete;
 
-			bool init();
-			bool deinit();
+			const Mouse& getMouse() const;
+			Mouse& getMouse();
 
-			void mapKeyandStatetoEvent(int key, STATE state, std::function<void()> event, const std::string& event_hint = "");
+			void mapKeyandStatetoEvent(int key, State state, std::function<void()> event, const std::string& event_hint = "");
 
+			void processPos(GLFWwindow* window);
 		public:
 			static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+			static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
-			void processInput(GLFWwindow* window, int key) const;
+			void processKey(GLFWwindow* window, int key, KeyType tpye) const;
 
 		private:
+			Mouse _mMouse;
+
 			std::unordered_map<InputKey, std::function<void()>> _mapOfEvents;
 	};
 };
