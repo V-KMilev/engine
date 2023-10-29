@@ -1,17 +1,24 @@
-set(ENGINE_SRC_DIR ${ENGINE_SOURCE_DIR}/src)
+set(ENGINE_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(SOURCES
+	${ENGINE_SRC_DIR}/camera/camera.cpp
+	${ENGINE_SRC_DIR}/camera/perspective_camera.cpp
+
 	${ENGINE_SRC_DIR}/input/input_handler.cpp
 	${ENGINE_SRC_DIR}/input/input_key.cpp
+
 	${ENGINE_SRC_DIR}/logger/logger.cpp
 	${ENGINE_SRC_DIR}/window/window.cpp
+	${ENGINE_SRC_DIR}/scene/scene.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+	${ENGINE_SRC_DIR}/camera
 	${ENGINE_SRC_DIR}/window
 	${ENGINE_SRC_DIR}/logger
 	${ENGINE_SRC_DIR}/utils
 	${ENGINE_SRC_DIR}/input
+	${ENGINE_SRC_DIR}/scene
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
