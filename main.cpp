@@ -5,8 +5,8 @@
 int main(void) {
 	printf("Staring..\n");
 
-	const uint32_t width  = 800;
-	const uint32_t hight  = 400;
+	const uint32_t width  = 1920;
+	const uint32_t hight  = 1080;
 	const uint32_t AA     = 4;
 	const bool fullscreen = false;
 

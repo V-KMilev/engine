@@ -10,11 +10,11 @@ set(SOURCES
 	main.cpp
 )
 
-add_subdirectory(${ENGINE_SOURCE_DIR}/modules/vkmGL)
+add_subdirectory(${PROJECT_SOURCE_DIR}/modules/vkmGL)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-add_subdirectory(${ENGINE_SOURCE_DIR}/src)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 target_link_libraries(${PROJECT_NAME}
 	vkmGL

@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
-#include "input_handler.h"
+namespace Engine {
+	class InputHandle;
+}
 
 // To avoid including the full GLFW implementation, we forward declaration GLFWwindow
 class GLFWwindow;
@@ -12,9 +15,9 @@ namespace Engine {
 		public:
 			Window(
 				const std::string& title,
-				uint32_t width,
-				uint32_t height,
-				uint32_t antiAliasing,
+				unsigned int width,
+				unsigned int height,
+				unsigned int antiAliasing,
 				bool fullscreen
 			);
 			~Window();
@@ -36,17 +39,18 @@ namespace Engine {
 			void input_config();
 
 		private:
-			GLFWwindow* _window;
+			GLFWwindow* _mWindow;
 
-			std::string _title;
-			uint32_t _width;
-			uint32_t _height;
+			std::shared_ptr<InputHandle> _mInput;
 
-			uint32_t _AA;
+			std::string _mTitle = "";
 
-			bool _fullscreen;
-			bool _close;
+			unsigned int _mWidth  = 0;
+			unsigned int _mHeight = 0;
 
-			InputHandle _input;
+			unsigned int _mAA = 0;
+
+			bool _mFullscreen = false;
+			bool _mClose      = false;
 	};
 };

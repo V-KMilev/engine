@@ -10,23 +10,27 @@
 
 #include "logger.h"
 
-#include "gl_render.h"
+#include "input_handler.h"
+
+#include "gl_quad.h"
 #include "gl_shader.h"
-#include "gl_triangle.h"
+#include "perspective_camera.h"
+
+#include "scene.h"
 
 namespace Engine {
 	Window::Window(
 		const std::string& title,
-		uint32_t width,
-		uint32_t height,
-		uint32_t antiAliasing,
+		unsigned int width,
+		unsigned int height,
+		unsigned int antiAliasing,
 		bool fullscreen
-	) : _title(title),
-		_width(width),
-		_height(height),
-		_AA(antiAliasing),
-		_fullscreen(fullscreen),
-		_close(false) {}
+	) : _mTitle(title),
+		_mWidth(width),
+		_mHeight(height),
+		_mAA(antiAliasing),
+		_mFullscreen(fullscreen),
+		_mClose(false) {}
 
 	Window::~Window() {
 		deinit();
@@ -44,23 +48,23 @@ namespace Engine {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		// Anti Aliasing. The second parameter is how many samples per pixels to cast.
-		glfwWindowHint(GLFW_SAMPLES, _AA);
+		glfwWindowHint(GLFW_SAMPLES, _mAA);
 
 		GLFWmonitor* mode = NULL;
 
-		if (_fullscreen) {
+		if (_mFullscreen) {
 			mode = glfwGetPrimaryMonitor();
 		}
 
-		_window = glfwCreateWindow(
-			_width,
-			_height,
-			_title.c_str(),
+		_mWindow = glfwCreateWindow(
+			_mWidth,
+			_mHeight,
+			_mTitle.c_str(),
 			mode,
 			nullptr
 		);
 
-		if (!_window) {
+		if (!_mWindow) {
 			LOG("Failed to create GLFW window", LOG_LEVEL::L_ERROR);
 
 			glfwTerminate();
@@ -68,7 +72,7 @@ namespace Engine {
 		}
 
 		// Make the window's context current
-		glfwMakeContextCurrent(_window);
+		glfwMakeContextCurrent(_mWindow);
 		gladLoadGL(glfwGetProcAddress);
 		// FPS cap
 		glfwSwapInterval(0);
@@ -85,18 +89,22 @@ namespace Engine {
 
 	void Window::set_close(bool flag) {
 		LOG("Close event is send", LOG_LEVEL::L_INFO);
-		_close = flag;
+		_mClose = flag;
 	}
 
 	void Window::input_config() {
+		_mInput = std::make_shared<InputHandle>();
+
 		// TODO: Find better "hack" for this to work
-		glfwSetKeyCallback(_window, _input.keyCallback);
-		glfwSetWindowUserPointer(_window, &_input);
+		glfwSetKeyCallback(_mWindow, _mInput->keyCallback);
+		glfwSetMouseButtonCallback(_mWindow, _mInput->mouseButtonCallback);
+
+		glfwSetWindowUserPointer(_mWindow, _mInput.get());
 
 		// Mapping exit button
-		_input.mapKeyandStatetoEvent(
+		_mInput->mapKeyandStatetoEvent(
 			GLFW_KEY_C,
-			STATE::PRESS,
+			State::PRESS,
 			std::function<void()>(
 				[this] { set_close(true); }
 			),
@@ -105,26 +113,25 @@ namespace Engine {
 	}
 
 	void Window::main_loop() {
-		Core::Renderer render;
+		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(_mInput, _mWidth, _mHeight);
 
-		Core::Shader shader("F:\\cpp\\engine\\src\\shaders\\triangle\\");
+		_mScene->addObject(std::make_shared<Core::Quad>());
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle\\"));
+		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
-		Core::Triangle triangle;
+		while(!glfwWindowShouldClose(_mWindow)) {
+			_mInput->processPos(_mWindow);
 
-		while(!glfwWindowShouldClose(_window)) {
-			render.clearColor();
-			render.clear();
+			_mScene->render();
 
-			triangle.draw(render, shader);
+			// Swap front and back buffers
+			glfwSwapBuffers(_mWindow);
 
-			/* Swap front and back buffers */
-			glfwSwapBuffers(_window);
-
-			/* Poll for and process events */
+			// Poll for and process events
 			glfwPollEvents();
 
-			if(_close) {
-				glfwSetWindowShouldClose(_window, _close);
+			if(_mClose) {
+				glfwSetWindowShouldClose(_mWindow, _mClose);
 			}
 		}
 	}
