@@ -73,10 +73,17 @@ namespace Engine {
 	};
 
 	struct UseData {
-		bool isActive = false;
+		public:
+			bool isActive = false;
 
-		float moveSpeed  = 1.0f;
-		float mouseSpeed = 0.1f;
+			float moveSpeed  = 1.0f;
+			float mouseSpeed = 0.1f;
+
+		public:
+			float horizontalAngle = 0.0f;
+			float verticalAngle   = 0.0f;
+
+			float maxUpAngle = 2.0f;
 	};
 
 	class Camera {
@@ -99,14 +106,15 @@ namespace Engine {
 			virtual void draw(const Core::Shader& shader) const = 0;
 
 			virtual void update(
+				float deltaTime,
 				UpdateEvent event,
 				PositionEvent pEvent = PositionEvent::NONE,
 				TargetEvent tEvent   = TargetEvent::NONE
 			) = 0;
 
 		protected:
-			void updatePosition(PositionEvent event);
-			void updateTarget(TargetEvent event);
+			void updatePosition(PositionEvent event, float deltaTime);
+			void updateTarget(TargetEvent event, float deltaTime);
 
 		protected:
 			Core::Common::ObjectID _mID;

@@ -11,6 +11,12 @@ namespace Engine {
 class GLFWwindow;
 
 namespace Engine {
+	struct deltaTime {
+		float lastTime    = 0.0f;
+		float currentTime = 0.0f;
+		float deltaTime   = 0.0f;
+	};
+
 	class Window {
 		public:
 			Window(
@@ -34,11 +40,17 @@ namespace Engine {
 			void main_loop();
 
 		private:
-			void set_close(bool flag);
+			void gl_config();
 
 			void input_config();
 
+			void set_close(bool flag);
+
+			float time_tick();
+
 		private:
+			deltaTime _mDelta;
+
 			GLFWwindow* _mWindow;
 
 			std::shared_ptr<InputHandle> _mInput;

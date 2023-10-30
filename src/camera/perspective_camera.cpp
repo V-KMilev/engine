@@ -68,12 +68,12 @@ namespace Engine {
 		shader.setUniform1f("uFar", _mWorldData.c_far);
 	}
 
-	void PerspectiveCamera::update(UpdateEvent event, PositionEvent pEvent, TargetEvent tEvent) {
+	void PerspectiveCamera::update(float deltaTime, UpdateEvent event, PositionEvent pEvent, TargetEvent tEvent) {
 		if (event == UpdateEvent::POSITION) {
-			updatePosition(pEvent);
+			updatePosition(pEvent, deltaTime);
 		}
 		else if (event == UpdateEvent::TARGET) {
-			updateTarget(tEvent);
+			updateTarget(tEvent, deltaTime);
 		}
 		else if (event == UpdateEvent::C_NEAR) {
 			updateProjection();

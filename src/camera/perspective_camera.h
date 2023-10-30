@@ -20,6 +20,7 @@ namespace Engine {
 			void draw(const Core::Shader& shader) const override;
 
 			void update(
+				float deltaTime,
 				UpdateEvent event,
 				PositionEvent pEvent = PositionEvent::NONE,
 				TargetEvent tEvent   = TargetEvent::NONE

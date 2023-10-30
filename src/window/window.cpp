@@ -10,13 +10,13 @@
 
 #include "logger.h"
 
-#include "input_handler.h"
-
-#include "gl_quad.h"
-#include "gl_shader.h"
 #include "perspective_camera.h"
-
+#include "input_handler.h"
 #include "scene.h"
+
+#include "gl_error_handle.h"
+#include "gl_shader.h"
+#include "gl_quad.h"
 
 namespace Engine {
 	Window::Window(
@@ -87,9 +87,19 @@ namespace Engine {
 		return true;
 	}
 
-	void Window::set_close(bool flag) {
-		LOG("Close event is send", LOG_LEVEL::L_INFO);
-		_mClose = flag;
+	void Window::gl_config() {
+		MY_GL_CHECK(glEnable(GL_PROGRAM_POINT_SIZE));
+		MY_GL_CHECK(glEnable(GL_MULTISAMPLE));
+
+		// Sourse: https://learnopengl.com/Advanced-OpenGL/Depth-testing
+		MY_GL_CHECK(glEnable(GL_DEPTH_TEST));
+		MY_GL_CHECK(glDepthFunc(GL_LESS));
+
+		// Properly filter across cubemap faces
+		MY_GL_CHECK(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+
+		// Anti Aliasing
+		MY_GL_CHECK(glEnable(GL_MULTISAMPLE));
 	}
 
 	void Window::input_config() {
@@ -112,14 +122,32 @@ namespace Engine {
 		);
 	}
 
+	void Window::set_close(bool flag) {
+		LOG("Close event is send", LOG_LEVEL::L_INFO);
+		_mClose = flag;
+	}
+
+	float Window::time_tick() {
+		_mDelta.currentTime = (float)glfwGetTime();
+		_mDelta.deltaTime   = _mDelta.currentTime - _mDelta.lastTime;
+		_mDelta.lastTime    = _mDelta.currentTime;
+
+		return _mDelta.deltaTime;
+	}
+
 	void Window::main_loop() {
+		gl_config();
+
 		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(_mInput, _mWidth, _mHeight);
 
 		_mScene->addObject(std::make_shared<Core::Quad>());
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick\\"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle\\"));
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
 		while(!glfwWindowShouldClose(_mWindow)) {
+			_mScene->updateTime(time_tick());
+
 			_mInput->processPos(_mWindow);
 
 			_mScene->render();

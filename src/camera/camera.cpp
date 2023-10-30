@@ -39,13 +39,13 @@ namespace Engine {
 		return _mUseData;
 	}
 
-	void Camera::updatePosition(PositionEvent event) {
-		if      (event == PositionEvent::POSX) { _mWorldData.position += _mUseData.moveSpeed * _mWorldData.front; }
-		else if (event == PositionEvent::NEGX) { _mWorldData.position -= _mUseData.moveSpeed * _mWorldData.front; }
-		else if (event == PositionEvent::POSY) { _mWorldData.position += _mUseData.moveSpeed * _mWorldData.up; }
-		else if (event == PositionEvent::NEGY) { _mWorldData.position -= _mUseData.moveSpeed * _mWorldData.up; }
-		else if (event == PositionEvent::POSZ) { _mWorldData.position += _mUseData.moveSpeed * _mWorldData.right; }
-		else if (event == PositionEvent::NEGZ) { _mWorldData.position -= _mUseData.moveSpeed * _mWorldData.right; }
+	void Camera::updatePosition(PositionEvent event, float deltaTime) {
+		if      (event == PositionEvent::POSX) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
+		else if (event == PositionEvent::NEGX) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
+		else if (event == PositionEvent::POSY) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.up; }
+		else if (event == PositionEvent::NEGY) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.up; }
+		else if (event == PositionEvent::POSZ) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
+		else if (event == PositionEvent::NEGZ) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
 		else {
 			return;
 		}
@@ -53,13 +53,13 @@ namespace Engine {
 		_mWorldData.updateLookAt();
 	}
 
-	void Camera::updateTarget(TargetEvent event) {
-		if      (event == TargetEvent::POSX) { _mWorldData.target += _mUseData.mouseSpeed * _mWorldData.mouseFront; }
-		else if (event == TargetEvent::NEGX) { _mWorldData.target -= _mUseData.mouseSpeed * _mWorldData.mouseFront; }
-		else if (event == TargetEvent::POSY) { _mWorldData.target += _mUseData.mouseSpeed * _mWorldData.mouseUp; }
-		else if (event == TargetEvent::NEGY) { _mWorldData.target -= _mUseData.mouseSpeed * _mWorldData.mouseUp; }
-		else if (event == TargetEvent::POSZ) { _mWorldData.target += _mUseData.mouseSpeed * _mWorldData.mouseRight; }
-		else if (event == TargetEvent::NEGZ) { _mWorldData.target -= _mUseData.mouseSpeed * _mWorldData.mouseRight; }
+	void Camera::updateTarget(TargetEvent event, float deltaTime) {
+		if      (event == TargetEvent::POSX) { _mWorldData.target += deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseFront; }
+		else if (event == TargetEvent::NEGX) { _mWorldData.target -= deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseFront; }
+		else if (event == TargetEvent::POSY) { _mWorldData.target += deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseUp; }
+		else if (event == TargetEvent::NEGY) { _mWorldData.target -= deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseUp; }
+		else if (event == TargetEvent::POSZ) { _mWorldData.target += deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseRight; }
+		else if (event == TargetEvent::NEGZ) { _mWorldData.target -= deltaTime * _mUseData.mouseSpeed * _mWorldData.mouseRight; }
 		else {
 			return;
 		}
