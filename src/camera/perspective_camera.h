@@ -23,7 +23,9 @@ namespace Engine {
 				float deltaTime,
 				UpdateEvent event,
 				PositionEvent pEvent = PositionEvent::NONE,
-				TargetEvent tEvent   = TargetEvent::NONE
+				const Mouse* mouse = nullptr,
+				unsigned int width = 0,
+				unsigned int hight = 0
 			) override;
 
 		private:

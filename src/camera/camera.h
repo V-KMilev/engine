@@ -11,6 +11,10 @@ namespace Core {
 }
 
 namespace Engine {
+	struct Mouse;
+};
+
+namespace Engine {
 	enum class CameraType {
 		NONE        = 0,
 		PERSPECTIVE = 1
@@ -37,47 +41,33 @@ namespace Engine {
 		NEGZ = 6
 	};
 
-	enum class TargetEvent {
-		NONE = 0,
-		POSX = 1,
-		NEGX = 2,
-		POSY = 3,
-		NEGY = 4,
-		POSZ = 5,
-		NEGZ = 6
-	};
-
 	struct CameraWorldData {
 		public:
 			void updateLookAt();
 
 		public:
-			glm::vec3 position = glm::vec3(-1.0f, 0.0f, -1.0f);
-			glm::vec3 target   = glm::vec3(1.0f, 0.0f, 1.0f);
+			glm::vec3 position = glm::vec3(0.0f, 1.0f, -5.0f);
+			glm::vec3 target   = glm::vec3(0.0f, 1.0f, 1.0f);
 
 			glm::mat4 lookAt = glm::lookAt(position, target, up);
 	
 			glm::mat4 projection = glm::mat4(1.0f);
 
-			float c_near = 0.001f;
+			float c_near = 0.01f;
 			float c_far  = 100.0f;
 
 		public:
 			glm::vec3 front = glm::vec3(1.0f, 0.0f,  1.0f);
 			glm::vec3 right = glm::vec3(1.0f, 0.0f, -1.0f);
 			glm::vec3 up    = glm::vec3(0.0f, 1.0f,  0.0f);
-
-			glm::vec3 mouseFront = glm::vec3(1.0f, 0.0f,  1.0f);
-			glm::vec3 mouseRight = glm::vec3(1.0f, 0.0f, -1.0f);
-			glm::vec3 mouseUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 	};
 
 	struct UseData {
 		public:
 			bool isActive = false;
 
-			float moveSpeed  = 1.0f;
-			float mouseSpeed = 0.1f;
+			float moveSpeed  = 10.0f;
+			float mouseSpeed = 4.0f;
 
 		public:
 			float horizontalAngle = 0.0f;
@@ -109,12 +99,14 @@ namespace Engine {
 				float deltaTime,
 				UpdateEvent event,
 				PositionEvent pEvent = PositionEvent::NONE,
-				TargetEvent tEvent   = TargetEvent::NONE
+				const Mouse* mouse = nullptr,
+				unsigned int width = 0,
+				unsigned int hight = 0
 			) = 0;
 
 		protected:
 			void updatePosition(PositionEvent event, float deltaTime);
-			void updateTarget(TargetEvent event, float deltaTime);
+			void updateTarget(const Mouse* mouse, float deltaTime, unsigned int width, unsigned int hight);
 
 		protected:
 			Core::Common::ObjectID _mID;
