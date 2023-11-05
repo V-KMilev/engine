@@ -8,17 +8,19 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/input/input_key.cpp
 
 	${ENGINE_SRC_DIR}/logger/logger.cpp
-	${ENGINE_SRC_DIR}/window/window.cpp
 	${ENGINE_SRC_DIR}/scene/scene.cpp
+	${ENGINE_SRC_DIR}/ui/ui.cpp
+	${ENGINE_SRC_DIR}/window/window.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/camera
-	${ENGINE_SRC_DIR}/window
-	${ENGINE_SRC_DIR}/logger
-	${ENGINE_SRC_DIR}/utils
 	${ENGINE_SRC_DIR}/input
+	${ENGINE_SRC_DIR}/logger
 	${ENGINE_SRC_DIR}/scene
+	${ENGINE_SRC_DIR}/ui
+	${ENGINE_SRC_DIR}/utils
+	${ENGINE_SRC_DIR}/window
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})

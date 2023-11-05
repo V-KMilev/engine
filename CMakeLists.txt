@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.21.0)
 project(Engine VERSION 0.1.0 LANGUAGES C CXX)
 
 # Set the C++ standard to 17
@@ -14,8 +14,13 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/modules/vkmGL)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Include the sources from subdirectories
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
+# Link the main target with external libraries
 target_link_libraries(${PROJECT_NAME}
 	vkmGL
+	glfw
+	imgui
+	${CMAKE_DL_LIBS}
 )
