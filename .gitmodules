@@ -1,6 +1,3 @@
 [submodule "modules/vkmGL"]
 	path = modules/vkmGL
 	url = https://github.com/V-KMilev/vkmGL.git
-[submodule "modules/imgui"]
-	path = modules/imgui
-	url = https://github.com/ocornut/imgui.git
