@@ -1,8 +1,5 @@
 #include "input_handler.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include "logger.h"
 
 namespace Engine{
@@ -59,6 +56,10 @@ namespace Engine{
 	}
 
 	void InputHandle::processPos(GLFWwindow* window) {
-		glfwGetCursorPos(window, &_mMouse.x, &_mMouse.y);
+		double x = 0.0f;
+		double y = 0.0f;
+		glfwGetCursorPos(window, &x, &y);
+		_mMouse.x = x;
+		_mMouse.y = y;
 	}
 };

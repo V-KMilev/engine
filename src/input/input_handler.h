@@ -5,16 +5,16 @@
 
 #include "input_key.h"
 
-// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
-class GLFWwindow;
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 	struct Mouse {
 		bool isLeftPressed  = false;
 		bool isRightPressed = false;
 
-		double x = 0.0f;
-		double y = 0.0f;
+		int x = 0.0f;
+		int y = 0.0f;
 
 		double speed = 0.1f;
 	};
@@ -36,6 +36,7 @@ namespace Engine {
 			void mapKeyandStatetoEvent(int key, State state, std::function<void()> event, const std::string& event_hint = "");
 
 			void processPos(GLFWwindow* window);
+
 		public:
 			static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 			static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

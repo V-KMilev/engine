@@ -3,8 +3,8 @@
 #include <functional>
 #include <string>
 
-// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
-class GLFWwindow;
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 	enum class KeyType {
