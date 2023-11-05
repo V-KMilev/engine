@@ -1,5 +1,5 @@
 #version 330 core
-layout (location = 0) in vec4 position;
+layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 texCoords;
 
 uniform mat4 uProjection;
@@ -7,14 +7,30 @@ uniform mat4 uView;
 uniform mat4 uModel;
 
 out VS_OUT {
-	vec3 position;
-	vec3 normal;
+	vec4 world_position;
+	vec4 position;
+
 	vec2 texCoords;
+	vec3 normal;
+
+	float depth;
+
+	mat4 projection;
+	mat4 view;
 } vs_out;
 
 void main() {
-	vs_out.position = vec3(uModel * position);
+	vec4 world_position = uProjection * uView * uModel * vec4(position, 1.0);
+
+	vs_out.position       = uModel * vec4(position, 1.0);
+	vs_out.world_position = world_position;
+
 	vs_out.texCoords = texCoords;
 
-	gl_Position = uProjection * uView * uModel * position; //uProjection * uView * uModel * position;
+	vs_out.depth = world_position.z / world_position.w;
+
+	vs_out.projection = uProjection;
+	vs_out.view       = uView;
+
+	gl_Position = world_position;
 }

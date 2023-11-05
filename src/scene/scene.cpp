@@ -1,22 +1,36 @@
 #include "scene.h"
 
-#include <glad/gl.h>
+#ifdef _WIN32
+	#include <windows.h>
+#endif
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#include "gl_error_handle.h"
 
 #include "gl_render.h"
 #include "gl_shader.h"
 
-#include "gl_texture.h"
 #include "gl_pick_texture.h"
+#include "gl_texture.h"
 
 #include "gl_object.h"
-#include "camera.h"
+#include "gl_quad.h"
 
 #include "input_handler.h"
+#include "ui.h"
+
+#include "camera.h"
 
 namespace Engine {
-	Scene::Scene(std::shared_ptr<InputHandle> inputHandle, unsigned int width, unsigned int height) :
+	Scene::Scene(
+		GLFWwindow* window,
+		const char* gl_version,
+		std::shared_ptr<InputHandle> inputHandle,
+		unsigned int width,
+		unsigned int height
+	) :
 		_mWidth(width),
 		_mHeight(height),
 		_mInput(inputHandle),
@@ -25,16 +39,33 @@ namespace Engine {
 		_mCameras({}),
 		_mShaders({})
 	{
+		_mUI = std::make_shared<UI>(window, gl_version, _mWidth, _mHeight);
+
 		_mRenderer = std::make_shared<Core::Renderer>();
 
-		keyBinds();
+		_mPickTexture = std::make_shared<Core::PickTexture>(_mWidth, _mHeight);
+		_mGrid = std::make_shared<Core::Quad>();
+
+		keyBinds(window);
 	}
 
 	void Scene::render() const {
 		_mRenderer->clearColor();
 		_mRenderer->clear();
 
-		normalDraw();
+		for(const std::shared_ptr<Core::Shader>& shader : _mShaders) {
+			if (shader->getName() == "infinite_grid") {
+				drawGrid(shader);
+			}
+			else if (shader->getName() == "pick") {
+				pickDraw(shader);
+			}
+			else if(shader->getName() == "triangle") {
+				draw(shader);
+			}
+		}
+
+		drawUI();
 	}
 
 	void Scene::addObject(std::shared_ptr<Core::Object> && object) {
@@ -46,44 +77,59 @@ namespace Engine {
 	}
 
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
+		if(_mCameras.size() == 0) {
+			camera->getUseData().isActive = true;
+		}
+
 		_mCameras.push_back(camera);
 	}
 
-	void Scene::pickDraw() const {
-		// Core::PickTexture pTexture;
-		// pTexture.enableWriting();
-
-		// _mRenderer->clear();
-
-		// // shader.setUniform1i("gObjectIndex", 1);
-
-		// pTexture.disableWriting();
-
-		// //Render Phase
-		// const double& x = _mInput->getMouse().x;
-		// const double& y = _mInput->getMouse().y;
-
-		// _mRenderer->clear();
-
-		// // int clicked_object_id = -1;
-
-		// Core::PixelInfo Pixel = pTexture.readPixel(x, _mHeight - y - 1);
-
-		// // if (Pixel.objectID != 0) {
-		// // 	clicked_object_id = Pixel.objectID - 1;
-		// // }
+	void Scene::updateTime(float deltaTime) {
+		_mDeltaTime = deltaTime;
 	}
 
-	void Scene::normalDraw() const {
-		for(const std::shared_ptr<Core::Shader>& shader : _mShaders) {
+	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
+		shader->bind();
 
-			for(const std::shared_ptr<Core::Object>& object : _mObjects) {
-				object->draw(*_mRenderer, *shader);
-			}
-
-			for(const std::shared_ptr<Camera>& camera : _mCameras) {
+		for(const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (camera->getUseData().isActive) {
 				camera->draw(*shader);
 			}
+		}
+
+		_mGrid->draw(*_mRenderer, *shader);
+	}
+
+	void Scene::pickDraw(const std::shared_ptr<Core::Shader>& shader) const {
+		_mPickTexture->enableWriting();
+
+		_mRenderer->clear();
+
+		shader->bind();
+
+		draw(shader);
+
+		_mPickTexture->disableWriting();
+	}
+
+	void Scene::draw(const std::shared_ptr<Core::Shader>& shader) const {
+		for(const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (camera->getUseData().isActive) {
+				camera->draw(*shader);
+			}
+		}
+
+		for(const std::shared_ptr<Core::Object>& object : _mObjects) {
+			shader->setUniform1ui("uObjectID", object->getID());
+			object->draw(*_mRenderer, *shader);
+		}
+	}
+
+	void Scene::drawUI() const {
+		if (_mUI->getData().isActive) {
+			_mUI->newFrame();
+			_mUI->ui();
+			_mUI->render();
 		}
 	}
 
@@ -91,26 +137,56 @@ namespace Engine {
 		// TODO
 	}
 
+	void Scene::pickEvent() {
+		int x = _mInput->getMouse().x;
+		int y = _mHeight - _mInput->getMouse().y - 1;
+
+		Core::PixelInfo pixel = _mPickTexture->readPixel(x, y);
+
+		if (pixel.objectID > 0) {
+			// TODO: Add pick logic
+		}
+	}
+
+	void Scene::updateUI() {
+		if (!_mUI->getData().isActive) {
+			_mUI->getData().isActive = true;
+			MY_GL_CHECK(glViewport(
+				_mWidth  * 1 / 4,
+				_mHeight * 2 / 8,
+				_mWidth  * 2 / 4,
+				_mHeight * 2 / 4
+			));
+		}
+		else {
+			_mUI->getData().isActive = false;
+
+			MY_GL_CHECK(glViewport(0, 0, _mWidth, _mHeight));
+		}
+	}
+
 	void Scene::updateCameras(
 		UpdateEvent event,
-		PositionEvent pEvent,
-		TargetEvent tEvent
+		PositionEvent pEvent
 	) {
 		for(std::shared_ptr<Camera>& camera : _mCameras) {
-			if (!camera->getUseData().isActive) {
-				camera->update(event, pEvent, tEvent);
+			if (camera->getUseData().isActive) {
+				camera->update(_mDeltaTime, event, pEvent, &_mInput->getMouse(), _mWidth, _mHeight);
 			}
 		}
 	}
 
-	void Scene::keyBinds() {
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::POSX);} ), "+x");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX);} ), "-x");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::POSY);} ), "+y");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_E, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY);} ), "-y");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ);} ), "+z");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] {updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ);} ), "-z");
+	void Scene::keyBinds(GLFWwindow* window) {
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_E, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] {printf("X: %f, Y: %f\n", _mInput->getMouse().x, _mInput->getMouse().y);} ), "Print mouse position");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { updateUI(); } ), "Activate UI");
+
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View move");
+		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEvent(); } ), "Select ability");
 	}
 };

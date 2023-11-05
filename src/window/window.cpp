@@ -75,7 +75,7 @@ namespace Engine {
 		glfwMakeContextCurrent(_mWindow);
 		gladLoadGL(glfwGetProcAddress);
 		// FPS cap
-		glfwSwapInterval(0);
+		glfwSwapInterval(1);
 
 		input_config();
 
@@ -91,7 +91,6 @@ namespace Engine {
 		MY_GL_CHECK(glEnable(GL_PROGRAM_POINT_SIZE));
 		MY_GL_CHECK(glEnable(GL_MULTISAMPLE));
 
-		// Sourse: https://learnopengl.com/Advanced-OpenGL/Depth-testing
 		MY_GL_CHECK(glEnable(GL_DEPTH_TEST));
 		MY_GL_CHECK(glDepthFunc(GL_LESS));
 
@@ -138,11 +137,19 @@ namespace Engine {
 	void Window::main_loop() {
 		gl_config();
 
-		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(_mInput, _mWidth, _mHeight);
+		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(
+			_mWindow,
+			"#version 330",
+			_mInput,
+			_mWidth,
+			_mHeight
+		);
 
 		_mScene->addObject(std::make_shared<Core::Quad>());
-		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick\\"));
-		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle\\"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
 		while(!glfwWindowShouldClose(_mWindow)) {

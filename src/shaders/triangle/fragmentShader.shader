@@ -1,26 +1,29 @@
 #version 330 core
 
+layout(location = 0) out vec4 outColor;
+
 uniform sampler2D tmp;
 
+uniform float uNear;
 uniform float uFar;
 
-uniform uint gDrawIndex;
-uniform uint gObjectIndex;
-
-out vec4 FragColor;
-
 in VS_OUT {
-	vec3 position;
-	vec3 normal;
+	vec4 world_position;
+	vec4 position;
+
 	vec2 texCoords;
+	vec3 normal;
+
+	float depth;
+
+	mat4 projection;
+	mat4 view;
 } fs_in;
 
-
 void main() {
-	vec4 positionColor = vec4(fs_in.position.x, fs_in.position.y, fs_in.position.z, 1.0f);
+	gl_FragDepth = fs_in.depth;
 
-	vec4 texColor = texture(tmp, fs_in.texCoords) + positionColor;
-	FragColor = texColor;
+	vec4 positionColor = vec4(fs_in.world_position.x, fs_in.world_position.y, fs_in.world_position.z, 1.0);
 
-	// FragColor = vec3(float(gObjectIndex), float(gDrawIndex), float(gl_PrimitiveID + 1));// + vec3(texColor);
+	outColor = texture(tmp, fs_in.texCoords) + vec4(positionColor.xyz, 1.0);
 }

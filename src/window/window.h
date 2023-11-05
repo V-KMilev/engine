@@ -7,8 +7,9 @@ namespace Engine {
 	class InputHandle;
 }
 
-// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
-class GLFWwindow;
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 	struct deltaTime {
@@ -49,11 +50,11 @@ namespace Engine {
 			float time_tick();
 
 		private:
-			deltaTime _mDelta;
-
 			GLFWwindow* _mWindow;
 
 			std::shared_ptr<InputHandle> _mInput;
+
+			deltaTime _mDelta;
 
 			std::string _mTitle = "";
 
