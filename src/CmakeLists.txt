@@ -4,6 +4,10 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/camera/camera.cpp
 	${ENGINE_SRC_DIR}/camera/perspective_camera.cpp
 
+	${ENGINE_SRC_DIR}/geometry/object.cpp
+	${ENGINE_SRC_DIR}/geometry/quad.cpp
+	${ENGINE_SRC_DIR}/geometry/triangle.cpp
+
 	${ENGINE_SRC_DIR}/input/input_handler.cpp
 	${ENGINE_SRC_DIR}/input/input_key.cpp
 
@@ -15,6 +19,7 @@ set(SOURCES
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/camera
+	${ENGINE_SRC_DIR}/geometry
 	${ENGINE_SRC_DIR}/input
 	${ENGINE_SRC_DIR}/logger
 	${ENGINE_SRC_DIR}/scene
