@@ -26,6 +26,14 @@ namespace Engine {
 		return *this;
 	}
 
+	unsigned int Camera::getID() const {
+		return _mID.getID();
+	}
+
+	CameraType Camera::getTpye() const {
+		return _mType;
+	}
+
 	const CameraWorldData& Camera::getWorldData() const {
 		return _mWorldData;
 	}
@@ -41,54 +49,53 @@ namespace Engine {
 		return _mUseData;
 	}
 
-	void Camera::updatePosition(PositionEvent event, float deltaTime) {
-		if      (event == PositionEvent::POSX) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
-		else if (event == PositionEvent::NEGX) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
-		else if (event == PositionEvent::POSY) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
-		else if (event == PositionEvent::NEGY) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
-		else if (event == PositionEvent::POSZ) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
-		else if (event == PositionEvent::NEGZ) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
+	void Camera::update(
+		UpdateEvent event,
+		PositionEvent pEvent,
+		float deltaTime,
+		const Mouse* mouse
+	) {
+		if (event == UpdateEvent::POSITION) {
+			_mUseData.hasUpdate = true;
+			updatePosition(pEvent, deltaTime);
+		}
+		else if (event == UpdateEvent::TARGET) {
+			_mUseData.hasUpdate = true;
+			updateTarget(mouse, deltaTime);
+		}
+		else if (event == UpdateEvent::FOV) {
+			_mUseData.hasUpdate = true;
+			zoom(mouse, deltaTime);
+		}
+		else if (event == UpdateEvent::UI) {
+			updateProjection();
+			_mWorldData.updateLookAt();
+		}
 		else {
 			return;
 		}
-
-		_mWorldData.updateLookAt();
+		_mUseData.hasUpdate = false;
 	}
 
-	void Camera::updateTarget(const Mouse* mouse, float deltaTime, unsigned int width, unsigned int height) {
-		// TODO: Fix it
+	void Camera::updatePosition(PositionEvent event, float deltaTime) {
+		if(_mUseData.hasUpdate) {
+			if      (event == PositionEvent::POSX) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
+			else if (event == PositionEvent::NEGX) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
+			else if (event == PositionEvent::POSY) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
+			else if (event == PositionEvent::NEGY) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
+			else if (event == PositionEvent::POSZ) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
+			else if (event == PositionEvent::NEGZ) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
+			else {
+				return;
+			}
 
-		// Calculate the mouse movement angles
-		float horizontalDelta = deltaTime * _mUseData.mouseSpeed * (width / 2.0f - mouse->x);
-		float verticalDelta = deltaTime * _mUseData.mouseSpeed * (height / 2.0f - mouse->y);
+			updateLookAt();
+		}
+	}
 
-		// Update the vertical & horizontal angle
-		_mUseData.verticalAngle += verticalDelta;
-		_mUseData.horizontalAngle += horizontalDelta;
-
-		// Clamp the vertical angle
-		_mUseData.verticalAngle = glm::clamp(_mUseData.verticalAngle, -_mUseData.maxUpAngle, _mUseData.maxUpAngle);
-
-		// Calculate the new front direction
-		glm::vec3 front(
-			cos(_mUseData.verticalAngle) * sin(_mUseData.horizontalAngle),
-			sin(_mUseData.verticalAngle),
-			cos(_mUseData.verticalAngle) * cos(_mUseData.horizontalAngle)
-		);
-
-		// Calculate the new right direction
-		glm::vec3 right(
-			sin(_mUseData.horizontalAngle - glm::pi<float>() / 2.0f),
-			0,
-			cos(_mUseData.horizontalAngle - glm::pi<float>() / 2.0f)
-		);
-
-		// Calculate the new up direction
-		glm::vec3 up = glm::cross(right, front);
-
-		// Update camera properties
-		_mWorldData.target = _mWorldData.position + front;
-
-		_mWorldData.updateLookAt();
+	void Camera::updateLookAt() {
+		if(_mUseData.hasUpdate) {
+			_mWorldData.updateLookAt();
+		}
 	}
 };

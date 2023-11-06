@@ -24,11 +24,8 @@ namespace Engine {
 		NONE       = 0,
 		POSITION   = 1,
 		TARGET     = 2,
-		C_NEAR     = 3,
-		C_FAR      = 4,
-		MOVESPEED  = 5,
-		MOUSESPEED = 6,
-		FOV        = 7
+		FOV        = 3,
+		UI         = 4
 	};
 
 	enum class PositionEvent {
@@ -60,20 +57,21 @@ namespace Engine {
 			glm::vec3 front = glm::vec3(1.0f, 0.0f,  1.0f);
 			glm::vec3 right = glm::vec3(1.0f, 0.0f, -1.0f);
 			glm::vec3 up    = glm::vec3(0.0f, 1.0f,  0.0f);
-	};
-
-	struct UseData {
-		public:
-			bool isActive = false;
-
-			float moveSpeed  = 10.0f;
-			float mouseSpeed = 4.0f;
 
 		public:
 			float horizontalAngle = 0.0f;
 			float verticalAngle   = 0.0f;
 
 			float maxUpAngle = 2.0f;
+	};
+
+	struct UseData {
+		public:
+			bool isActive = false;
+			bool hasUpdate = false;
+
+			float moveSpeed  = 10.0f;
+			float mouseSpeed = 0.05f;
 	};
 
 	class Camera {
@@ -87,6 +85,9 @@ namespace Engine {
 			Camera(Camera && other) = delete;
 			Camera& operator = (Camera && other) = delete;
 
+			unsigned int getID() const;
+			CameraType getTpye() const;
+
 			const CameraWorldData& getWorldData() const;
 			CameraWorldData& getWorldData();
 
@@ -96,17 +97,20 @@ namespace Engine {
 			virtual void draw(const Core::Shader& shader) const = 0;
 
 			virtual void update(
-				float deltaTime,
-				UpdateEvent event,
+				UpdateEvent event    = UpdateEvent::NONE,
 				PositionEvent pEvent = PositionEvent::NONE,
-				const Mouse* mouse = nullptr,
-				unsigned int width = 0,
-				unsigned int hight = 0
-			) = 0;
+				float deltaTime      = 0.0f,
+				const Mouse* mouse   = nullptr
+			);
 
 		protected:
 			void updatePosition(PositionEvent event, float deltaTime);
-			void updateTarget(const Mouse* mouse, float deltaTime, unsigned int width, unsigned int hight);
+			void updateLookAt();
+
+			virtual void updateTarget(const Mouse* mouse, float deltaTime) = 0;
+			virtual void updateProjection() = 0;
+
+			virtual void zoom(const Mouse* mouse, float deltaTime) = 0;
 
 		protected:
 			Core::Common::ObjectID _mID;

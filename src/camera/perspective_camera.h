@@ -17,19 +17,19 @@ namespace Engine {
 			float getFov() const;
 			float& getFov();
 
+			unsigned int getWidth() const;
+			unsigned int& getWidth();
+
+			unsigned int getHeight() const;
+			unsigned int& getHeight();
+
 			void draw(const Core::Shader& shader) const override;
 
-			void update(
-				float deltaTime,
-				UpdateEvent event,
-				PositionEvent pEvent = PositionEvent::NONE,
-				const Mouse* mouse = nullptr,
-				unsigned int width = 0,
-				unsigned int hight = 0
-			) override;
-
 		private:
-			void updateProjection();
+			void updateTarget(const Mouse* mouse, float deltaTime) override;
+			void updateProjection() override;
+
+			void zoom(const Mouse* mouse, float deltaTime) override;
 
 		private:
 			float _mFov = 60.0f;
