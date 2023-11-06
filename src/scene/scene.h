@@ -6,7 +6,6 @@
 namespace Core {
 	class Texture;
 	class PickTexture;
-	class Object;
 
 	class Renderer;
 	class Shader;
@@ -16,6 +15,7 @@ namespace Core {
 namespace Engine {
 	class InputHandle;
 	class UI;
+	class Object;
 }
 
 #define GLFW_INCLUDE_NONE
@@ -44,31 +44,25 @@ namespace Engine {
 			Scene& operator = (Scene && other) = delete;
 
 			void render() const;
+			void renderUI();
 
-			void addObject(std::shared_ptr<Core::Object> && object);
+			void update(float deltaTime);
+
+			void addObject(std::shared_ptr<Object> && object);
 			void addShader(std::shared_ptr<Core::Shader> && shader);
 			void addCamera(std::shared_ptr<Camera> && camera);
 
-			void updateTime(float deltaTime);
-
 		private:
 			void drawGrid(const std::shared_ptr<Core::Shader>& shader) const;
-			void pickDraw(const std::shared_ptr<Core::Shader>& shader) const;
-			void draw(const std::shared_ptr<Core::Shader>& shader) const;
-			void drawUI() const;
-
-			void update();
+			void drawPick(const std::shared_ptr<Core::Shader>& shader) const;
+			void drawGeometry(const std::shared_ptr<Core::Shader>& shader) const;
 
 			void pickEvent();
 
 			void updateUI();
+			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
 
-			void updateCameras(
-				UpdateEvent event,
-				PositionEvent pEvent = PositionEvent::NONE
-			);
-
-			void keyBinds(GLFWwindow* window);
+			void keyBinds();
 
 		private:
 			std::shared_ptr<InputHandle> _mInput;
@@ -77,15 +71,13 @@ namespace Engine {
 			std::shared_ptr<Core::Renderer> _mRenderer;
 
 			std::shared_ptr<Core::PickTexture> _mPickTexture;
-			std::shared_ptr<Core::FrameBuffer> FB;
+			std::shared_ptr<Object> _mGrid;
 
 			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
 
 			std::vector<std::shared_ptr<Core::Shader>> _mShaders;
-			std::vector<std::shared_ptr<Core::Object>> _mObjects;
+			std::vector<std::shared_ptr<Object>> _mObjects;
 			std::vector<std::shared_ptr<Camera>> _mCameras;
-
-			std::shared_ptr<Core::Object> _mGrid;
 
 			float _mDeltaTime;
 

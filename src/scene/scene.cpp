@@ -15,8 +15,8 @@
 #include "gl_pick_texture.h"
 #include "gl_texture.h"
 
-#include "gl_object.h"
-#include "gl_quad.h"
+#include "object.h"
+#include "quad.h"
 
 #include "input_handler.h"
 #include "ui.h"
@@ -31,9 +31,9 @@ namespace Engine {
 		unsigned int width,
 		unsigned int height
 	) :
+		_mInput(inputHandle),
 		_mWidth(width),
 		_mHeight(height),
-		_mInput(inputHandle),
 		_mTextures({}),
 		_mObjects({}),
 		_mCameras({}),
@@ -44,9 +44,9 @@ namespace Engine {
 		_mRenderer = std::make_shared<Core::Renderer>();
 
 		_mPickTexture = std::make_shared<Core::PickTexture>(_mWidth, _mHeight);
-		_mGrid = std::make_shared<Core::Quad>();
+		_mGrid = std::make_shared<Quad>();
 
-		keyBinds(window);
+		keyBinds();
 	}
 
 	void Scene::render() const {
@@ -58,17 +58,36 @@ namespace Engine {
 				drawGrid(shader);
 			}
 			else if (shader->getName() == "pick") {
-				pickDraw(shader);
+				drawPick(shader);
 			}
 			else if(shader->getName() == "triangle") {
-				draw(shader);
+				drawGeometry(shader);
 			}
 		}
-
-		drawUI();
 	}
 
-	void Scene::addObject(std::shared_ptr<Core::Object> && object) {
+	void Scene::renderUI() {
+		if (_mUI->getData().isActive) {
+			_mUI->newFrame();
+			_mUI->ui(_mObjects, _mCameras);
+			_mUI->render();
+		}
+	}
+
+	void Scene::update(float deltaTime) {
+		_mDeltaTime = deltaTime;
+
+		for(const std::shared_ptr<Object>& object : _mObjects) {
+			object->update();
+		}
+		for(const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (_mUI->getData().isActive) {
+				camera->update(UpdateEvent::UI);
+			}
+		}
+	}
+
+	void Scene::addObject(std::shared_ptr<Object> && object) {
 		_mObjects.push_back(object);
 	}
 
@@ -84,10 +103,6 @@ namespace Engine {
 		_mCameras.push_back(camera);
 	}
 
-	void Scene::updateTime(float deltaTime) {
-		_mDeltaTime = deltaTime;
-	}
-
 	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
 		shader->bind();
 
@@ -100,41 +115,29 @@ namespace Engine {
 		_mGrid->draw(*_mRenderer, *shader);
 	}
 
-	void Scene::pickDraw(const std::shared_ptr<Core::Shader>& shader) const {
+	void Scene::drawPick(const std::shared_ptr<Core::Shader>& shader) const {
 		_mPickTexture->enableWriting();
 
 		_mRenderer->clear();
 
 		shader->bind();
 
-		draw(shader);
+		drawGeometry(shader);
 
 		_mPickTexture->disableWriting();
 	}
 
-	void Scene::draw(const std::shared_ptr<Core::Shader>& shader) const {
+	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
 				camera->draw(*shader);
 			}
 		}
 
-		for(const std::shared_ptr<Core::Object>& object : _mObjects) {
+		for(const std::shared_ptr<Object>& object : _mObjects) {
 			shader->setUniform1ui("uObjectID", object->getID());
 			object->draw(*_mRenderer, *shader);
 		}
-	}
-
-	void Scene::drawUI() const {
-		if (_mUI->getData().isActive) {
-			_mUI->newFrame();
-			_mUI->ui();
-			_mUI->render();
-		}
-	}
-
-	void Scene::update() {
-		// TODO
 	}
 
 	void Scene::pickEvent() {
@@ -151,9 +154,10 @@ namespace Engine {
 	void Scene::updateUI() {
 		if (!_mUI->getData().isActive) {
 			_mUI->getData().isActive = true;
+
 			MY_GL_CHECK(glViewport(
 				_mWidth  * 1 / 4,
-				_mHeight * 2 / 8,
+				_mHeight * 1 / 4 + ActivityBarWidth * 2,
 				_mWidth  * 2 / 4,
 				_mHeight * 2 / 4
 			));
@@ -165,18 +169,15 @@ namespace Engine {
 		}
 	}
 
-	void Scene::updateCameras(
-		UpdateEvent event,
-		PositionEvent pEvent
-	) {
+	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
 		for(std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
-				camera->update(_mDeltaTime, event, pEvent, &_mInput->getMouse(), _mWidth, _mHeight);
+				camera->update(event, pEvent, _mDeltaTime, &_mInput->getMouse());
 			}
 		}
 	}
 
-	void Scene::keyBinds(GLFWwindow* window) {
+	void Scene::keyBinds() {
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
@@ -186,7 +187,9 @@ namespace Engine {
 
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { updateUI(); } ), "Activate UI");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View move");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
+
 		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEvent(); } ), "Select ability");
 	}
 };

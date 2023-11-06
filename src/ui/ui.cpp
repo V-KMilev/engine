@@ -4,6 +4,12 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "camera.h"
+#include "perspective_camera.h"
+
+#include "object.h"
+#include "quad.h"
+
 #include "gl_error_handle.h"
 
 const ImGuiWindowFlags staticWindow = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing;
@@ -26,7 +32,7 @@ namespace Engine {
 		if (_mData.isActive) {
 			MY_GL_CHECK(glViewport(
 				_mData.width  * 1 / 4,
-				_mData.height * 1 / 4,
+				_mData.height * 1 / 4 + ActivityBarWidth * 4,
 				_mData.width  * 2 / 4,
 				_mData.height * 2 / 4
 			));
@@ -69,14 +75,17 @@ namespace Engine {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void UI::ui() {
+	void UI::ui(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
 		ImGui::ShowDemoWindow();
 		mainManu();
 
-		leftPanel();
-		rightPanel();
+		leftPanel(objects, cameras);
+		rightPanel(objects, cameras);
 
-		topPanel();
+		topPanel(cameras);
 		botPanel();
 	}
 
@@ -96,38 +105,132 @@ namespace Engine {
 		}
 	}
 
-	void UI::leftPanel() {
+	void UI::leftPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
 		// Object Data
 		ImGui::SetNextWindowPos(ImVec2(0, MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowBgAlpha(0.50f);
+		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Left", nullptr, staticWindow);
+
+		// Debug only
+		for(std::shared_ptr<Object>& object : objects) {
+			std::string objectID = std::to_string(object->getID());
+
+			ImGui::BulletText("Object:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", object->getID());
+
+			std::string position = "Position##" + objectID;
+			std::string rotation = "Rotation##" + objectID;
+			std::string scale    = "Scale##"    + objectID;
+	
+			if(ImGui::DragFloat3(position.c_str(), &object->getWorldData().position[0], 1)) {
+				object->getWorldData().hasUpdate = true;
+			}
+			if(ImGui::DragFloat3(rotation.c_str(), &object->getWorldData().rotation[0], 1)) {
+				object->getWorldData().hasUpdate = true;
+			}
+			if(ImGui::DragFloat3(scale.c_str(), &object->getWorldData().scale[0], 1)) {
+				object->getWorldData().hasUpdate = true;
+			}
+
+			ImGui::Separator();
+		}
+
+		for(std::shared_ptr<Camera>& camera : cameras) {
+			if (camera->getUseData().isActive) {
+				ImGui::BulletText("Main Camera:");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
+			}
+
+			std::string cameraID = std::to_string(camera->getID());
+
+			std::string sposition = "Position##" + cameraID;
+			std::string starget   = "Target##" + cameraID;
+			std::string sfar      = "Far##" + cameraID;
+			std::string snear     = "Near##" + cameraID;
+			std::string sfov      = "FOV##" + cameraID;
+			std::string swidth    = "Width##" + cameraID;
+			std::string sheight   = "Height##" + cameraID;
+
+			if(ImGui::DragFloat3(sposition.c_str(), &camera->getWorldData().position[0], 1)) {
+				camera->getUseData().hasUpdate = true;
+			}
+			if(ImGui::DragFloat3(starget.c_str(), &camera->getWorldData().target[0], 1)) {
+				camera->getUseData().hasUpdate = true;
+			}
+			if(ImGui::DragFloat(sfar.c_str(), &camera->getWorldData().c_far, 1, 0, FLT_MAX)) {
+				camera->getUseData().hasUpdate = true;
+			}
+			if(ImGui::DragFloat(snear.c_str(), &camera->getWorldData().c_near, 1, 0, FLT_MAX)) {
+				camera->getUseData().hasUpdate = true;
+			}
+
+			if(camera->getTpye() == CameraType::PERSPECTIVE) {
+				PerspectiveCamera* pCamera = static_cast<PerspectiveCamera*>(camera.get());
+
+				if(ImGui::DragFloat(sfov.c_str(), &pCamera->getFov(), 1)) {
+					camera->getUseData().hasUpdate = true;
+				}
+
+				int width  = pCamera->getWidth();
+				int height = pCamera->getHeight();
+
+				if(ImGui::DragInt(swidth.c_str(), &width, 1, 0, INT_MAX)) {
+					pCamera->getWidth() = width;
+					camera->getUseData().hasUpdate = true;
+				}
+
+				if(ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) {
+					pCamera->getHeight() = height;
+					camera->getUseData().hasUpdate = true;
+				}
+			}
+		}
+
+		// ImGuiStyle* style = &ImGui::GetStyle();
+		// ImVec4* colors = style->Colors;
+
+		// for (int i = 0; i < ImGuiCol_COUNT; i++) {
+		// 	ImGui::ColorEdit4(ImGui::GetStyleColorName(i), &colors[i].x);
+		// }
 
 		ImGui::End();
 	}
 
-	void UI::rightPanel() {
+	void UI::rightPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
 		// Object Params
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4 , MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowBgAlpha(0.50f);
+		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Right", nullptr, staticWindow);
 		ImGui::End();
 	}
 
-	void UI::topPanel() {
+	void UI::topPanel(std::vector<std::shared_ptr<Camera>>& cameras) {
 		// Activity information
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, ActivityBarWidth * 2), ImGuiCond_Once);
-		ImGui::SetNextWindowBgAlpha(0.50f);
+		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Top", nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
 
-		ImGui::BulletText("Camera");
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "#ID");
+		for(std::shared_ptr<Camera>& camera : cameras) {
+			if (camera->getUseData().isActive) {
+				ImGui::BulletText("Camera");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
+			}
+		}
 
 		ImGui::BulletText("FPS");
 		ImGui::SameLine();
@@ -138,9 +241,9 @@ namespace Engine {
 
 	void UI::botPanel() {
 		// Assets
-		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  _mData.height * 3 / 4 - MainBarWidth * 3), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, _mData.height * 1 / 4 + MainBarWidth * 3), ImGuiCond_Once);
-		ImGui::SetNextWindowBgAlpha(0.50f);
+		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Bot", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 			if (ImGui::BeginMenuBar()) {
@@ -157,12 +260,6 @@ namespace Engine {
 		ImGui::End();
 	}
 
-	void UI::panelPosition() {
-		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowBgAlpha(0.50f);
-	}
-
 	void UI::setStyle() {
 		ImGuiStyle* style = &ImGui::GetStyle();
 		ImVec4* colors = style->Colors;
@@ -170,7 +267,7 @@ namespace Engine {
 		colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 		colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
-		colors[ImGuiCol_WindowBg]               = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+		colors[ImGuiCol_WindowBg]               = ImVec4(0.075f, 0.075f, 0.075f, 1.00f);
 
 		colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 		colors[ImGuiCol_PopupBg]                = ImVec4(0.15f, 0.15f, 0.15f, 0.90f);
@@ -186,7 +283,7 @@ namespace Engine {
 		colors[ImGuiCol_TitleBgActive]          = ImVec4(0.48f, 0.16f, 0.16f, 1.00f);
 		colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
 
-		colors[ImGuiCol_MenuBarBg]              = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+		colors[ImGuiCol_MenuBarBg]              = ImVec4(0.05f, 0.05f, 0.05f, 1.00f);
 
 		colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.05f, 0.05f, 0.05f, 0.50f);
 		colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.48f, 0.16f, 0.16f, 0.60f);
@@ -195,20 +292,20 @@ namespace Engine {
 
 		colors[ImGuiCol_CheckMark]              = ImVec4(0.98f, 0.26f, 0.26f, 1.00f);
 
-		colors[ImGuiCol_SliderGrab]             = ImVec4(0.88f, 0.24f, 0.24f, 1.0f);
-		colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.98f, 0.26f, 0.26f, 1.0f);
+		colors[ImGuiCol_SliderGrab]             = ImVec4(0.88f, 0.24f, 0.24f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.98f, 0.26f, 0.26f, 1.00f);
 
-		colors[ImGuiCol_Button]                 = ImVec4(0.98f, 0.26f, 0.26f, 0.4f);
-		colors[ImGuiCol_ButtonHovered]          = ImVec4(0.98f, 0.26f, 0.26f, 1.0f);
-		colors[ImGuiCol_ButtonActive]           = ImVec4(0.98f, 0.06f, 0.06f, 1.0f);
+		colors[ImGuiCol_Button]                 = ImVec4(0.98f, 0.26f, 0.26f, 0.40f);
+		colors[ImGuiCol_ButtonHovered]          = ImVec4(0.98f, 0.26f, 0.26f, 1.00f);
+		colors[ImGuiCol_ButtonActive]           = ImVec4(0.98f, 0.06f, 0.06f, 1.00f);
 
-		colors[ImGuiCol_Header]                 = ImVec4(0.98f, 0.26f, 0.26f, 0.3f);
-		colors[ImGuiCol_HeaderHovered]          = ImVec4(0.98f, 0.26f, 0.26f, 0.8f);
-		colors[ImGuiCol_HeaderActive]           = ImVec4(0.98f, 0.26f, 0.26f, 1.0f);
+		colors[ImGuiCol_Header]                 = ImVec4(0.98f, 0.26f, 0.26f, 0.30f);
+		colors[ImGuiCol_HeaderHovered]          = ImVec4(0.98f, 0.26f, 0.26f, 0.80f);
+		colors[ImGuiCol_HeaderActive]           = ImVec4(0.98f, 0.26f, 0.26f, 1.00f);
 
-		colors[ImGuiCol_Separator]              = colors[ImGuiCol_Border];
-		colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.75f, 0.10f, 0.10f, 0.8f);
-		colors[ImGuiCol_SeparatorActive]        = ImVec4(0.75f, 0.10f, 0.10f, 1.0f);
+		colors[ImGuiCol_Separator]              = ImVec4(0.75f, 0.10f, 0.10f, 0.50f);
+		colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.75f, 0.10f, 0.10f, 0.80f);
+		colors[ImGuiCol_SeparatorActive]        = ImVec4(0.75f, 0.10f, 0.10f, 1.00f);
 
 		colors[ImGuiCol_ResizeGrip]             = ImVec4(0.98f, 0.26f, 0.26f, 0.20f);
 		colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.98f, 0.26f, 0.26f, 0.70f);

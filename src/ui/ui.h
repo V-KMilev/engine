@@ -1,10 +1,19 @@
 #pragma once
 
+#include <vector>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #define MainBarWidth 20
 #define ActivityBarWidth 20
+
+#include "scene.h"
+
+namespace Engine {
+	class Object;
+	class Camera;
+}
 
 namespace Engine {
 	struct uiData {
@@ -15,6 +24,7 @@ namespace Engine {
 			unsigned int width = 0;
 			unsigned int height = 0;
 
+		public:
 			bool isActive = true;
 	};
 
@@ -43,15 +53,26 @@ namespace Engine {
 
 			void render();
 
-			void ui();
+			void ui(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
 
 			void update();
 
 		private:
 			void mainManu();
-			void leftPanel();
-			void rightPanel();
-			void topPanel();
+
+			void leftPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
+			void rightPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
+
+			void topPanel(std::vector<std::shared_ptr<Camera>>& cameras);
 			void botPanel();
 
 			void panelPosition();
