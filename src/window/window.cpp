@@ -13,10 +13,10 @@
 #include "perspective_camera.h"
 #include "input_handler.h"
 #include "scene.h"
+#include "quad.h"
 
 #include "gl_error_handle.h"
 #include "gl_shader.h"
-#include "gl_quad.h"
 
 namespace Engine {
 	Window::Window(
@@ -107,6 +107,7 @@ namespace Engine {
 		// TODO: Find better "hack" for this to work
 		glfwSetKeyCallback(_mWindow, _mInput->keyCallback);
 		glfwSetMouseButtonCallback(_mWindow, _mInput->mouseButtonCallback);
+		glfwSetScrollCallback(_mWindow, _mInput->mouseScrollCallback);
 
 		glfwSetWindowUserPointer(_mWindow, _mInput.get());
 
@@ -145,7 +146,8 @@ namespace Engine {
 			_mHeight
 		);
 
-		_mScene->addObject(std::make_shared<Core::Quad>());
+		_mScene->addObject(std::make_shared<Quad>());
+		_mScene->addObject(std::make_shared<Quad>());
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));
@@ -153,11 +155,12 @@ namespace Engine {
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
 		while(!glfwWindowShouldClose(_mWindow)) {
-			_mScene->updateTime(time_tick());
+			_mInput->processMouse(_mWindow);
 
-			_mInput->processPos(_mWindow);
+			_mScene->update(time_tick());
 
 			_mScene->render();
+			_mScene->renderUI();
 
 			// Swap front and back buffers
 			glfwSwapBuffers(_mWindow);

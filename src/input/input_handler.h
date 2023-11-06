@@ -16,6 +16,9 @@ namespace Engine {
 		int x = 0.0f;
 		int y = 0.0f;
 
+		float scrollX = 0.0f;
+		float scrollY = 0.0f;
+
 		double speed = 0.1f;
 	};
 
@@ -35,11 +38,12 @@ namespace Engine {
 
 			void mapKeyandStatetoEvent(int key, State state, std::function<void()> event, const std::string& event_hint = "");
 
-			void processPos(GLFWwindow* window);
+			void processMouse(GLFWwindow* window);
 
 		public:
 			static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 			static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+			static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 			void processKey(GLFWwindow* window, int key, KeyType tpye) const;
 

@@ -19,7 +19,12 @@ namespace Engine{
 			return;
 		}
 
-		LOG("Mapped Key/State: '%c' & '%s' to '%s'", LOG_LEVEL::L_INFO, key, stateToString(state).c_str(), event_hint.c_str());
+		if (key > 31 && key < 97) {
+			LOG("Mapped Key/State: '%c' & '%s' to '%s'", LOG_LEVEL::L_INFO, key, stateToString(state).c_str(), event_hint.c_str());
+		}
+		else {
+			LOG("Mapped Key/State: '%d' & '%s' to '%s'", LOG_LEVEL::L_INFO, key, stateToString(state).c_str(), event_hint.c_str());
+		}
 
 		// Store the provided event in the map based on key and state.
 		_mapOfEvents[{key, state}] = event;
@@ -43,6 +48,16 @@ namespace Engine{
 		}
 	}
 
+	void InputHandle::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+		// You can retrieve the user pointer to get the InputHandle instance
+		InputHandle* inputHandle = static_cast<InputHandle*>(glfwGetWindowUserPointer(window));
+
+		if (inputHandle) {
+			inputHandle->getMouse().scrollX = xoffset;
+			inputHandle->getMouse().scrollY = yoffset;
+		}
+	}
+
 	void InputHandle::processKey(GLFWwindow* window, int key, KeyType tpye) const {
 		State state = getState(window, key, tpye);
 
@@ -55,7 +70,7 @@ namespace Engine{
 		}
 	}
 
-	void InputHandle::processPos(GLFWwindow* window) {
+	void InputHandle::processMouse(GLFWwindow* window) {
 		double x = 0.0f;
 		double y = 0.0f;
 		glfwGetCursorPos(window, &x, &y);
