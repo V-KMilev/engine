@@ -24,23 +24,23 @@ namespace Engine {
 	#define GL_TRIANGLES 0x0004
 #endif
 
+// Basic define primitive geometry
+#define Dimensions 3
+
+#define TextureVertices  2
+#define TriangleVertices 3
+#define QuadVertices     4
+
+#define TriangleVerticesSize Dimensions * TriangleVertices
+#define QuadVerticesSize     Dimensions * QuadVertices
+
+#define TriangleIndices 3
+#define QuadIndices     6
+
+#define TriangleIndicesSize TriangleIndices
+#define QuadIndicesSize     QuadIndices
+
 namespace Engine {
-	// Basic define primitive geometry
-	#define Dimensions 3
-
-	#define TextureVertices  2
-	#define TriangleVertices 3
-	#define QuadVertices     4
-
-	#define TriangleVerticesSize Dimensions * TriangleVertices
-	#define QuadVerticesSize     Dimensions * QuadVertices
-
-	#define TriangleIndices 3
-	#define QuadIndices     6
-
-	#define TriangleIndicesSize TriangleIndices
-	#define QuadIndicesSize     QuadIndices
-
 	struct ObjectWorldData {
 		public:
 			void updateModel();
@@ -52,6 +52,9 @@ namespace Engine {
 			glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
 			glm::mat4 model = glm::mat4(1.0f);
+
+		public:
+			bool hasUpdate = false;
 	};
 
 	class Object {
@@ -68,17 +71,15 @@ namespace Engine {
 			unsigned int getID() const;
 			const Core::Texture& getTexture() const;
 
-			ObjectWorldData& getWorldData();
 			const ObjectWorldData& getWorldData() const;
+			ObjectWorldData& getWorldData();
 
 			bool updateTexture(const std::string& file);
 			bool updateTexture(const Core::Texture& texture);
 
-			void draw(const Core::Renderer &renderer, const Core::Shader &shader, unsigned int drawType = GL_TRIANGLES) const;
+			void update();
 
-		protected:
-			virtual bool init() = 0;
-			virtual bool deinit() = 0;
+			void draw(const Core::Renderer &renderer, const Core::Shader &shader, unsigned int drawType = GL_TRIANGLES) const;
 
 		protected:
 			Core::Common::ObjectID _mID;

@@ -20,10 +20,6 @@ namespace Engine {
 			Quad& operator = (Quad && other) = delete;
 
 		private:
-			bool init() override;
-			bool deinit() override;
-
-		private:
 			const float _mVertices[QuadVerticesSize + TextureVertices * QuadVertices] = {
 				// positions        // texture Coords
 				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,    //bottom left

@@ -20,10 +20,6 @@ namespace Engine {
 			Triangle& operator = (Triangle && other) = delete;
 
 		private:
-			bool init() override;
-			bool deinit() override;
-
-		private:
 			static constexpr float _mVertices[TriangleVerticesSize + TextureVertices * TriangleVertices] = {
 				// positions        // texture Coords
 				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,    // bottom left

@@ -7,15 +7,17 @@
 
 namespace Engine {
 	void ObjectWorldData::updateModel() {
-		model = glm::mat4(1.0f);
+		if (hasUpdate) {
+			model = glm::mat4(1.0f);
 
-		model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+			model = glm::translate(model, position);
 
-		model = glm::scale(model, scale);
+			model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		model = glm::translate(model, position);
+			model = glm::scale(model, scale);
+		}
 	}
 
 	Object::Object() :
@@ -77,6 +79,14 @@ namespace Engine {
 		return *_mTexture;
 	}
 
+	const ObjectWorldData& Object::getWorldData() const {
+		return _mWorldData;
+	}
+
+	ObjectWorldData& Object::getWorldData() {
+		return _mWorldData;
+	}
+
 	bool Object::updateTexture(const std::string& file) {
 		_mTexture = nullptr;
 		_mTexture = std::make_shared<Core::Texture>(file);
@@ -89,6 +99,11 @@ namespace Engine {
 		_mTexture = std::make_shared<Core::Texture>(texture);
 
 		return _mTexture->update();
+	}
+
+	void Object::update() {
+		_mWorldData.updateModel();
+		_mWorldData.hasUpdate = false;
 	}
 
 	void Object::draw(const Core::Renderer& renderer, const Core::Shader& shader, unsigned int drawType) const {

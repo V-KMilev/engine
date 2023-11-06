@@ -2,7 +2,16 @@
 
 namespace Engine {
 	Quad::Quad() : Object() {
-		init();
+		_mVB = std::make_shared<Core::VertexBuffer>(&_mVertices[0], (QuadVerticesSize + TextureVertices * QuadVertices) * sizeof(float));
+		_mIB = std::make_shared<Core::IndexBuffer>(&_mIndices[0], QuadIndices);
+		_mVA = std::make_shared<Core::VertexArray>();
+
+		// 3 floats for position, 2 floats for texture coordinates
+		_mVBL = std::make_shared<Core::VertexBufferLayout>();
+		_mVBL->push<float>(3);
+		_mVBL->push<float>(2);
+
+		_mVA->addBuffer(*_mVB, *_mVBL);
 	}
 
 	Quad::Quad(const Quad& other) : Object() {}
@@ -15,24 +24,5 @@ namespace Engine {
 		Object::operator=(other);
 
 		return *this;
-	}
-
-	bool Quad::init() {
-		_mVB = std::make_shared<Core::VertexBuffer>(&_mVertices[0], (QuadVerticesSize + TextureVertices * QuadVertices) * sizeof(float));
-		_mIB = std::make_shared<Core::IndexBuffer>(&_mIndices[0], QuadIndices);
-		_mVA = std::make_shared<Core::VertexArray>();
-
-		// 3 floats for position, 2 floats for texture coordinates
-		_mVBL = std::make_shared<Core::VertexBufferLayout>();
-		_mVBL->push<float>(3);
-		_mVBL->push<float>(2);
-
-		_mVA->addBuffer(*_mVB, *_mVBL);
-
-		return true;
-	}
-
-	bool Quad::deinit() {
-		return true;
 	}
 };
