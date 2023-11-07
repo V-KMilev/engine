@@ -12,7 +12,7 @@ namespace Engine {
 #include <GLFW/glfw3.h>
 
 namespace Engine {
-	struct deltaTime {
+	struct DeltaTime {
 		float lastTime    = 0.0f;
 		float currentTime = 0.0f;
 		float deltaTime   = 0.0f;
@@ -45,16 +45,16 @@ namespace Engine {
 
 			void input_config();
 
-			void set_close(bool flag);
-
 			float time_tick();
+
+			void set_close(bool flag);
 
 		private:
 			GLFWwindow* _mWindow;
 
 			std::shared_ptr<InputHandle> _mInput;
 
-			deltaTime _mDelta;
+			DeltaTime _mDelta;
 
 			std::string _mTitle = "";
 

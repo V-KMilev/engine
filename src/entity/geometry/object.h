@@ -10,7 +10,7 @@
 #include "gl_shader.h"
 #include "gl_texture.h"
 
-#include "object_id.h"
+#include "entity_id.h"
 
 namespace Engine {
 	class VertexArray;
@@ -82,7 +82,7 @@ namespace Engine {
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader, unsigned int drawType = GL_TRIANGLES) const;
 
 		protected:
-			Core::Common::ObjectID _mID;
+			Core::EntityID _mID;
 
 			ObjectWorldData _mWorldData;
 

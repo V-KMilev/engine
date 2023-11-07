@@ -4,7 +4,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "object_id.h"
+#include "entity_id.h"
 
 namespace Core {
 	class Shader;
@@ -113,7 +113,7 @@ namespace Engine {
 			virtual void zoom(const Mouse* mouse, float deltaTime) = 0;
 
 		protected:
-			Core::Common::ObjectID _mID;
+			Core::EntityID _mID;
 
 			CameraWorldData _mWorldData;
 			UseData         _mUseData;

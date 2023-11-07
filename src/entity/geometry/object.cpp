@@ -53,7 +53,7 @@ namespace Engine {
 		_mVBL = other._mVBL;
 	}
 
-	Object& Object::operator=(const Object& other) {
+	Object& Object::operator = (const Object& other) {
 		if (this == &other) {
 			return *this;
 		}

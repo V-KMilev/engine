@@ -122,17 +122,17 @@ namespace Engine {
 		);
 	}
 
-	void Window::set_close(bool flag) {
-		LOG("Close event is send", LOG_LEVEL::L_INFO);
-		_mClose = flag;
-	}
-
 	float Window::time_tick() {
 		_mDelta.currentTime = (float)glfwGetTime();
 		_mDelta.deltaTime   = _mDelta.currentTime - _mDelta.lastTime;
 		_mDelta.lastTime    = _mDelta.currentTime;
 
 		return _mDelta.deltaTime;
+	}
+
+	void Window::set_close(bool flag) {
+		LOG("Close event is send", LOG_LEVEL::L_INFO);
+		_mClose = flag;
 	}
 
 	void Window::main_loop() {
