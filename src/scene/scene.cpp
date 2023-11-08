@@ -74,17 +74,21 @@ namespace Engine {
 		}
 	}
 
-	void Scene::update(float deltaTime) {
+	void Scene::onUpdate(float deltaTime) {
 		_mDeltaTime = deltaTime;
 
-		for(const std::shared_ptr<Object>& object : _mObjects) {
-			object->update();
-		}
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (_mUI->getData().isActive) {
-				camera->update(UpdateEvent::UI);
+				camera->onUpdate(&_mInput->getMouse(), _mDeltaTime);
 			}
 		}
+
+		for(const std::shared_ptr<Object>& object : _mObjects) {
+			object->onUpdate(&_mInput->getMouse(), _mDeltaTime);
+		}
+
+		// TODO: Think of where this should be
+		_mInput->getMouse().hasUpdate = false;
 	}
 
 	void Scene::addObject(std::shared_ptr<Object> && object) {
@@ -108,7 +112,7 @@ namespace Engine {
 
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
-				camera->draw(*shader);
+				camera->draw(*_mRenderer, *shader);
 			}
 		}
 
@@ -130,7 +134,7 @@ namespace Engine {
 	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
-				camera->draw(*shader);
+				camera->draw(*_mRenderer, *shader);
 			}
 		}
 
@@ -172,7 +176,9 @@ namespace Engine {
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
 		for(std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
-				camera->update(event, pEvent, _mDeltaTime, &_mInput->getMouse());
+				camera->getUseData().hasUpdate = true;
+				camera->getUseData().updateEvent = event;
+				camera->getUseData().positionEvent = pEvent;
 			}
 		}
 	}

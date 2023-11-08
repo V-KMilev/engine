@@ -116,82 +116,62 @@ namespace Engine {
 
 		ImGui::Begin("##Left", nullptr, staticWindow);
 
-		// Debug only
+		// Debugging
 		for(std::shared_ptr<Object>& object : objects) {
-			std::string objectID = std::to_string(object->getID());
-
-			ImGui::BulletText("Object:");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", object->getID());
-
-			std::string position = "Position##" + objectID;
-			std::string rotation = "Rotation##" + objectID;
-			std::string scale    = "Scale##"    + objectID;
-	
-			if(ImGui::DragFloat3(position.c_str(), &object->getWorldData().position[0], 1)) {
-				object->getWorldData().hasUpdate = true;
-			}
-			if(ImGui::DragFloat3(rotation.c_str(), &object->getWorldData().rotation[0], 1)) {
-				object->getWorldData().hasUpdate = true;
-			}
-			if(ImGui::DragFloat3(scale.c_str(), &object->getWorldData().scale[0], 1)) {
-				object->getWorldData().hasUpdate = true;
-			}
-
-			ImGui::Separator();
+			object->drawUIParams();
 		}
 
-		for(std::shared_ptr<Camera>& camera : cameras) {
-			if (camera->getUseData().isActive) {
-				ImGui::BulletText("Main Camera:");
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
-			}
+		// for(std::shared_ptr<Camera>& camera : cameras) {
+		// 	if (camera->getUseData().isActive) {
+		// 		ImGui::BulletText("Main Camera:");
+		// 		ImGui::SameLine();
+		// 		ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
+		// 	}
 
-			std::string cameraID = std::to_string(camera->getID());
+		// 	std::string cameraID = std::to_string(camera->getID());
 
-			std::string sposition = "Position##" + cameraID;
-			std::string starget   = "Target##" + cameraID;
-			std::string sfar      = "Far##" + cameraID;
-			std::string snear     = "Near##" + cameraID;
-			std::string sfov      = "FOV##" + cameraID;
-			std::string swidth    = "Width##" + cameraID;
-			std::string sheight   = "Height##" + cameraID;
+		// 	std::string sposition = "Position##" + cameraID;
+		// 	std::string starget   = "Target##" + cameraID;
+		// 	std::string sfar      = "Far##" + cameraID;
+		// 	std::string snear     = "Near##" + cameraID;
+		// 	std::string sfov      = "FOV##" + cameraID;
+		// 	std::string swidth    = "Width##" + cameraID;
+		// 	std::string sheight   = "Height##" + cameraID;
 
-			if(ImGui::DragFloat3(sposition.c_str(), &camera->getWorldData().position[0], 1)) {
-				camera->getUseData().hasUpdate = true;
-			}
-			if(ImGui::DragFloat3(starget.c_str(), &camera->getWorldData().target[0], 1)) {
-				camera->getUseData().hasUpdate = true;
-			}
-			if(ImGui::DragFloat(sfar.c_str(), &camera->getWorldData().c_far, 1, 0, FLT_MAX)) {
-				camera->getUseData().hasUpdate = true;
-			}
-			if(ImGui::DragFloat(snear.c_str(), &camera->getWorldData().c_near, 1, 0, FLT_MAX)) {
-				camera->getUseData().hasUpdate = true;
-			}
+		// 	if(ImGui::DragFloat3(sposition.c_str(), &camera->getWorldData().position[0], 1)) {
+		// 		camera->getUseData().hasUpdate = true;
+		// 	}
+		// 	if(ImGui::DragFloat3(starget.c_str(), &camera->getWorldData().target[0], 1)) {
+		// 		camera->getUseData().hasUpdate = true;
+		// 	}
+		// 	if(ImGui::DragFloat(sfar.c_str(), &camera->getWorldData().c_far, 1, 0, FLT_MAX)) {
+		// 		camera->getUseData().hasUpdate = true;
+		// 	}
+		// 	if(ImGui::DragFloat(snear.c_str(), &camera->getWorldData().c_near, 1, 0, FLT_MAX)) {
+		// 		camera->getUseData().hasUpdate = true;
+		// 	}
 
-			if(camera->getTpye() == CameraType::PERSPECTIVE) {
-				PerspectiveCamera* pCamera = static_cast<PerspectiveCamera*>(camera.get());
+		// 	if(camera->getTpye() == CameraType::PERSPECTIVE) {
+		// 		PerspectiveCamera* pCamera = static_cast<PerspectiveCamera*>(camera.get());
 
-				if(ImGui::DragFloat(sfov.c_str(), &pCamera->getFov(), 1)) {
-					camera->getUseData().hasUpdate = true;
-				}
+		// 		if(ImGui::DragFloat(sfov.c_str(), &pCamera->getFov(), 1)) {
+		// 			camera->getUseData().hasUpdate = true;
+		// 		}
 
-				int width  = pCamera->getWidth();
-				int height = pCamera->getHeight();
+		// 		int width  = pCamera->getWidth();
+		// 		int height = pCamera->getHeight();
 
-				if(ImGui::DragInt(swidth.c_str(), &width, 1, 0, INT_MAX)) {
-					pCamera->getWidth() = width;
-					camera->getUseData().hasUpdate = true;
-				}
+		// 		if(ImGui::DragInt(swidth.c_str(), &width, 1, 0, INT_MAX)) {
+		// 			pCamera->getWidth() = width;
+		// 			camera->getUseData().hasUpdate = true;
+		// 		}
 
-				if(ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) {
-					pCamera->getHeight() = height;
-					camera->getUseData().hasUpdate = true;
-				}
-			}
-		}
+		// 		if(ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) {
+		// 			pCamera->getHeight() = height;
+		// 			camera->getUseData().hasUpdate = true;
+		// 		}
+		// 	}
+		// }
 
 		// ImGuiStyle* style = &ImGui::GetStyle();
 		// ImVec4* colors = style->Colors;

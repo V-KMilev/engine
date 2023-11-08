@@ -1,18 +1,19 @@
-#pragma once
+#pragma noce
 
+#include <vector>
 #include <memory>
 
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "gl_render.h"
-#include "gl_shader.h"
-#include "gl_texture.h"
+#include "entity.h"
 
-#include "entity_id.h"
+#include "utils.h"
 
-namespace Engine {
+namespace Core {
+	class Texture;
+
 	class VertexArray;
 	class VertexBuffer;
 	class IndexBuffer;
@@ -41,10 +42,7 @@ namespace Engine {
 #define QuadIndicesSize     QuadIndices
 
 namespace Engine {
-	struct ObjectWorldData {
-		public:
-			void updateModel();
-
+	struct MeshWorldData : WorldData {
 		public:
 			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 scale    = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -52,45 +50,48 @@ namespace Engine {
 			glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
 			glm::mat4 model = glm::mat4(1.0f);
-
-		public:
-			bool hasUpdate = false;
 	};
 
-	class Object {
+	struct MeshUseData : UseData {
 		public:
-			Object();
-			virtual ~Object() = default;
+	};
 
-			Object(const Object& other);
-			Object& operator = (const Object& other);
-
-			Object(Object && other) = delete;
-			Object& operator = (Object && other) = delete;
+	class Mesh : public Entity {
+		public:
+			Mesh(
+				const std::vector<Utils::Vertex>& mVertices,
+				const std::vector<unsigned int>&  mIndices,
+				const std::vector<unsigned int>&  mTextureIDs
+			);
 
 			unsigned int getID() const;
-			const Core::Texture& getTexture() const;
 
-			const ObjectWorldData& getWorldData() const;
-			ObjectWorldData& getWorldData();
+			const MeshWorldData& getWorldData() const override;
+			MeshWorldData& getWorldData() override;
 
-			bool updateTexture(const std::string& file);
-			bool updateTexture(const Core::Texture& texture);
+			const MeshUseData& getUseData() const override;
+			MeshUseData& getUseData() override;
 
-			void update();
+			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
-			void draw(const Core::Renderer &renderer, const Core::Shader &shader, unsigned int drawType = GL_TRIANGLES) const;
+			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override;
 
-		protected:
-			Core::EntityID _mID;
+			void drawUIParams() override;
 
-			ObjectWorldData _mWorldData;
+			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
 
-			std::shared_ptr<Core::Texture> _mTexture;
+		private:
+			void updateShader(const Core::Shader &shader) const override;
+
+		private:
+			MeshWorldData _mMeshWorldData;
+			MeshUseData   _mMeshUseData;
+
+			std::vector<std::shared_ptr<Core::Texture>> _mTexture;
 
 			std::shared_ptr<Core::VertexArray>        _mVA;
 			std::shared_ptr<Core::VertexBuffer>       _mVB;
 			std::shared_ptr<Core::IndexBuffer>        _mIB;
 			std::shared_ptr<Core::VertexBufferLayout> _mVBL;
 	};
-}
+};

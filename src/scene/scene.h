@@ -46,7 +46,7 @@ namespace Engine {
 			void render() const;
 			void renderUI();
 
-			void update(float deltaTime);
+			void onUpdate(float deltaTime);
 
 			void addObject(std::shared_ptr<Object> && object);
 			void addShader(std::shared_ptr<Core::Shader> && shader);

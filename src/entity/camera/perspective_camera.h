@@ -6,13 +6,6 @@ namespace Engine {
 	class PerspectiveCamera : public Camera {
 		public:
 			PerspectiveCamera(unsigned int width, unsigned int height);
-			~PerspectiveCamera() = default;
-
-			PerspectiveCamera(const PerspectiveCamera& other);
-			PerspectiveCamera& operator = (const PerspectiveCamera& other);
-
-			PerspectiveCamera(Camera && other) = delete;
-			PerspectiveCamera& operator = (PerspectiveCamera && other) = delete;
 
 			float getFov() const;
 			float& getFov();
@@ -23,9 +16,13 @@ namespace Engine {
 			unsigned int getHeight() const;
 			unsigned int& getHeight();
 
-			void draw(const Core::Shader& shader) const override;
+			void draw(const Core::Renderer& renderer, const Core::Shader& shader) const override;
+
+			void drawUIParams() override;
 
 		private:
+			void updateShader(const Core::Shader &shader) const override;
+
 			void updateTarget(const Mouse* mouse, float deltaTime) override;
 			void updateProjection() override;
 

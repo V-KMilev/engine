@@ -8,10 +8,12 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/camera/camera.cpp
 	${ENGINE_SRC_DIR}/entity/camera/perspective_camera.cpp
 	
-	${ENGINE_SRC_DIR}/entity/geometry/object.cpp
-	${ENGINE_SRC_DIR}/entity/geometry/basic_geometry/quad.cpp
-	${ENGINE_SRC_DIR}/entity/geometry/basic_geometry/triangle.cpp
-	${ENGINE_SRC_DIR}/entity/entity_id/entity_id.cpp
+	${ENGINE_SRC_DIR}/entity/object/object.cpp
+	${ENGINE_SRC_DIR}/entity/object/basic_geometry/quad.cpp
+	${ENGINE_SRC_DIR}/entity/object/basic_geometry/triangle.cpp
+	${ENGINE_SRC_DIR}/entity/object/mesh/mesh.cpp
+	${ENGINE_SRC_DIR}/entity/entity_id.cpp
+	${ENGINE_SRC_DIR}/entity/entity.cpp
 	
 	${ENGINE_SRC_DIR}/scene/scene.cpp
 	${ENGINE_SRC_DIR}/ui/ui.cpp
@@ -24,10 +26,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/common/logger
 
 	${ENGINE_SRC_DIR}/entity/camera
-	${ENGINE_SRC_DIR}/entity/geometry
-	${ENGINE_SRC_DIR}/entity/geometry/basic_geometry
-	${ENGINE_SRC_DIR}/entity/geometry/mesh
-	${ENGINE_SRC_DIR}/entity/entity_id
+	${ENGINE_SRC_DIR}/entity/object
+	${ENGINE_SRC_DIR}/entity/object/basic_geometry
+	${ENGINE_SRC_DIR}/entity/object/mesh
+	${ENGINE_SRC_DIR}/entity
 
 	${ENGINE_SRC_DIR}/scene
 	${ENGINE_SRC_DIR}/ui

@@ -6,40 +6,28 @@
 
 namespace Engine {
 	PerspectiveCamera::PerspectiveCamera(unsigned int width, unsigned int height) : _mWidth(width), _mHeight(height), Camera(CameraType::PERSPECTIVE) {
-		_mWorldData.projection = glm::perspective(
+		auto& ud = _mCameraUseData;
+		auto& wd = _mCameraWorldData;
+
+		wd.projection = glm::perspective(
 			glm::radians(_mFov),
 			_mWidth / float(_mHeight),
-			_mWorldData.c_near,
-			_mWorldData.c_far
+			wd.c_near,
+			wd.c_far
 		);
 
 		// Calculate initial camera orientation
-		_mWorldData.front = glm::normalize(_mWorldData.target - _mWorldData.position);
-		_mWorldData.right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), _mWorldData.front));
-		_mWorldData.up    = glm::cross(_mWorldData.front, _mWorldData.right);
+		wd.front = glm::normalize(wd.target - wd.position);
+		wd.right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), wd.front));
+		wd.up    = glm::cross(wd.front, wd.right);
 
 		// Ensure that the up vector is perpendicular to the direction vector
-		if (glm::length(_mWorldData.up) < 0.9f) {
-			_mWorldData.right = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), _mWorldData.front));
-			_mWorldData.up    = glm::cross(_mWorldData.front, _mWorldData.right);
+		if (glm::length(wd.up) < 0.9f) {
+			wd.right = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), wd.front));
+			wd.up    = glm::cross(wd.front, wd.right);
 		}
 
-		_mUseData.hasUpdate = true;
 		updateLookAt();
-	}
-
-	PerspectiveCamera::PerspectiveCamera(const PerspectiveCamera& other) : Camera() {
-		_mFov = other._mFov;
-	}
-
-	PerspectiveCamera& PerspectiveCamera::operator = (const PerspectiveCamera& other) {
-		if (this == &other) {
-			return *this;
-		}
-
-		_mFov = other._mFov;
-
-		return *this;
 	}
 
 	float PerspectiveCamera::getFov() const {
@@ -64,66 +52,81 @@ namespace Engine {
 		return _mHeight;
 	}
 
-	void PerspectiveCamera::draw(const Core::Shader& shader) const {
+	void PerspectiveCamera::draw(const Core::Renderer& renderer, const Core::Shader& shader) const {
+		updateShader(shader);
+	}
+
+	void PerspectiveCamera::drawUIParams() {
+
+	}
+
+	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
+		auto& wd = _mCameraWorldData;
+
 		shader.bind();
 
-		shader.setUniformMatrix4fv("uView", _mWorldData.lookAt);
-		shader.setUniformMatrix4fv("uProjection", _mWorldData.projection);
+		shader.setUniformMatrix4fv("uView", wd.lookAt);
+		shader.setUniformMatrix4fv("uProjection", wd.projection);
 
-		shader.setUniform1f("uNear", _mWorldData.c_near);
-		shader.setUniform1f("uFar", _mWorldData.c_far);
+		shader.setUniform1f("uNear", wd.c_near);
+		shader.setUniform1f("uFar", wd.c_far);
 	}
 
 	void PerspectiveCamera::updateTarget(const Mouse* mouse, float deltaTime) {
-		if(_mUseData.hasUpdate) {
-			// Calculate the mouse movement angles
-			float horizontalDelta = deltaTime * _mUseData.mouseSpeed * (_mWidth / 2.0f - mouse->x);
-			float verticalDelta = deltaTime * _mUseData.mouseSpeed * (_mHeight / 2.0f - mouse->y);
+		auto& ud = _mCameraUseData;
+		auto& wd = _mCameraWorldData;
 
-			// Update the vertical & horizontal angle
-			_mWorldData.verticalAngle += verticalDelta;
-			_mWorldData.horizontalAngle += horizontalDelta;
+		// Calculate the mouse movement angles
+		float horizontalDelta = deltaTime * ud.mouseSpeed * (_mWidth / 2.0f - mouse->x);
+		float verticalDelta = deltaTime * ud.mouseSpeed * (_mHeight / 2.0f - mouse->y);
 
-			// Clamp the vertical angle
-			_mWorldData.verticalAngle = glm::clamp(_mWorldData.verticalAngle, -_mWorldData.maxUpAngle, _mWorldData.maxUpAngle);
+		// Update the vertical & horizontal angle
+		wd.verticalAngle += verticalDelta;
+		wd.horizontalAngle += horizontalDelta;
 
-			// Calculate the new front direction
-			glm::vec3 front(
-				cos(_mWorldData.verticalAngle) * sin(_mWorldData.horizontalAngle),
-				sin(_mWorldData.verticalAngle),
-				cos(_mWorldData.verticalAngle) * cos(_mWorldData.horizontalAngle)
-			);
+		// Clamp the vertical angle
+		wd.verticalAngle = glm::clamp(wd.verticalAngle, -wd.maxUpAngle, wd.maxUpAngle);
 
-			// Calculate the new right direction
-			glm::vec3 right(
-				sin(_mWorldData.horizontalAngle - glm::pi<float>() / 2.0f),
-				0,
-				cos(_mWorldData.horizontalAngle - glm::pi<float>() / 2.0f)
-			);
+		// Calculate the new front direction
+		glm::vec3 front(
+			cos(wd.verticalAngle) * sin(wd.horizontalAngle),
+			sin(wd.verticalAngle),
+			cos(wd.verticalAngle) * cos(wd.horizontalAngle)
+		);
 
-			// Calculate the new up direction
-			glm::vec3 up = glm::cross(right, front);
+		// Calculate the new right direction
+		glm::vec3 right(
+			sin(wd.horizontalAngle - glm::pi<float>() / 2.0f),
+			0,
+			cos(wd.horizontalAngle - glm::pi<float>() / 2.0f)
+		);
 
-			// Update camera properties
-			_mWorldData.target = _mWorldData.position + front;
+		// Calculate the new up direction
+		glm::vec3 up = glm::cross(right, front);
 
-			updateLookAt();
-		}
+		// TODO: Think of better way
+
+		// Update camera properties
+		// front * 2.0f so when you try to move you dont start spining
+		wd.target = wd.position + (front * 2.0f);
 	}
 
 	void PerspectiveCamera::updateProjection() {
-		if( _mUseData.hasUpdate) {
-			_mWorldData.projection = glm::perspective(
-				glm::radians(_mFov),
-				_mWidth / float(_mHeight),
-				_mWorldData.c_near,
-				_mWorldData.c_far
-			);
-		}
+		auto& wd = _mCameraWorldData;
+
+		wd.projection = glm::perspective(
+			glm::radians(_mFov),
+			_mWidth / float(_mHeight),
+			wd.c_near,
+			wd.c_far
+		);
 	}
 
 	void PerspectiveCamera::zoom(const Mouse* mouse, float deltaTime) {
-		_mFov -= mouse->scrollY; //* deltaTime;
+		auto& ud = _mCameraUseData;
+		if(mouse->hasUpdate) {
+			_mFov -= deltaTime * ud.zoomSpeed * mouse->scrollY;
+		}
 
 		if (_mFov < 1.0f) {
 			_mFov = 10.0f;
@@ -131,7 +134,5 @@ namespace Engine {
 		else if(_mFov > 120.0f) {
 			_mFov = 120.0f;
 		}
-
-		updateProjection();
 	}
 };

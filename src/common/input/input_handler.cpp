@@ -55,6 +55,7 @@ namespace Engine{
 		if (inputHandle) {
 			inputHandle->getMouse().scrollX = xoffset;
 			inputHandle->getMouse().scrollY = yoffset;
+			inputHandle->getMouse().hasUpdate = true;
 		}
 	}
 

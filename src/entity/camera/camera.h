@@ -4,11 +4,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "entity_id.h"
-
-namespace Core {
-	class Shader;
-}
+#include "entity.h"
 
 namespace Engine {
 	struct Mouse;
@@ -24,8 +20,7 @@ namespace Engine {
 		NONE       = 0,
 		POSITION   = 1,
 		TARGET     = 2,
-		FOV        = 3,
-		UI         = 4
+		FOV        = 3
 	};
 
 	enum class PositionEvent {
@@ -38,10 +33,7 @@ namespace Engine {
 		NEGZ = 6
 	};
 
-	struct CameraWorldData {
-		public:
-			void updateLookAt();
-
+	struct CameraWorldData : WorldData {
 		public:
 			glm::vec3 position = glm::vec3(0.0f, 1.0f, -5.0f);
 			glm::vec3 target   = glm::vec3(0.0f, 1.0f, 1.0f);
@@ -62,50 +54,43 @@ namespace Engine {
 			float horizontalAngle = 0.0f;
 			float verticalAngle   = 0.0f;
 
-			float maxUpAngle = 2.0f;
+			float maxUpAngle = 1.70f;
 	};
 
-	struct UseData {
+	struct CameraUseData : UseData {
 		public:
-			bool isActive = false;
-			bool hasUpdate = false;
-
 			float moveSpeed  = 10.0f;
 			float mouseSpeed = 0.05f;
+
+			float zoomSpeed  = 500.0f;
+
+		public:
+			UpdateEvent updateEvent = UpdateEvent::NONE;
+			PositionEvent positionEvent = PositionEvent::NONE;
 	};
 
-	class Camera {
+	class Camera : public Entity {
 		public:
 			Camera(CameraType Type = CameraType::NONE);
-			~Camera() = default;
 
-			Camera(const Camera& other);
-			Camera& operator = (const Camera& other);
+			CameraType getCameraTpye() const;
 
-			Camera(Camera && other) = delete;
-			Camera& operator = (Camera && other) = delete;
+			const CameraWorldData& getWorldData() const override;
+			CameraWorldData& getWorldData() override;
 
-			unsigned int getID() const;
-			CameraType getTpye() const;
+			const CameraUseData& getUseData() const override;
+			CameraUseData& getUseData() override;
 
-			const CameraWorldData& getWorldData() const;
-			CameraWorldData& getWorldData();
+			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
-			const UseData& getUseData() const;
-			UseData& getUseData();
+			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override = 0;
 
-			virtual void draw(const Core::Shader& shader) const = 0;
-
-			virtual void update(
-				UpdateEvent event    = UpdateEvent::NONE,
-				PositionEvent pEvent = PositionEvent::NONE,
-				float deltaTime      = 0.0f,
-				const Mouse* mouse   = nullptr
-			);
-
+			virtual void drawUIParams() override = 0;
 		protected:
-			void updatePosition(PositionEvent event, float deltaTime);
+			void updatePosition(float deltaTime);
 			void updateLookAt();
+
+			virtual void updateShader(const Core::Shader &shader) const override = 0;
 
 			virtual void updateTarget(const Mouse* mouse, float deltaTime) = 0;
 			virtual void updateProjection() = 0;
@@ -113,11 +98,9 @@ namespace Engine {
 			virtual void zoom(const Mouse* mouse, float deltaTime) = 0;
 
 		protected:
-			Core::EntityID _mID;
+			CameraType _mCameraType;
 
-			CameraWorldData _mWorldData;
-			UseData         _mUseData;
-
-			CameraType _mType;
+			CameraWorldData _mCameraWorldData;
+			CameraUseData _mCameraUseData;
 	};
 }

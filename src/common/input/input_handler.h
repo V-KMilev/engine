@@ -20,6 +20,8 @@ namespace Engine {
 		float scrollY = 0.0f;
 
 		double speed = 0.1f;
+
+		bool hasUpdate = false;
 	};
 
 	class InputHandle {

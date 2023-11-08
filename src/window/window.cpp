@@ -157,7 +157,7 @@ namespace Engine {
 		while(!glfwWindowShouldClose(_mWindow)) {
 			_mInput->processMouse(_mWindow);
 
-			_mScene->update(time_tick());
+			_mScene->onUpdate(time_tick());
 
 			_mScene->render();
 			_mScene->renderUI();

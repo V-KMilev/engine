@@ -2,100 +2,75 @@
 
 #include "input_handler.h"
 
+#include "error_handle.h"
+
 namespace Engine {
-	void CameraWorldData::updateLookAt() {
-		lookAt = glm::lookAt(position, target, up);
-	}
+	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {}
 
-	Camera::Camera(CameraType Type) : _mType(Type) {}
-
-	Camera::Camera(const Camera& other) {
-		_mID        = other._mID;
-		_mWorldData = other._mWorldData;
-		_mType      = other._mType;
-	}
-
-	Camera& Camera::operator = (const Camera& other) {
-		if (this == &other) {
-			return *this;
-		}
-		_mID        = other._mID;
-		_mWorldData = other._mWorldData;
-		_mType      = other._mType;
-
-		return *this;
-	}
-
-	unsigned int Camera::getID() const {
-		return _mID.getID();
-	}
-
-	CameraType Camera::getTpye() const {
-		return _mType;
+	CameraType Camera::getCameraTpye() const {
+		return _mCameraType;
 	}
 
 	const CameraWorldData& Camera::getWorldData() const {
-		return _mWorldData;
+		return _mCameraWorldData;
 	}
 
 	CameraWorldData& Camera::getWorldData() {
-		return _mWorldData;
+		return _mCameraWorldData;
 	}
 
-	const UseData& Camera::getUseData() const {
-		return _mUseData;
-	}
-	UseData& Camera::getUseData() {
-		return _mUseData;
+	const CameraUseData& Camera::getUseData() const {
+		return _mCameraUseData;
 	}
 
-	void Camera::update(
-		UpdateEvent event,
-		PositionEvent pEvent,
-		float deltaTime,
-		const Mouse* mouse
-	) {
-		if (event == UpdateEvent::POSITION) {
-			_mUseData.hasUpdate = true;
-			updatePosition(pEvent, deltaTime);
-		}
-		else if (event == UpdateEvent::TARGET) {
-			_mUseData.hasUpdate = true;
-			updateTarget(mouse, deltaTime);
-		}
-		else if (event == UpdateEvent::FOV) {
-			_mUseData.hasUpdate = true;
-			zoom(mouse, deltaTime);
-		}
-		else if (event == UpdateEvent::UI) {
-			updateProjection();
-			_mWorldData.updateLookAt();
-		}
-		else {
-			return;
-		}
-		_mUseData.hasUpdate = false;
+	CameraUseData& Camera::getUseData() {
+		return _mCameraUseData;
 	}
 
-	void Camera::updatePosition(PositionEvent event, float deltaTime) {
-		if(_mUseData.hasUpdate) {
-			if      (event == PositionEvent::POSX) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
-			else if (event == PositionEvent::NEGX) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.front; }
-			else if (event == PositionEvent::POSY) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
-			else if (event == PositionEvent::NEGY) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.up;    }
-			else if (event == PositionEvent::POSZ) { _mWorldData.position += deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
-			else if (event == PositionEvent::NEGZ) { _mWorldData.position -= deltaTime * _mUseData.moveSpeed * _mWorldData.right; }
+	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
+		auto& ud = _mCameraUseData;
+
+		M_ASSERT(mouse);
+
+		if (ud.hasUpdate) {
+			if (ud.positionEvent != PositionEvent::NONE) {
+				updatePosition(deltaTime);
+			}
+			else if (ud.updateEvent == UpdateEvent::TARGET) {
+				updateTarget(mouse, deltaTime);
+			}
+			else if (ud.updateEvent == UpdateEvent::FOV) {
+				zoom(mouse, deltaTime);
+			}
 			else {
 				return;
 			}
 
+			updateProjection();
 			updateLookAt();
+
+			ud.hasUpdate = false;
+		}
+	}
+
+	void Camera::updatePosition(float deltaTime) {
+		auto& ud = _mCameraUseData;
+		auto& wd = _mCameraWorldData;
+
+		if      (ud.positionEvent == PositionEvent::POSX) { wd.position += deltaTime * ud.moveSpeed * wd.front; }
+		else if (ud.positionEvent == PositionEvent::NEGX) { wd.position -= deltaTime * ud.moveSpeed * wd.front; }
+		else if (ud.positionEvent == PositionEvent::POSY) { wd.position += deltaTime * ud.moveSpeed * wd.up;    }
+		else if (ud.positionEvent == PositionEvent::NEGY) { wd.position -= deltaTime * ud.moveSpeed * wd.up;    }
+		else if (ud.positionEvent == PositionEvent::POSZ) { wd.position += deltaTime * ud.moveSpeed * wd.right; }
+		else if (ud.positionEvent == PositionEvent::NEGZ) { wd.position -= deltaTime * ud.moveSpeed * wd.right; }
+		else {
+			return;
 		}
 	}
 
 	void Camera::updateLookAt() {
-		if(_mUseData.hasUpdate) {
-			_mWorldData.updateLookAt();
-		}
+		auto& wd = _mCameraWorldData;
+
+		wd.lookAt = glm::lookAt(wd.position, wd.target, wd.up);
 	}
 };
