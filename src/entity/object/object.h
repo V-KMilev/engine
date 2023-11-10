@@ -58,6 +58,7 @@ namespace Engine {
 
 	struct ObjectUseData : UseData {
 		public:
+			bool linesOnly = false;
 	};
 
 	class Object : public Entity {

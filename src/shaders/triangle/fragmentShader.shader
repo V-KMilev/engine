@@ -1,8 +1,9 @@
 #version 330 core
-
 layout(location = 0) out vec4 outColor;
 
 uniform sampler2D tmp;
+
+uniform int uSelected;
 
 uniform float uNear;
 uniform float uFar;
@@ -26,4 +27,8 @@ void main() {
 	vec4 positionColor = vec4(fs_in.world_position.x, fs_in.world_position.y, fs_in.world_position.z, 1.0);
 
 	outColor = texture(tmp, fs_in.texCoords) + vec4(positionColor.xyz, 1.0);
+
+	if(bool(uSelected)) {
+		outColor = vec4(1.0, 0.0, 0.0, 1.0);
+	}
 }

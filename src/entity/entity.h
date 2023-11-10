@@ -25,8 +25,9 @@ namespace Engine {
 	// Base UseData struct
 	struct UseData {
 		public:
-			bool isActive  = false;
-			bool hasUpdate = false;
+			bool isActive   = false;
+			bool isSelected = false;
+			bool hasUpdate  = false;
 	};
 
 	class Entity {

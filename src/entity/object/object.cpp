@@ -7,6 +7,8 @@
 #include "gl_render.h"
 #include "gl_shader.h"
 
+#include "gl_error_handle.h"
+
 #include "mesh.h"
 
 namespace Engine {
@@ -52,9 +54,15 @@ namespace Engine {
 	void Object::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
 		updateShader(shader);
 
+		if (_mObjectUseData.linesOnly) {
+			MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+		}
 		for(const std::shared_ptr<Mesh>& mesh : _mMeshes) {
+
 			mesh->draw(renderer, shader);
 		}
+
+		MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 	}
 
 	void Object::drawUIParams() {
@@ -68,6 +76,7 @@ namespace Engine {
 		std::string position = "Position##Object" + std::to_string(_mID.getID());
 		std::string rotation = "Rotation##Object" + std::to_string(_mID.getID());
 		std::string scale    = "Scale##Object"    + std::to_string(_mID.getID());
+		std::string lines    = "Lines##Object"    + std::to_string(_mID.getID());
 
 		if(ImGui::DragFloat3(position.c_str(), &wd.position[0], 1)) {
 			ud.hasUpdate = true;
@@ -79,14 +88,18 @@ namespace Engine {
 			ud.hasUpdate = true;
 		}
 
+		ImGui::Checkbox(lines.c_str(), &_mObjectUseData.linesOnly);
+
 		for(std::shared_ptr<Mesh>& mesh : _mMeshes) {
 			mesh->drawUIParams();
 		}
 	}
 
 	void Object::updateShader(const Core::Shader &shader) const {
-		// We dont have anything to put in here
-		// The meshes are updating the shader
+		shader.bind();
+
+		shader.setUniform1ui("uObjectID", _mID.getID());
+		shader.setUniform1i("uSelected", _mObjectUseData.isSelected);
 	}
 
 	void Object::updateModel() {

@@ -139,7 +139,6 @@ namespace Engine {
 		}
 
 		for(const std::shared_ptr<Object>& object : _mObjects) {
-			shader->setUniform1ui("uObjectID", object->getID());
 			object->draw(*_mRenderer, *shader);
 		}
 	}
@@ -151,7 +150,9 @@ namespace Engine {
 		Core::PixelInfo pixel = _mPickTexture->readPixel(x, y);
 
 		if (pixel.objectID > 0) {
-			// TODO: Add pick logic
+			for(const std::shared_ptr<Object>& object : _mObjects) {
+				object->getUseData().isSelected = (object->getID() == pixel.objectID) ? true : false;
+			}
 		}
 	}
 
