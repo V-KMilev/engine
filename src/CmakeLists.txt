@@ -12,6 +12,7 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/object/basic_geometry/quad.cpp
 	${ENGINE_SRC_DIR}/entity/object/basic_geometry/triangle.cpp
 	${ENGINE_SRC_DIR}/entity/object/mesh/mesh.cpp
+	${ENGINE_SRC_DIR}/entity/object/model/model.cpp
 	${ENGINE_SRC_DIR}/entity/entity_id.cpp
 	${ENGINE_SRC_DIR}/entity/entity.cpp
 	
@@ -29,6 +30,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/entity/object
 	${ENGINE_SRC_DIR}/entity/object/basic_geometry
 	${ENGINE_SRC_DIR}/entity/object/mesh
+	${ENGINE_SRC_DIR}/entity/object/model
 	${ENGINE_SRC_DIR}/entity
 
 	${ENGINE_SRC_DIR}/scene
