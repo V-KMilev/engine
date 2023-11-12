@@ -72,8 +72,23 @@ namespace Engine {
 				std::vector<std::shared_ptr<Camera>>& cameras
 			);
 
-			void topPanel(std::vector<std::shared_ptr<Camera>>& cameras);
-			void botPanel();
+			void lowLeftPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
+			void LowRightPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
+
+			void topPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
+			void botPanel(
+				std::vector<std::shared_ptr<Object>>& objects,
+				std::vector<std::shared_ptr<Camera>>& cameras
+			);
 
 			void panelPosition();
 

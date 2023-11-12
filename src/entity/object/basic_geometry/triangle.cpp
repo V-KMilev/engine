@@ -18,10 +18,7 @@ namespace Engine {
 
 		std::vector<unsigned int> indices = {0, 1, 2};
 
-		// Create an empty vector for texture IDs
-		std::vector<unsigned int> textureIDs;
-
 		// Now, you can pass these vectors to your functions
-		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, textureIDs));
+		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices));
 	}
 };

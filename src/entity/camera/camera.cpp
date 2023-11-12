@@ -42,13 +42,13 @@ namespace Engine {
 			else if (ud.updateEvent == UpdateEvent::FOV) {
 				zoom(mouse, deltaTime);
 			}
-			else {
-				return;
-			}
 
 			updateProjection();
 			updateLookAt();
 
+			ud.updateEvent = UpdateEvent::NONE;
+
+			// Reset the update event
 			ud.hasUpdate = false;
 		}
 	}
@@ -66,6 +66,8 @@ namespace Engine {
 		else {
 			return;
 		}
+
+		ud.positionEvent = PositionEvent::NONE;
 	}
 
 	void Camera::updateLookAt() {

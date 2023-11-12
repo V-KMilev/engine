@@ -59,9 +59,9 @@ namespace Engine {
 	class Mesh : public Entity {
 		public:
 			Mesh(
-				const std::vector<Utils::Vertex>& mVertices,
-				const std::vector<unsigned int>&  mIndices,
-				const std::vector<unsigned int>&  mTextureIDs
+				const std::vector<Utils::Vertex>& vertices,
+				const std::vector<unsigned int>& indices,
+				std::vector<std::shared_ptr<Core::Texture>> && textures = {}
 			);
 
 			unsigned int getID() const;
@@ -77,6 +77,7 @@ namespace Engine {
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override;
 
 			void drawUIParams() override;
+			void drawUiTextures();
 
 			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
 

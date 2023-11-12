@@ -11,20 +11,25 @@
 
 #include "gl_render.h"
 #include "gl_shader.h"
+#include "gl_texture.h"
 
 #include "error_handle.h"
 
 namespace Engine {
 	Mesh::Mesh(
-		const std::vector<Utils::Vertex>& mVertices,
-		const std::vector<unsigned int>&  mIndices,
-		const std::vector<unsigned int>&  mTextureIDs
-	) : Entity(EntityType::MESH) {
+			const std::vector<Utils::Vertex>& vertices,
+			const std::vector<unsigned int>& indices,
+			std::vector<std::shared_ptr<Core::Texture>> && textures
+	) : _mTexture(std::move(textures)), Entity(EntityType::MESH) {
 
-		M_ASSERT(!mVertices.empty() && !mIndices.empty());
+		M_ASSERT(!vertices.empty() && !indices.empty());
 
-		_mVB = std::make_shared<Core::VertexBuffer>(&mVertices[0], mVertices.size() * sizeof(Utils::Vertex));
-		_mIB = std::make_shared<Core::IndexBuffer>(&mIndices[0], mIndices.size());
+		for(std::shared_ptr<Core::Texture>& texture : _mTexture) {
+			texture->init();
+		}
+
+		_mVB = std::make_shared<Core::VertexBuffer>(&vertices[0], vertices.size() * sizeof(Utils::Vertex));
+		_mIB = std::make_shared<Core::IndexBuffer>(&indices[0], indices.size());
 		_mVA = std::make_shared<Core::VertexArray>();
 
 		_mVBL = std::make_shared<Core::VertexBufferLayout>();
@@ -62,8 +67,8 @@ namespace Engine {
 
 		// TODO: Think of what we can do in this situation
 		if (ud.hasUpdate) {
-			// updateModel();
 
+			// Reset the update event
 			ud.hasUpdate = false;
 		}
 	}
@@ -74,31 +79,13 @@ namespace Engine {
 		renderer.draw(*_mVA, *_mIB, shader);
 	}
 
-	void Mesh::drawUIParams() {
-		auto& ud = _mMeshUseData;
-		auto& wd = _mMeshWorldData;
-
-		ImGui::BulletText("Mesh:");
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", _mID.getID());
-
-		std::string position = "Position##Mesh" + std::to_string(_mID.getID());
-		std::string rotation = "Rotation##Mesh" + std::to_string(_mID.getID());
-		std::string scale    = "Scale##Mesh"    + std::to_string(_mID.getID());
-
-		if(ImGui::DragFloat3(position.c_str(), &wd.position[0], 1)) {
-			ud.hasUpdate = true;
-		}
-		if(ImGui::DragFloat3(rotation.c_str(), &wd.rotation[0], 1)) {
-			ud.hasUpdate = true;
-		}
-		if(ImGui::DragFloat3(scale.c_str(), &wd.scale[0], 1)) {
-			ud.hasUpdate = true;
-		}
-	}
-
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		shader.bind();
+
+		for(const std::shared_ptr<Core::Texture>& texture : _mTexture) {
+			texture->bind(texture->getID());
+			shader.setUniform1ui(texture->getName(), texture->getID());
+		}
 
 		shader.setUniformMatrix4fv("uModel", _mMeshWorldData.model);
 	}
@@ -118,5 +105,37 @@ namespace Engine {
 
 		// TODO: Think if we can fix the "problem"
 		wd.model *= objectModel;
+	}
+
+	void Mesh::drawUIParams() {
+		auto& ud = _mMeshUseData;
+		auto& wd = _mMeshWorldData;
+
+		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
+
+		std::string sPosition = "Position##Mesh" + std::to_string(_mID.getID());
+		std::string sRotation = "Rotation##Mesh" + std::to_string(_mID.getID());
+		std::string sScale    = "Scale##Mesh"    + std::to_string(_mID.getID());
+
+		if(ImGui::TreeNode(sMesh.c_str())) {
+
+			ImGui::SeparatorText(sMesh.c_str());
+
+			if(ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
+			if(ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
+			if(ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0],    1)) { ud.hasUpdate = true; }
+
+			ImGui::TreePop();
+		}
+	}
+
+	void Mesh::drawUiTextures() {
+		for(const std::shared_ptr<Core::Texture>& texture : _mTexture) {
+			// std::string sTexture = "Texture: #" + std::to_string(texture->getID());
+
+			// ImGui::SeparatorText(sTexture.c_str());
+
+			// ImGui::BulletText(texture->getName().c_str());
+		}
 	}
 };

@@ -88,6 +88,7 @@ namespace Engine {
 		}
 
 		// TODO: Think of where this should be
+		// Reset the update event
 		_mInput->getMouse().hasUpdate = false;
 	}
 

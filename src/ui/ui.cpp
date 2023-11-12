@@ -85,8 +85,11 @@ namespace Engine {
 		leftPanel(objects, cameras);
 		rightPanel(objects, cameras);
 
-		topPanel(cameras);
-		botPanel();
+		lowLeftPanel(objects, cameras);
+		LowRightPanel(objects, cameras);
+
+		topPanel(objects, cameras);
+		botPanel(objects, cameras);
 	}
 
 	void UI::mainManu() {
@@ -111,13 +114,15 @@ namespace Engine {
 	) {
 		// Object Data
 		ImGui::SetNextWindowPos(ImVec2(0, MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth - (_mData.height * 1 / 4 + MainBarWidth * 4)), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Left", nullptr, staticWindow);
 
 		for(std::shared_ptr<Object>& object : objects) {
-			object->drawUIParams();
+			if (object->getUseData().isSelected) {
+				object->drawUIParams();
+			}
 		}
 
 		ImGui::End();
@@ -128,8 +133,8 @@ namespace Engine {
 		std::vector<std::shared_ptr<Camera>>& cameras
 	) {
 		// Object Params
-		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4 , MainBarWidth), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4, MainBarWidth), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth - (_mData.height * 1 / 4 + MainBarWidth * 4)), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Right", nullptr, staticWindow);
@@ -137,10 +142,80 @@ namespace Engine {
 		for(std::shared_ptr<Camera>& camera : cameras) {
 			camera->drawUIParams();
 		}
+
 		ImGui::End();
 	}
 
-	void UI::topPanel(std::vector<std::shared_ptr<Camera>>& cameras) {
+	void UI::lowLeftPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
+		// Object Data
+		ImGui::SetNextWindowPos(ImVec2(0, _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowBgAlpha(1.0f);
+
+		ImGui::Begin("##LowLeft", nullptr, staticWindow);
+
+		if (ImGui::BeginTabBar("##lowLeftTabBar")) {
+			if (ImGui::BeginTabItem("test1")) {
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("test2")) {
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("test3")) {
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+
+		for(std::shared_ptr<Object>& object : objects) {
+			if (object->getUseData().isSelected) {
+				object->drawUIMeshList();
+			}
+		}
+
+		ImGui::End();
+	}
+
+	void UI::LowRightPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
+		// Object Data
+		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4, _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
+		ImGui::SetNextWindowBgAlpha(1.0f);
+
+		ImGui::Begin("##LowRight", nullptr, staticWindow);
+
+		if (ImGui::BeginTabBar("##lowRightTabBar")) {
+			if (ImGui::BeginTabItem("test1")) {
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("test2")) {
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("test3")) {
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+
+		for(std::shared_ptr<Object>& object : objects) {
+			if (object->getUseData().isSelected) {
+				object->drawUIRenderData();
+			}
+		}
+
+		ImGui::End();
+	}
+
+	void UI::topPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
 		// Activity information
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, ActivityBarWidth * 2), ImGuiCond_Once);
@@ -163,7 +238,10 @@ namespace Engine {
 		ImGui::End();
 	}
 
-	void UI::botPanel() {
+	void UI::botPanel(
+		std::vector<std::shared_ptr<Object>>& objects,
+		std::vector<std::shared_ptr<Camera>>& cameras
+	) {
 		// Assets
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
@@ -181,6 +259,12 @@ namespace Engine {
 			if (ImGui::BeginMenu("test3")) {
 			}
 			ImGui::EndMenuBar();
+		}
+
+		for(std::shared_ptr<Object>& object : objects) {
+			if (object->getUseData().isSelected) {
+				object->drawUIMeshTextures();
+			}
 		}
 
 		// Debug
@@ -244,6 +328,12 @@ namespace Engine {
 		colors[ImGuiCol_ResizeGrip]             = ImVec4(0.98f, 0.26f, 0.26f, 0.20f);
 		colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.98f, 0.26f, 0.26f, 0.70f);
 		colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.98f, 0.26f, 0.26f, 0.90f);
+
+		colors[ImGuiCol_Tab]                    = ImVec4(0.60f, 0.18f, 0.18f, 0.80f);
+		colors[ImGuiCol_TabHovered]             = ImVec4(0.98f, 0.26f, 0.26f, 0.90f);
+		colors[ImGuiCol_TabActive]              = ImVec4(0.70f, 0.20f, 0.20f, 1.00f);
+		colors[ImGuiCol_TabUnfocused]           = ImVec4(0.15f, 0.07f, 0.07f, 1.00f);
+		colors[ImGuiCol_TabUnfocusedActive]     = ImVec4(0.43f, 0.14f, 0.14f, 1.00f);
 
 		colors[ImGuiCol_PlotLines]              = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
 		colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
