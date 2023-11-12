@@ -36,7 +36,6 @@ namespace Engine {
 	bool Model::load_data() {
 		tinyobj::ObjReader reader;
 		tinyobj::ObjReaderConfig reader_config;
-		// reader_config.mtl_search_path = "";
 
 		if (!reader.ParseFromFile(_mPath, reader_config)) {
 			if (!reader.Error().empty()) {
@@ -99,28 +98,27 @@ namespace Engine {
 					}
 
 					vertices.push_back({position, normal, textCoord});
-					indices.push_back((unsigned int)idx.vertex_index);
+					indices.push_back(vertices.size() - 1);
 				}
 				index_offset += fv;
-
-				// Retrieve material index for the current face
-				int materialID = shapes[0][s].mesh.material_ids[f];
-
-				textures.emplace_back(material_fill(materials, materialID));
 			}
+
+			load_materials(materials, textures);
 
 			push_mesh(vertices, indices, std::move(textures));
 		}
 	}
 
-	std::shared_ptr<Core::Texture> && Model::material_fill(const std::vector<tinyobj::material_t>* materials, int materialID) {
+	void Model::load_materials(
+		const std::vector<tinyobj::material_t>* materials,
+		std::vector<std::shared_ptr<Core::Texture>>& textures
+	) {
 		// Default texture
-		std::string texturePath = "../asset/textures/default/tmp.jpg";
-		
-		// Check if the material index is valid
-		if (materialID >= 0 && static_cast<size_t>(materialID) < materials->size()) {
-			const tinyobj::material_t& material = materials[0][materialID];
+		std::string defaultPath = "../asset/textures/default/tmp.jpg";
 
+		std::vector<std::string> texturePaths(13, "");
+
+		for(const tinyobj::material_t& material : materials[0]) {
 			// Load the material data
 			_mRenderData.ambient       = glm::make_vec3(material.ambient);
 			_mRenderData.diffuse       = glm::make_vec3(material.diffuse);
@@ -135,24 +133,37 @@ namespace Engine {
 			_mRenderData.metallic  = material.metallic;
 			_mRenderData.sheen     = material.sheen;
 
-			// Load the material texture
-			texturePath = material.ambient_texname.empty()            ? texturePath : material.ambient_texname;
-			texturePath = material.diffuse_texname.empty()            ? texturePath : material.diffuse_texname;
-			texturePath = material.specular_texname.empty()           ? texturePath : material.specular_texname;
-			texturePath = material.specular_highlight_texname.empty() ? texturePath : material.specular_highlight_texname;
-			texturePath = material.bump_texname.empty()               ? texturePath : material.bump_texname;
-			texturePath = material.displacement_texname.empty()       ? texturePath : material.displacement_texname;
-			texturePath = material.alpha_texname.empty()              ? texturePath : material.alpha_texname;
-			texturePath = material.reflection_texname.empty()         ? texturePath : material.reflection_texname;
+			std::vector<std::string> newTexturePaths = {
+				material.ambient_texname,
+				material.diffuse_texname,
+				material.specular_texname,
+				material.specular_highlight_texname,
+				material.bump_texname,
+				material.displacement_texname,
+				material.alpha_texname,
+				material.reflection_texname,
+				material.roughness_texname,
+				material.metallic_texname,
+				material.sheen_texname,
+				material.emissive_texname,
+				material.normal_texname
+			};
 
-			texturePath = material.roughness_texname.empty() ? texturePath : material.roughness_texname;
-			texturePath = material.metallic_texname.empty()  ? texturePath : material.metallic_texname;
-			texturePath = material.sheen_texname.empty()     ? texturePath : material.sheen_texname;
-			texturePath = material.emissive_texname.empty()  ? texturePath : material.emissive_texname;
-			texturePath = material.normal_texname.empty()    ? texturePath : material.normal_texname;
+			for (int idx = 0; idx < texturePaths.size(); idx++) {
+				if (texturePaths[idx].empty() && !newTexturePaths[idx].empty()) {
+					texturePaths[idx] = newTexturePaths[idx];
+				}
+			}
 		}
 
-		return std::move(std::make_shared<Core::Texture>(texturePath));
+		for (int idx = 0; idx < texturePaths.size(); idx++) {
+			std::string texturePath = defaultPath;
+			if(!texturePaths[idx].empty()) {
+				texturePath = _mPath.substr(0, _mPath.find_last_of('/')) + "/" + texturePaths[idx];
+			}
+
+			textures.emplace_back(std::make_shared<Core::Texture>(texturePath, Core::TextureShaderType(idx + 1)));
+		}
 	}
 
 	void Model::push_mesh(

@@ -149,7 +149,7 @@ namespace Engine {
 
 		_mScene->addObject(std::make_shared<Quad>());
 		_mScene->addObject(std::make_shared<Quad>());
-		// _mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
+		_mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));

@@ -1,12 +1,21 @@
 #version 330 core
 layout(location = 0) out vec4 outColor;
 
-uniform sampler2D tmp;
-
-uniform int uSelected;
-
-uniform float uNear;
-uniform float uFar;
+struct Material {
+	sampler2D Ambient;
+	sampler2D Diffuse;
+	sampler2D Specular;
+	sampler2D Specular_highlight;
+	sampler2D Bump;
+	sampler2D Displacement;
+	sampler2D Alpha;
+	sampler2D Reflection;
+	sampler2D Roughness;
+	sampler2D Metallic;
+	sampler2D Sheen;
+	sampler2D Emissive;
+	sampler2D Normal;
+};
 
 in VS_OUT {
 	vec4 world_position;
@@ -21,14 +30,19 @@ in VS_OUT {
 	mat4 view;
 } fs_in;
 
+uniform int uSelected;
+
+uniform float uNear;
+uniform float uFar;
+
+uniform Material uMaterial;
+
 void main() {
 	gl_FragDepth = fs_in.depth;
 
-	vec4 positionColor = vec4(fs_in.world_position.x, fs_in.world_position.y, fs_in.world_position.z, 1.0);
-
-	outColor = texture(tmp, fs_in.texCoords) + vec4(positionColor.xyz, 1.0);
+	outColor = texture(uMaterial.Diffuse, fs_in.texCoords) + vec4(fs_in.position.xyz, 1.0);
 
 	if(bool(uSelected)) {
-		outColor = vec4(1.0, 0.0, 0.0, 1.0);
+		outColor *= vec4(1.0, 0.7, 0.7, 0.5);
 	}
 }
