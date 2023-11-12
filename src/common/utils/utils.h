@@ -4,6 +4,10 @@
 #include <sstream>
 #include <chrono>
 
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+#include <imgui.h>
+
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
@@ -32,5 +36,13 @@ namespace Engine {
 
 			return ss.str();
 		}
+
+		namespace UI {
+			static void ColoredBulletText(const std::string& bulletText, const std::string& coloredText, ImVec4 color) {
+				ImGui::BulletText("%s", bulletText.c_str());
+				ImGui::SameLine();
+				ImGui::TextColored(color, "%s", coloredText.c_str());
+			}
+		};
 	};
 };

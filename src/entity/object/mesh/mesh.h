@@ -88,7 +88,7 @@ namespace Engine {
 			MeshWorldData _mMeshWorldData;
 			MeshUseData   _mMeshUseData;
 
-			std::vector<std::shared_ptr<Core::Texture>> _mTexture;
+			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
 
 			std::shared_ptr<Core::VertexArray>        _mVA;
 			std::shared_ptr<Core::VertexBuffer>       _mVB;

@@ -163,7 +163,7 @@ namespace Engine {
 	}
 
 	void Object::drawUIMeshTextures() {
-		std::string sMeshTextures  = "Mesh Textures##Object" + std::to_string(_mID.getID());
+		std::string sMeshTextures  = "Mesh Texture List##Object" + std::to_string(_mID.getID());
 
 		ImGui::SeparatorText(sMeshTextures.c_str());
 

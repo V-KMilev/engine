@@ -15,16 +15,18 @@
 
 #include "error_handle.h"
 
+#include "utils.h"
+
 namespace Engine {
 	Mesh::Mesh(
 			const std::vector<Utils::Vertex>& vertices,
 			const std::vector<unsigned int>& indices,
 			std::vector<std::shared_ptr<Core::Texture>> && textures
-	) : _mTexture(std::move(textures)), Entity(EntityType::MESH) {
+	) : _mTextures(std::move(textures)), Entity(EntityType::MESH) {
 
 		M_ASSERT(!vertices.empty() && !indices.empty());
 
-		for(std::shared_ptr<Core::Texture>& texture : _mTexture) {
+		for(std::shared_ptr<Core::Texture>& texture : _mTextures) {
 			texture->init();
 		}
 
@@ -82,9 +84,14 @@ namespace Engine {
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		shader.bind();
 
-		for(const std::shared_ptr<Core::Texture>& texture : _mTexture) {
-			texture->bind(texture->getID());
-			shader.setUniform1ui(texture->getName(), texture->getID());
+		for(int idx = 0; idx < _mTextures.size(); idx++) {
+			const std::shared_ptr<Core::Texture>& texture = _mTextures[idx];
+
+			texture->bind(idx);
+
+			std::string material = "uMaterial." + texture->getShaderName();
+
+			shader.setUniform1i(material, idx);
 		}
 
 		shader.setUniformMatrix4fv("uModel", _mMeshWorldData.model);
@@ -130,12 +137,58 @@ namespace Engine {
 	}
 
 	void Mesh::drawUiTextures() {
-		for(const std::shared_ptr<Core::Texture>& texture : _mTexture) {
-			// std::string sTexture = "Texture: #" + std::to_string(texture->getID());
+		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
 
-			// ImGui::SeparatorText(sTexture.c_str());
+		if(ImGui::TreeNode(sMesh.c_str())) {
+			static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
 
-			// ImGui::BulletText(texture->getName().c_str());
+			ImGui::Unindent();
+
+			if (ImGui::BeginTable("table1", 3, tableFlags)) {
+				ImGui::TableSetupColumn("Texture Tpye:");
+				ImGui::TableSetupColumn("Texture:");
+				ImGui::TableSetupColumn("Data:");
+
+				ImGui::TableHeadersRow();
+
+				for(const std::shared_ptr<Core::Texture>& texture : _mTextures) {
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::NewLine();
+					ImGui::NewLine();
+					ImGui::Indent();
+					ImGui::TextColored(ImVec4(0.96f, 0.26f, 0.26f, 1.00f), "%s", texture->getShaderName().c_str());
+					ImGui::Unindent();
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::Image((ImTextureID)texture->getID(), ImVec2(100.0f, 100.0f));
+
+					ImGui::TableSetColumnIndex(2);
+
+					Utils::UI::ColoredBulletText("ID:", std::to_string(texture->getID()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText("Width:", std::to_string(texture->getWidth()), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText("Height:", std::to_string(texture->getHeight()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText("Path:", texture->getPath(), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText("Name:", texture->getName(), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+
+					if (ImGui::TreeNodeEx("OpenGL Data", ImGuiTreeNodeFlags_Selected)) {
+						const auto& tParams = texture->getParams();
+
+						Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Target:", std::to_string(tParams.target), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Level:", std::to_string(tParams.level), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Internal Format:", std::to_string(tParams.internalFormat), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Format:", std::to_string(tParams.format), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+						Utils::UI::ColoredBulletText("Type:", std::to_string(tParams.type), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+
+						ImGui::TreePop();
+					}
+				}
+				ImGui::EndTable();
+			}
+			ImGui::TreePop();
 		}
 	}
 };
