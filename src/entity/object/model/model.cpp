@@ -114,7 +114,7 @@ namespace Engine {
 		std::vector<std::shared_ptr<Core::Texture>>& textures
 	) {
 		// Default texture
-		std::string defaultPath = "../asset/textures/default/tmp.jpg";
+		std::string defaultPath = "../asset/textures/default/texture.png";
 
 		std::vector<std::string> texturePaths(13, "");
 
