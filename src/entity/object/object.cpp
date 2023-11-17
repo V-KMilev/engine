@@ -13,7 +13,7 @@
 
 namespace Engine {
 	Object::Object(ObjectType type) : _mObjectType(type), Entity(EntityType::OBJECT) {
-		updateModel();
+		_mObjectUseData.hasUpdate = true;
 	}
 
 	ObjectType Object::getObjectTpye() const {

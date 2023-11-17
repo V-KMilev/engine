@@ -54,7 +54,7 @@ namespace Engine {
 			float horizontalAngle = 0.0f;
 			float verticalAngle   = 0.0f;
 
-			float maxUpAngle = 1.70f;
+			float maxUpAngle = 1.57f;
 	};
 
 	struct CameraUseData : UseData {

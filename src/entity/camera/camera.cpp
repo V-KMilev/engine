@@ -5,7 +5,9 @@
 #include "error_handle.h"
 
 namespace Engine {
-	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {}
+	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
+		_mCameraUseData.hasUpdate = true;
+	}
 
 	CameraType Camera::getCameraTpye() const {
 		return _mCameraType;
