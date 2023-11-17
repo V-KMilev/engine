@@ -9,6 +9,7 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/camera/perspective_camera.cpp
 	
 	${ENGINE_SRC_DIR}/entity/object/object.cpp
+	${ENGINE_SRC_DIR}/entity/object/basic_geometry/cube.cpp
 	${ENGINE_SRC_DIR}/entity/object/basic_geometry/quad.cpp
 	${ENGINE_SRC_DIR}/entity/object/basic_geometry/triangle.cpp
 	${ENGINE_SRC_DIR}/entity/object/mesh/mesh.cpp
