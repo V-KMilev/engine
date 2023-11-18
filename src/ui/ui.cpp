@@ -30,12 +30,7 @@ namespace Engine {
 	) : _mData(uiData(width, height, true))
 	{
 		if (_mData.isActive) {
-			MY_GL_CHECK(glViewport(
-				_mData.width  * 1 / 4,
-				_mData.height * 1 / 4 + ActivityBarWidth * 4,
-				_mData.width  * 2 / 4,
-				_mData.height * 2 / 4
-			));
+			setViewPort();
 		}
 
 		IMGUI_CHECKVERSION();
@@ -90,6 +85,19 @@ namespace Engine {
 
 		topPanel(objects, cameras);
 		botPanel(objects, cameras);
+	}
+
+	void UI::showUI() {
+		if (!_mData.isActive) {
+			_mData.isActive = true;
+
+			setViewPort();
+		}
+		else {
+			_mData.isActive = false;
+
+			MY_GL_CHECK(glViewport(0, 0, _mData.width, _mData.height));
+		}
 	}
 
 	void UI::mainManu() {
@@ -276,6 +284,17 @@ namespace Engine {
 		// }
 
 		ImGui::End();
+	}
+
+	void UI::setViewPort() {
+		MY_GL_CHECK(
+			glViewport(
+				_mData.width  * 1 / 4,
+				_mData.height * 1 / 4 + ActivityBarWidth * 4,
+				_mData.width  * 2 / 4,
+				_mData.height * 2 / 4
+			)
+		);
 	}
 
 	void UI::setStyle() {

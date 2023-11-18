@@ -15,8 +15,10 @@
 #include "gl_pick_texture.h"
 #include "gl_texture.h"
 
+#include "orientation.h"
+#include "grid.h"
+
 #include "object.h"
-#include "quad.h"
 
 #include "input_handler.h"
 #include "ui.h"
@@ -43,8 +45,10 @@ namespace Engine {
 
 		_mRenderer = std::make_shared<Core::Renderer>();
 
+		_mOrientation = std::make_shared<Orientation>();
+		_mGrid = std::make_shared<Grid>();
+
 		_mPickTexture = std::make_shared<Core::PickTexture>(_mWidth, _mHeight);
-		_mGrid = std::make_shared<Quad>();
 
 		keyBinds();
 	}
@@ -56,6 +60,9 @@ namespace Engine {
 		for(const std::shared_ptr<Core::Shader>& shader : _mShaders) {
 			if (shader->getName() == "infinite_grid") {
 				drawGrid(shader);
+			}
+			else if (shader->getName() == "orientation") {
+				drawOrientation(shader);
 			}
 			else if (shader->getName() == "pick") {
 				drawPick(shader);
@@ -87,6 +94,8 @@ namespace Engine {
 			object->onUpdate(&_mInput->getMouse(), _mDeltaTime);
 		}
 
+		_mOrientation->onUpdate(&_mInput->getMouse(), _mDeltaTime);
+
 		// TODO: Think of where this should be
 		// Reset the update event
 		_mInput->getMouse().hasUpdate = false;
@@ -101,6 +110,7 @@ namespace Engine {
 	}
 
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
+		// Set the first camera as main (active) camera
 		if(_mCameras.size() == 0) {
 			camera->getUseData().isActive = true;
 		}
@@ -108,7 +118,7 @@ namespace Engine {
 		_mCameras.push_back(camera);
 	}
 
-	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
+	void Scene::drawView(const std::shared_ptr<Core::Shader>& shader) const {
 		shader->bind();
 
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
@@ -116,8 +126,18 @@ namespace Engine {
 				camera->draw(*_mRenderer, *shader);
 			}
 		}
+	}
+
+	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
+		drawView(shader);
 
 		_mGrid->draw(*_mRenderer, *shader);
+	}
+
+	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {
+		drawView(shader);
+
+		_mOrientation->draw(*_mRenderer, *shader);
 	}
 
 	void Scene::drawPick(const std::shared_ptr<Core::Shader>& shader) const {
@@ -133,11 +153,7 @@ namespace Engine {
 	}
 
 	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
-		for(const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
-				camera->draw(*_mRenderer, *shader);
-			}
-		}
+		drawView(shader);
 
 		for(const std::shared_ptr<Object>& object : _mObjects) {
 			object->draw(*_mRenderer, *shader);
@@ -152,26 +168,8 @@ namespace Engine {
 
 		if (pixel.objectID > 0) {
 			for(const std::shared_ptr<Object>& object : _mObjects) {
-				object->getUseData().isSelected = (object->getID() == pixel.objectID) ? true : false;
+				object->getUseData().isSelected = (object->getID() == pixel.objectID && !object->getUseData().isSelected) ? true : false;
 			}
-		}
-	}
-
-	void Scene::updateUI() {
-		if (!_mUI->getData().isActive) {
-			_mUI->getData().isActive = true;
-
-			MY_GL_CHECK(glViewport(
-				_mWidth  * 1 / 4,
-				_mHeight * 1 / 4 + ActivityBarWidth * 2,
-				_mWidth  * 2 / 4,
-				_mHeight * 2 / 4
-			));
-		}
-		else {
-			_mUI->getData().isActive = false;
-
-			MY_GL_CHECK(glViewport(0, 0, _mWidth, _mHeight));
 		}
 	}
 
@@ -193,7 +191,7 @@ namespace Engine {
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { updateUI(); } ), "Activate UI");
+		_mInput->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");

@@ -7,8 +7,8 @@ int main(void) {
 
 	const uint32_t width  = 1920;
 	const uint32_t hight  = 1080;
-	const uint32_t AA     = 4;
-	const bool fullscreen = false;
+	const uint32_t AA     = 8;
+	const bool fullscreen = true;
 
 	Engine::Window window("VKM Engine", width, hight, AA, fullscreen);
 

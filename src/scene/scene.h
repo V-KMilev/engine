@@ -15,6 +15,10 @@ namespace Core {
 namespace Engine {
 	class InputHandle;
 	class UI;
+
+	class Grid;
+	class Orientation;
+
 	class Object;
 }
 
@@ -53,13 +57,14 @@ namespace Engine {
 			void addCamera(std::shared_ptr<Camera> && camera);
 
 		private:
+			void drawView(const std::shared_ptr<Core::Shader>& shader) const;
+			void drawOrientation(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGrid(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawPick(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGeometry(const std::shared_ptr<Core::Shader>& shader) const;
 
 			void pickEvent();
 
-			void updateUI();
 			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
 
 			void keyBinds();
@@ -70,8 +75,10 @@ namespace Engine {
 
 			std::shared_ptr<Core::Renderer> _mRenderer;
 
+			std::shared_ptr<Orientation> _mOrientation;
+			std::shared_ptr<Grid> _mGrid;
+
 			std::shared_ptr<Core::PickTexture> _mPickTexture;
-			std::shared_ptr<Object> _mGrid;
 
 			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
 

@@ -10,11 +10,13 @@
 
 #include "logger.h"
 
-#include "perspective_camera.h"
 #include "input_handler.h"
 #include "scene.h"
-#include "quad.h"
+
+#include "perspective_camera.h"
 #include "model.h"
+#include "cube.h"
+#include "quad.h"
 
 #include "gl_error_handle.h"
 #include "gl_shader.h"
@@ -76,7 +78,7 @@ namespace Engine {
 		glfwMakeContextCurrent(_mWindow);
 		gladLoadGL(glfwGetProcAddress);
 		// FPS cap
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		input_config();
 
@@ -147,14 +149,19 @@ namespace Engine {
 			_mHeight
 		);
 
+		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
+
 		_mScene->addObject(std::make_shared<Quad>());
-		_mScene->addObject(std::make_shared<Quad>());
+		_mScene->addObject(std::make_shared<Cube>());
+
 		_mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
+		_mScene->addObject(std::make_shared<Model>("../asset/models/airplane/11805_airplane_v2_L2.obj"));
+
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\orientation"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
-		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
 		while(!glfwWindowShouldClose(_mWindow)) {
 			_mInput->processMouse(_mWindow);

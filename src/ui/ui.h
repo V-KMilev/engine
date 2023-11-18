@@ -60,6 +60,8 @@ namespace Engine {
 
 			void update();
 
+			void showUI();
+
 		private:
 			void mainManu();
 
@@ -91,6 +93,8 @@ namespace Engine {
 			);
 
 			void panelPosition();
+
+			void setViewPort();
 
 			void setStyle();
 		private:

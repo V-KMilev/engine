@@ -30,6 +30,8 @@ namespace Engine{
 		_mapOfEvents[{key, state}] = event;
 	}
 
+// TODO: Think of way to process inputs parallel
+
 	void InputHandle::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		// You can retrieve the user pointer to get the InputHandle instance
 		InputHandle* inputHandle = static_cast<InputHandle*>(glfwGetWindowUserPointer(window));
