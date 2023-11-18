@@ -8,8 +8,9 @@ uniform mat4 uView;
 uniform mat4 uModel;
 
 out VS_OUT {
+	vec4 local_position;
+	vec4 camera_position;
 	vec4 world_position;
-	vec4 position;
 
 	vec2 texCoords;
 	vec3 normal;
@@ -21,10 +22,13 @@ out VS_OUT {
 } vs_out;
 
 void main() {
-	vec4 world_position = uProjection * uView * uModel * vec4(position, 1.0);
+	vec4 local_position  = vec4(position, 1.0);
+	vec4 camera_position = uView * uModel * local_position;
+	vec4 world_position  = uProjection * camera_position;
 
-	vs_out.position       = uModel * vec4(position, 1.0);
-	vs_out.world_position = world_position;
+	vs_out.local_position  = local_position;
+	vs_out.camera_position = camera_position;
+	vs_out.world_position  = world_position;
 
 	vs_out.texCoords = texCoords;
 
