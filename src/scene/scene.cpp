@@ -24,6 +24,7 @@
 #include "ui.h"
 
 #include "camera.h"
+#include "perspective_camera.h"
 
 namespace Engine {
 	Scene::Scene(
@@ -68,6 +69,7 @@ namespace Engine {
 				drawPick(shader);
 			}
 			else if(shader->getName() == "triangle") {
+				moveEntity(shader);
 				drawGeometry(shader);
 			}
 		}
@@ -85,7 +87,7 @@ namespace Engine {
 		_mDeltaTime = deltaTime;
 
 		for(const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (_mUI->getData().isActive) {
+			if (camera->getUseData().isActive) {
 				camera->onUpdate(&_mInput->getMouse(), _mDeltaTime);
 			}
 		}
@@ -160,7 +162,7 @@ namespace Engine {
 		}
 	}
 
-	void Scene::pickEvent() {
+	void Scene::pickEntity() {
 		int x = _mInput->getMouse().x;
 		int y = _mHeight - _mInput->getMouse().y - 1;
 
@@ -171,6 +173,64 @@ namespace Engine {
 				object->getUseData().isSelected = (object->getID() == pixel.objectID && !object->getUseData().isSelected) ? true : false;
 			}
 		}
+	}
+
+	void Scene::moveEntity(const std::shared_ptr<Core::Shader>& shader) const {
+		// Function to move an entity in world space based on mouse coordinates
+
+		glm::mat4 view       = glm::mat4(1.0f);
+		glm::mat4 projection = glm::mat4(1.0f);
+
+		float fov    = 0.0f;
+		float width  = 0.0f;
+		float height = 0.0f;
+
+		for(const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (camera->getUseData().isActive) {
+				view       = camera->getWorldData().lookAt;
+				projection = camera->getWorldData().projection;
+
+				PerspectiveCamera* cam = static_cast<PerspectiveCamera*>(camera.get());
+
+				fov    = cam->getFov();
+				width  = cam->getWidth();
+				height = cam->getHeight();
+			}
+		}
+
+		for(const std::shared_ptr<Object>& object : _mObjects) {
+			if (object->getUseData().isSelected && _mMoveWithMouse) {
+				// Get the position of the object in world space
+				glm::vec3 position = object->getWorldData().position;
+
+				// Get mouse coordinates
+				float x = (float)_mInput->getMouse().x;
+				float y = (float)_mInput->getMouse().y;
+
+				// Convert mouse coordinates to NDC space
+				float xNDC = (2.0f * x) / width - 1.0f;
+				// Flip the Y axis
+				float yNDC = 1.0f - (2.0f * y) / height;
+
+				// Vector representing the ray in NDC space
+				glm::vec4 rayNDC  = glm::vec4(xNDC, yNDC, 1.0f, 1.0f);
+				// Convert the ray from NDC space to view space
+				glm::vec4 rayView = glm::inverse(projection) * rayNDC;
+
+				// Intersect view vector with object Z plane (in view space)
+				glm::vec4 viewPosition = view * glm::vec4(position, 1.0f);
+				// Calculate the intersection point of the ray with the object's Z plane in view space
+				// Note: I have no idea why we need to get the negative value of viewPosition's z
+				glm::vec4 view_space_intersect = glm::vec4(glm::vec3(rayView) * -viewPosition.z, 1.0f);
+
+				object->getWorldData().position = glm::inverse(view) * view_space_intersect;
+				object->getUseData().hasUpdate = true;
+			}
+		}
+	}
+
+	void Scene::moveEvent() {
+		_mMoveWithMouse = _mMoveWithMouse ? false : true;
 	}
 
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
@@ -196,6 +256,7 @@ namespace Engine {
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
 		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEvent(); } ), "Select ability");
+		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEntity(); } ), "Select ability");
+		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_RIGHT, State::PRESS, std::function<void()>( [this] { moveEvent(); } ), "Move flag");
 	}
 };

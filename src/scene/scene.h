@@ -63,7 +63,9 @@ namespace Engine {
 			void drawPick(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGeometry(const std::shared_ptr<Core::Shader>& shader) const;
 
-			void pickEvent();
+			void pickEntity();
+			void moveEntity(const std::shared_ptr<Core::Shader>& shader) const;
+			void moveEvent();
 
 			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
 
@@ -90,5 +92,7 @@ namespace Engine {
 
 			unsigned int _mWidth;
 			unsigned int _mHeight;
+
+			bool _mMoveWithMouse = false;
 	};
 }
