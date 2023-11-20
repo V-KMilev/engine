@@ -29,7 +29,7 @@ namespace Engine {
 			void zoom(const Mouse* mouse, float deltaTime) override;
 
 		private:
-			float _mFov = 60.0f;
+			float _mFov = 45.0f;
 
 			unsigned int _mHeight = 0;
 			unsigned int _mWidth  = 0;

@@ -78,7 +78,7 @@ namespace Engine {
 		glfwMakeContextCurrent(_mWindow);
 		gladLoadGL(glfwGetProcAddress);
 		// FPS cap
-		glfwSwapInterval(0);
+		glfwSwapInterval(1);
 
 		input_config();
 

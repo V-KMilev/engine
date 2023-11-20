@@ -93,11 +93,16 @@ namespace Engine {
 
 		shader.bind();
 
-		shader.setUniformMatrix4fv("uView", wd.lookAt);
-		shader.setUniformMatrix4fv("uProjection", wd.projection);
 
-		shader.setUniform1f("uNear", wd.c_near);
-		shader.setUniform1f("uFar", wd.c_far);
+		shader.setUniformMatrix4fv("uCamera.view", wd.lookAt);
+		shader.setUniformMatrix4fv("uCamera.projection", wd.projection);
+
+		shader.setUniform1f("uCamera.FOV", _mFov);
+		shader.setUniform1f("uCamera.width", (float)_mWidth);
+		shader.setUniform1f("uCamera.height", (float)_mHeight);
+
+		shader.setUniform1f("uCamera.near", wd.c_near);
+		shader.setUniform1f("uCamera.far", wd.c_far);
 	}
 
 	void PerspectiveCamera::updateTarget(const Mouse* mouse, float deltaTime) {

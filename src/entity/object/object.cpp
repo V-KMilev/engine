@@ -66,8 +66,8 @@ namespace Engine {
 		if (_mObjectUseData.linesOnly) {
 			MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
 		}
-		for(const std::shared_ptr<Mesh>& mesh : _mMeshes) {
 
+		for(const std::shared_ptr<Mesh>& mesh : _mMeshes) {
 			mesh->draw(renderer, shader);
 		}
 

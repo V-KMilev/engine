@@ -1,6 +1,18 @@
 #version 330 core
 layout(location = 0) out vec4 outColor;
 
+struct Camera {
+	mat4 projection;
+	mat4 view;
+
+	float FOV;
+	float width;
+	float height;
+
+	float near;
+	float far;
+};
+
 struct Material {
 	sampler2D Ambient;
 	sampler2D Diffuse;
@@ -19,23 +31,18 @@ struct Material {
 
 in VS_OUT {
 	vec4 local_position;
-	vec4 camera_position;
 	vec4 world_position;
+	vec4 mvp_position;
 
 	vec2 texCoords;
 	vec3 normal;
 
 	float depth;
-
-	mat4 projection;
-	mat4 view;
 } fs_in;
 
 uniform int uSelected;
 
-uniform float uNear;
-uniform float uFar;
-
+uniform Camera uCamera;
 uniform Material uMaterial;
 
 void main() {
@@ -43,7 +50,7 @@ void main() {
 
 	gl_FragDepth = fs_in.depth;
 
-	outColor = texture(uMaterial.Diffuse, fs_in.texCoords);// + vec4(localPosition, 1.0);
+	outColor = texture(uMaterial.Diffuse, fs_in.texCoords) + vec4(localPosition, 1.0);
 
 	if(bool(uSelected)) {
 		outColor *= vec4(1.0, 0.7, 0.7, 0.5);

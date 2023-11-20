@@ -1,15 +1,23 @@
 #version 330 core
 layout(location = 0) out vec4 outColor;
 
-uniform float uNear;
-uniform float uFar;
+struct Camera {
+	mat4 projection;
+	mat4 view;
+
+	float FOV;
+	float width;
+	float height;
+
+	float near;
+	float far;
+};
+
+uniform Camera uCamera;
 
 in VS_OUT {
 	vec3 near;
 	vec3 far;
-
-	mat4 projection;
-	mat4 view;
 } fs_in;
 
 vec4 grid(vec3 fragmentPosition3D, float scale, vec4 gridColor) {
@@ -43,8 +51,8 @@ vec4 grid(vec3 fragmentPosition3D, float scale, vec4 gridColor) {
 	return color;
 }
 
-float computeDepth(vec3 position) {
-	vec4 clip_space_pos = fs_in.projection * fs_in.view * vec4(position, 1.0);
+float computeDepth(vec3 position, mat4 view, mat4 projection) {
+	vec4 clip_space_pos = projection * view * vec4(position, 1.0);
 	return (clip_space_pos.z / clip_space_pos.w);
 }
 
@@ -58,9 +66,9 @@ void main() {
 	float t = -fs_in.near.y / (fs_in.far.y - fs_in.near.y);
 	vec3 fragmentPosition3D = fs_in.near + t * (fs_in.far - fs_in.near);
 
-	gl_FragDepth = computeDepth(fragmentPosition3D);
+	gl_FragDepth = computeDepth(fragmentPosition3D, uCamera.view, uCamera.projection);
 
-	float linearDepth = LinearizeDepth(gl_FragDepth, uNear, uFar) / 2;
+	float linearDepth = LinearizeDepth(gl_FragDepth, uCamera.near, uCamera.far) / 2;
 
 	outColor = (
 		grid(fragmentPosition3D, 100.0, vec4(0.2, 0.2, 0.2, 1.0)) +

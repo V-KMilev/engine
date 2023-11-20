@@ -3,16 +3,24 @@ layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoords;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
+struct Camera {
+	mat4 projection;
+	mat4 view;
+
+	float FOV;
+	float width;
+	float height;
+
+	float near;
+	float far;
+};
+
+uniform Camera uCamera;
 uniform mat4 uModel;
 
 out VS_OUT {
 	vec3 near;
 	vec3 far;
-
-	mat4 projection;
-	mat4 view;
 } vs_out;
 
 vec3 UnprojectPoint(float x, float y, float z, mat4 view, mat4 projection) {
@@ -22,11 +30,8 @@ vec3 UnprojectPoint(float x, float y, float z, mat4 view, mat4 projection) {
 }
 
 void main() {
-	vs_out.near = UnprojectPoint(position.x, position.y, 0.0, uView, uProjection);
-	vs_out.far  = UnprojectPoint(position.x, position.y, 1.0, uView, uProjection);
-
-	vs_out.projection = uProjection;
-	vs_out.view       = uView;
+	vs_out.near = UnprojectPoint(position.x, position.y, 0.0, uCamera.view, uCamera.projection);
+	vs_out.far  = UnprojectPoint(position.x, position.y, 1.0, uCamera.view, uCamera.projection);
 
 	gl_Position = vec4(position, 1.0);
 }
