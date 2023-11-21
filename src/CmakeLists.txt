@@ -18,6 +18,7 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/entity.cpp
 	
 	${ENGINE_SRC_DIR}/scene/orientation/orientation.cpp
+	${ENGINE_SRC_DIR}/scene/gizmo/gizmo.cpp
 	${ENGINE_SRC_DIR}/scene/grid/grid.cpp
 	${ENGINE_SRC_DIR}/scene/scene.cpp
 
@@ -38,6 +39,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/entity
 
 	${ENGINE_SRC_DIR}/scene/orientation
+	${ENGINE_SRC_DIR}/scene/gizmo
 	${ENGINE_SRC_DIR}/scene/grid
 	${ENGINE_SRC_DIR}/scene
 
