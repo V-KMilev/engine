@@ -15,23 +15,32 @@
 
 #include "error_handle.h"
 
+#include "material.h"
 #include "utils.h"
 
 namespace Engine {
 	Mesh::Mesh(
 			const std::vector<Utils::Vertex>& vertices,
 			const std::vector<unsigned int>& indices,
-			std::vector<std::shared_ptr<Core::Texture>> && textures
-	) : _mTextures(std::move(textures)), Entity(EntityType::MESH) {
+			std::shared_ptr<Material> material
 
-		M_ASSERT(!vertices.empty() && !indices.empty());
+	) : Object(ObjectType::MESH),
+		_mVertices(new std::vector<Utils::Vertex>(vertices)),
+		_mIndices(new std::vector<unsigned int>(indices))
+	{
+			_mMaterial = material;
+			load_mesh();
+	}
 
-		for(std::shared_ptr<Core::Texture>& texture : _mTextures) {
+	void Mesh::load_mesh() {
+		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
+
+		for(std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures().textures) {
 			texture->init();
 		}
 
-		_mVB = std::make_shared<Core::VertexBuffer>(&vertices[0], vertices.size() * sizeof(Utils::Vertex));
-		_mIB = std::make_shared<Core::IndexBuffer>(&indices[0], indices.size());
+		_mVB = std::make_shared<Core::VertexBuffer>(_mVertices->data(), _mVertices->size() * sizeof(Utils::Vertex));
+		_mIB = std::make_shared<Core::IndexBuffer>(_mIndices->data(), _mIndices->size());
 		_mVA = std::make_shared<Core::VertexArray>();
 
 		_mVBL = std::make_shared<Core::VertexBufferLayout>();
@@ -45,27 +54,17 @@ namespace Engine {
 
 		_mVA->addBuffer(*_mVB, *_mVBL);
 
+		// Clean the cashe data
+		_mVertices->clear();
+		_mVertices->shrink_to_fit();
+		_mIndices->clear();
+		_mIndices->shrink_to_fit();
+
 		updateModel();
 	}
 
-	const MeshWorldData& Mesh::getWorldData() const {
-		return _mMeshWorldData;
-	}
-
-	MeshWorldData& Mesh::getWorldData() {
-		return _mMeshWorldData;
-	}
-
-	const MeshUseData& Mesh::getUseData() const {
-		return _mMeshUseData;
-	}
-
-	MeshUseData& Mesh::getUseData() {
-		return _mMeshUseData;
-	}
-
 	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
-		auto& ud = _mMeshUseData;
+		auto& ud = _mObjectUseData;
 
 		// TODO: Think of what we can do in this situation
 		if (ud.hasUpdate) {
@@ -83,22 +82,14 @@ namespace Engine {
 
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		shader.bind();
+		
+		_mMaterial->updateShader(shader);
 
-		for(int idx = 0; idx < _mTextures.size(); idx++) {
-			const std::shared_ptr<Core::Texture>& texture = _mTextures[idx];
-
-			texture->bind(idx);
-
-			std::string material = "uMaterial." + texture->getShaderName();
-
-			shader.setUniform1i(material, idx);
-		}
-
-		shader.setUniformMatrix4fv("uModel", _mMeshWorldData.model);
+		shader.setUniformMatrix4fv("uModel", _mObjectWorldData.model);
 	}
 
 	void Mesh::updateModel(glm::mat4 objectModel) {
-		auto& wd = _mMeshWorldData;
+		auto& wd = _mObjectWorldData;
 
 		wd.model = glm::mat4(1.0f);
 
@@ -115,8 +106,8 @@ namespace Engine {
 	}
 
 	void Mesh::drawUIParams() {
-		auto& ud = _mMeshUseData;
-		auto& wd = _mMeshWorldData;
+		auto& ud = _mObjectUseData;
+		auto& wd = _mObjectWorldData;
 
 		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
 
@@ -132,62 +123,6 @@ namespace Engine {
 			if(ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
 			if(ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0],    1)) { ud.hasUpdate = true; }
 
-			ImGui::TreePop();
-		}
-	}
-
-	void Mesh::drawUiTextures() {
-		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
-
-		if(ImGui::TreeNode(sMesh.c_str())) {
-			static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
-
-			ImGui::Unindent();
-
-			if (ImGui::BeginTable("table1", 3, tableFlags)) {
-				ImGui::TableSetupColumn("Texture Tpye:");
-				ImGui::TableSetupColumn("Texture:");
-				ImGui::TableSetupColumn("Data:");
-
-				ImGui::TableHeadersRow();
-
-				for(const std::shared_ptr<Core::Texture>& texture : _mTextures) {
-					ImGui::TableNextRow();
-
-					ImGui::TableSetColumnIndex(0);
-					ImGui::NewLine();
-					ImGui::NewLine();
-					ImGui::Indent();
-					ImGui::TextColored(ImVec4(0.96f, 0.26f, 0.26f, 1.00f), "%s", texture->getShaderName().c_str());
-					ImGui::Unindent();
-
-					ImGui::TableSetColumnIndex(1);
-					ImGui::Image((ImTextureID)texture->getID(), ImVec2(100.0f, 100.0f));
-
-					ImGui::TableSetColumnIndex(2);
-
-					Utils::UI::ColoredBulletText("ID:", std::to_string(texture->getID()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Width:", std::to_string(texture->getWidth()), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Height:", std::to_string(texture->getHeight()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Path:", texture->getPath(), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Name:", texture->getName(), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-
-					if (ImGui::TreeNodeEx("OpenGL Data", ImGuiTreeNodeFlags_Selected)) {
-						const auto& tParams = texture->getParams();
-
-						Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Target:", std::to_string(tParams.target), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Level:", std::to_string(tParams.level), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Internal Format:", std::to_string(tParams.internalFormat), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Format:", std::to_string(tParams.format), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-						Utils::UI::ColoredBulletText("Type:", std::to_string(tParams.type), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-
-						ImGui::TreePop();
-					}
-				}
-				ImGui::EndTable();
-			}
 			ImGui::TreePop();
 		}
 	}

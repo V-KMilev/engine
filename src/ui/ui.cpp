@@ -271,7 +271,7 @@ namespace Engine {
 
 		for(std::shared_ptr<Object>& object : objects) {
 			if (object->getUseData().isSelected) {
-				object->drawUIMeshTextures();
+				object->drawUITextures();
 			}
 		}
 

@@ -12,6 +12,7 @@
 
 #include "logger.h"
 
+#include "material.h"
 #include "mesh.h"
 
 namespace Engine {
@@ -103,37 +104,38 @@ namespace Engine {
 				index_offset += fv;
 			}
 
-			load_materials(materials, textures);
+			load_materials(materials);
 
-			push_mesh(vertices, indices, std::move(textures));
+			push_mesh(vertices, indices);
 		}
 	}
 
-	void Model::load_materials(
-		const std::vector<tinyobj::material_t>* materials,
-		std::vector<std::shared_ptr<Core::Texture>>& textures
-	) {
+	void Model::load_materials(const std::vector<tinyobj::material_t>* materials) {
 		// Default texture
 		std::string defaultPath = "../asset/textures/default/texture.png";
+		std::string rootPath    = _mPath.substr(0, _mPath.find_last_of('/'));
 
 		std::vector<std::string> texturePaths(13, "");
 
+		auto& my_material = _mMaterial->getCoefficients();
+		auto& my_textures = _mMaterial->getTextures();
+
+		// Load the material data
 		for(const tinyobj::material_t& material : materials[0]) {
-			// Load the material data
-			_mRenderData.ambient       = glm::make_vec3(material.ambient);
-			_mRenderData.diffuse       = glm::make_vec3(material.diffuse);
-			_mRenderData.specular      = glm::make_vec3(material.specular);
-			_mRenderData.transmittance = glm::make_vec3(material.transmittance);
-			_mRenderData.emission      = glm::make_vec3(material.emission);
+			my_material.ambient       = glm::make_vec3(material.ambient);
+			my_material.diffuse       = glm::make_vec3(material.diffuse);
+			my_material.specular      = glm::make_vec3(material.specular);
+			my_material.transmittance = glm::make_vec3(material.transmittance);
+			my_material.emission      = glm::make_vec3(material.emission);
 
-			_mRenderData.shininess = material.shininess;
-			_mRenderData.ior       = material.ior;
+			my_material.shininess = material.shininess;
+			my_material.ior       = material.ior;
 
-			_mRenderData.roughness = material.roughness;
-			_mRenderData.metallic  = material.metallic;
-			_mRenderData.sheen     = material.sheen;
+			my_material.roughness = material.roughness;
+			my_material.metallic  = material.metallic;
+			my_material.sheen     = material.sheen;
 
-			std::vector<std::string> newTexturePaths = {
+			std::vector<std::string> texnames = {
 				material.ambient_texname,
 				material.diffuse_texname,
 				material.specular_texname,
@@ -149,28 +151,21 @@ namespace Engine {
 				material.normal_texname
 			};
 
-			for (int idx = 0; idx < texturePaths.size(); idx++) {
-				if (texturePaths[idx].empty() && !newTexturePaths[idx].empty()) {
-					texturePaths[idx] = newTexturePaths[idx];
+			for(int idx = 0; idx < texnames.size(); idx++) {
+				if (texnames[idx] != "") {
+					my_textures.textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
+				}
+				else {
+					my_textures.textures[idx] = std::make_shared<Core::Texture>(defaultPath);
 				}
 			}
-		}
-
-		for (int idx = 0; idx < texturePaths.size(); idx++) {
-			std::string texturePath = defaultPath;
-			if(!texturePaths[idx].empty()) {
-				texturePath = _mPath.substr(0, _mPath.find_last_of('/')) + "/" + texturePaths[idx];
-			}
-
-			textures.emplace_back(std::make_shared<Core::Texture>(texturePath, Core::TextureShaderType(idx + 1)));
 		}
 	}
 
 	void Model::push_mesh(
 		const std::vector<Utils::Vertex>& vertices,
-		const std::vector<unsigned int>& indices,
-		std::vector<std::shared_ptr<Core::Texture>> && textures
+		const std::vector<unsigned int>& indices
 	) {
-		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, std::move(textures)));
+		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, _mMaterial));
 	}
 };

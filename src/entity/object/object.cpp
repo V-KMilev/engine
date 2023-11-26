@@ -9,10 +9,12 @@
 
 #include "gl_error_handle.h"
 
+#include "material.h"
 #include "mesh.h"
 
 namespace Engine {
 	Object::Object(ObjectType type) : _mObjectType(type), Entity(EntityType::OBJECT) {
+		_mMaterial = std::make_shared<Material>();
 		_mObjectUseData.hasUpdate = true;
 	}
 
@@ -34,14 +36,6 @@ namespace Engine {
 
 	ObjectUseData& Object::getUseData() {
 		return _mObjectUseData;
-	}
-
-	const RenderData& Object::getRenderData() const {
-		return _mRenderData;
-	}
-
-	RenderData& Object::getRenderData() {
-		return _mRenderData;
 	}
 
 	void Object::onUpdate(const Mouse* mouse, float deltaTime) {
@@ -98,7 +92,6 @@ namespace Engine {
 	void Object::drawUIParams() {
 		auto& ud = _mObjectUseData;
 		auto& wd = _mObjectWorldData;
-		auto& rd = _mRenderData;
 
 		std::string sObject    = "Object: #" + std::to_string(_mID.getID());
 		std::string sLinesOnly = "Lines Only##Object" + std::to_string(_mID.getID());
@@ -119,37 +112,7 @@ namespace Engine {
 	}
 
 	void Object::drawUIRenderData() {
-		auto& ud = _mObjectUseData;
-		auto& rd = _mRenderData;
-
-		std::string sAmbient       = "Ambient##Object"       + std::to_string(_mID.getID());
-		std::string sDiffuse       = "Diffuse##Object"       + std::to_string(_mID.getID());
-		std::string sSpecular      = "Specular##Object"      + std::to_string(_mID.getID());
-		std::string sTransmittance = "Transmittance##Object" + std::to_string(_mID.getID());
-		std::string sEmission      = "Emission##Object"      + std::to_string(_mID.getID());
-
-		std::string sShininess = "Shininess##Object" + std::to_string(_mID.getID());
-		std::string sIOR       = "Ior##Object"       + std::to_string(_mID.getID());
-
-		std::string sRoughness = "Roughness##Object" + std::to_string(_mID.getID());
-		std::string sMetallic  = "Metallic##Object"  + std::to_string(_mID.getID());
-		std::string sSheen     = "Sheen##Object"     + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText("Default");
-
-		if(ImGui::ColorEdit3(sAmbient.c_str(),       &rd.ambient[0]))       { ud.hasUpdate = true; }
-		if(ImGui::ColorEdit3(sDiffuse.c_str(),       &rd.diffuse[0]))       { ud.hasUpdate = true; }
-		if(ImGui::ColorEdit3(sSpecular.c_str(),      &rd.specular[0]))      { ud.hasUpdate = true; }
-		if(ImGui::ColorEdit3(sTransmittance.c_str(), &rd.transmittance[0])) { ud.hasUpdate = true; }
-		if(ImGui::ColorEdit3(sEmission.c_str(),      &rd.emission[0]))      { ud.hasUpdate = true; }
-		if(ImGui::DragFloat(sShininess.c_str(),      &rd.shininess))        { ud.hasUpdate = true; }
-		if(ImGui::DragFloat(sIOR.c_str(),            &rd.ior, 1))           { ud.hasUpdate = true; }
-
-		ImGui::SeparatorText("PBR");
-
-		if(ImGui::DragFloat(sRoughness.c_str(), &rd.roughness, 1)) { ud.hasUpdate = true; }
-		if(ImGui::DragFloat(sMetallic.c_str(),  &rd.metallic,  1)) { ud.hasUpdate = true; }
-		if(ImGui::DragFloat(sSheen.c_str(),     &rd.sheen,     1)) { ud.hasUpdate = true; }
+		_mMaterial->drawUICoefficients(_mID.getID());
 	}
 
 	void Object::drawUIMeshList() {
@@ -162,13 +125,7 @@ namespace Engine {
 		}
 	}
 
-	void Object::drawUIMeshTextures() {
-		std::string sMeshTextures  = "Mesh Texture List##Object" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sMeshTextures.c_str());
-
-		for(std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->drawUiTextures();
-		}
+	void Object::drawUITextures() {
+		_mMaterial->drawUITextures(_mID.getID());
 	}
 };

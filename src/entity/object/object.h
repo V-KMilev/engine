@@ -10,10 +10,9 @@
 #include "entity.h"
 
 namespace Engine {
+	class Material;
+
 	class Entity;
-
-	struct WorldData;
-
 	class Mesh;
 }
 
@@ -57,22 +56,6 @@ namespace Engine {
 			glm::mat4 model = glm::mat4(1.0f);
 	};
 
-	struct RenderData {
-		glm::vec3 ambient       = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 diffuse       = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 specular      = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 transmittance = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 emission      = glm::vec3(0.0f, 0.0f, 0.0f);
-
-		float shininess = 0.0f;
-		// index of refraction
-		float ior       = 0.0f;
-
-		float roughness = 0.0f;
-		float metallic  = 0.0f;
-		float sheen     = 0.0f;
-	};
-
 	struct ObjectUseData : UseData {
 		public:
 			bool linesOnly = false;
@@ -93,9 +76,6 @@ namespace Engine {
 			const ObjectUseData& getUseData() const override;
 			ObjectUseData& getUseData() override;
 
-			const RenderData& getRenderData() const;
-			RenderData& getRenderData();
-
 			virtual void load_mesh() = 0;
 
 		public:
@@ -106,7 +86,7 @@ namespace Engine {
 			void drawUIParams() override;
 			void drawUIRenderData();
 			void drawUIMeshList();
-			void drawUIMeshTextures();
+			void drawUITextures();
 
 		protected:
 			void updateShader(const Core::Shader &shader) const override;
@@ -119,7 +99,7 @@ namespace Engine {
 			ObjectWorldData _mObjectWorldData;
 			ObjectUseData _mObjectUseData;
 
-			RenderData _mRenderData;
+			std::shared_ptr<Material> _mMaterial;
 
 			std::vector<std::shared_ptr<Mesh>> _mMeshes;
 	};

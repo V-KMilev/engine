@@ -37,15 +37,11 @@ namespace Engine {
 				const std::vector<tinyobj::material_t>* materials
 			);
 
-			void load_materials(
-				const std::vector<tinyobj::material_t>* materials,
-				std::vector<std::shared_ptr<Core::Texture>>& textures
-			);
+			void load_materials(const std::vector<tinyobj::material_t>* materials);
 
 			void push_mesh(
 				const std::vector<Utils::Vertex>& vertices,
-				const std::vector<unsigned int>& indices,
-				std::vector<std::shared_ptr<Core::Texture>> && textures
+				const std::vector<unsigned int>& indices
 			);
 
 		private:

@@ -15,8 +15,7 @@ namespace Engine {
 	enum class EntityType {
 		NONE   = 0,
 		OBJECT = 1,
-		MESH   = 2,
-		CAMERA = 3
+		CAMERA = 2
 	};
 
 	// Base WorldData struct

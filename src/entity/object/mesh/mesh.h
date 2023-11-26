@@ -7,7 +7,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "entity.h"
+#include "object.h"
 
 #include "utils.h"
 
@@ -42,42 +42,23 @@ namespace Core {
 #define QuadIndicesSize     QuadIndices
 
 namespace Engine {
-	struct MeshWorldData : WorldData {
-		public:
-			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 scale    = glm::vec3(1.0f, 1.0f, 1.0f);
-			// roll, pitch, yaw
-			glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
-			glm::mat4 model = glm::mat4(1.0f);
-	};
-
-	struct MeshUseData : UseData {
-		public:
-	};
-
-	class Mesh : public Entity {
+	class Mesh : public Object {
 		public:
 			Mesh(
 				const std::vector<Utils::Vertex>& vertices,
 				const std::vector<unsigned int>& indices,
-				std::vector<std::shared_ptr<Core::Texture>> && textures = {}
+				std::shared_ptr<Material> material
 			);
 
 			unsigned int getID() const;
 
-			const MeshWorldData& getWorldData() const override;
-			MeshWorldData& getWorldData() override;
-
-			const MeshUseData& getUseData() const override;
-			MeshUseData& getUseData() override;
+			void load_mesh() override;
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override;
 
 			void drawUIParams() override;
-			void drawUiTextures();
 
 			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
 
@@ -85,14 +66,13 @@ namespace Engine {
 			void updateShader(const Core::Shader &shader) const override;
 
 		private:
-			MeshWorldData _mMeshWorldData;
-			MeshUseData   _mMeshUseData;
-
-			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
-
 			std::shared_ptr<Core::VertexArray>        _mVA;
 			std::shared_ptr<Core::VertexBuffer>       _mVB;
 			std::shared_ptr<Core::IndexBuffer>        _mIB;
 			std::shared_ptr<Core::VertexBufferLayout> _mVBL;
+
+		private:
+			std::vector<Utils::Vertex>* _mVertices;
+			std::vector<unsigned int>* _mIndices;
 	};
 };

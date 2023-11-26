@@ -27,7 +27,6 @@ namespace Engine {
 			unsigned int _mGID = 0;
 
 			static unsigned int _mObjectID;
-			static unsigned int _mMeshID;
 			static unsigned int _mCameraID;
 			static unsigned int _mGlobalID;
 	};
