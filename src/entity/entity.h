@@ -56,7 +56,6 @@ namespace Engine {
 
 			virtual void drawUIParams() = 0;
 
-		protected:
 			virtual void updateShader(const Core::Shader &shader) const = 0;
 
 		protected:

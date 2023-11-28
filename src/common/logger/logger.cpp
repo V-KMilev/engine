@@ -87,13 +87,13 @@ namespace Engine {
 
 		std::string leveled_message = time + "\t";
 
-		if(level == LOG_LEVEL::L_INFO) {
+		if (level == LOG_LEVEL::L_INFO) {
 			leveled_message += "[INFO] ";
 		}
-		else if(level == LOG_LEVEL::L_WARN) {
+		else if (level == LOG_LEVEL::L_WARN) {
 			leveled_message += "[WARN] ";
 		}
-		else if(level == LOG_LEVEL::L_ERROR) {
+		else if (level == LOG_LEVEL::L_ERROR) {
 			leveled_message += "[ERROR][" + std::string(file) + ":" + std::to_string(line) + "]";
 		}
 
@@ -108,7 +108,6 @@ namespace Engine {
 
 			return true;
 		}
-
 		return false;
 	}
 

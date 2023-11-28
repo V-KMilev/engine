@@ -121,7 +121,7 @@ namespace Engine {
 		auto& my_textures = _mMaterial->getTextures();
 
 		// Load the material data
-		for(const tinyobj::material_t& material : materials[0]) {
+		for (const tinyobj::material_t& material : materials[0]) {
 			my_material.ambient       = glm::make_vec3(material.ambient);
 			my_material.diffuse       = glm::make_vec3(material.diffuse);
 			my_material.specular      = glm::make_vec3(material.specular);
@@ -151,7 +151,7 @@ namespace Engine {
 				material.normal_texname
 			};
 
-			for(int idx = 0; idx < texnames.size(); idx++) {
+			for (int idx = 0; idx < texnames.size(); idx++) {
 				if (texnames[idx] != "") {
 					my_textures.textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
 				}
@@ -167,5 +167,8 @@ namespace Engine {
 		const std::vector<unsigned int>& indices
 	) {
 		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, _mMaterial));
+
+		// Reset materials
+		_mMaterial = std::make_shared<Material>();
 	}
 };

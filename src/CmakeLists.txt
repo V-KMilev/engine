@@ -1,8 +1,9 @@
 set(ENGINE_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(SOURCES
-	${ENGINE_SRC_DIR}/common/input/input_handler.cpp
+	${ENGINE_SRC_DIR}/common/input/input_manager.cpp
 	${ENGINE_SRC_DIR}/common/input/input_key.cpp
+
 	${ENGINE_SRC_DIR}/common/logger/logger.cpp
 	
 	${ENGINE_SRC_DIR}/entity/camera/camera.cpp
@@ -17,6 +18,8 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/entity_id.cpp
 	${ENGINE_SRC_DIR}/entity/entity.cpp
 
+	${ENGINE_SRC_DIR}/event/event_manager.cpp
+
 	${ENGINE_SRC_DIR}/material/material.cpp
 
 	${ENGINE_SRC_DIR}/scene/orientation/orientation.cpp
@@ -30,8 +33,10 @@ set(SOURCES
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/common/input
-	${ENGINE_SRC_DIR}/common/utils
+
 	${ENGINE_SRC_DIR}/common/logger
+	
+	${ENGINE_SRC_DIR}/common/utils
 
 	${ENGINE_SRC_DIR}/entity/camera
 	${ENGINE_SRC_DIR}/entity/object
@@ -39,6 +44,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/entity/object/mesh
 	${ENGINE_SRC_DIR}/entity/object/model
 	${ENGINE_SRC_DIR}/entity
+
+	${ENGINE_SRC_DIR}/event
 
 	${ENGINE_SRC_DIR}/material
 

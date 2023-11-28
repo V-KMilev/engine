@@ -12,7 +12,7 @@
 namespace Engine {
 
 	static std::string TextureTypeToString(TextureType type) {
-		switch(type) {
+		switch (type) {
 			case TextureType::AMBIENT:            return "Ambient";
 			case TextureType::DIFFUSE:            return "Diffuse";
 			case TextureType::SPECULAR:           return "Specular";
@@ -51,7 +51,7 @@ namespace Engine {
 	void Material::updateShader(const Core::Shader &shader) const {
 		shader.bind();
 
-		for(int idx = 0; idx < _mTextures.textures.size(); idx++) {
+		for (int idx = 0; idx < _mTextures.textures.size(); idx++) {
 
 			_mTextures.textures[idx]->bind(idx);
 
@@ -64,7 +64,7 @@ namespace Engine {
 	void Material::drawUITextures(unsigned int id) {
 		std::string sMesh = "Mesh: #" + std::to_string(id);
 
-		if(ImGui::TreeNode(sMesh.c_str())) {
+		if (ImGui::TreeNode(sMesh.c_str())) {
 			static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
 
 			ImGui::Unindent();
@@ -76,7 +76,7 @@ namespace Engine {
 
 				ImGui::TableHeadersRow();
 
-				for(int idx = 0; idx < _mTextures.textures.size(); idx++) {
+				for (int idx = 0; idx < _mTextures.textures.size(); idx++) {
 					const std::shared_ptr<Core::Texture>& texture = _mTextures.textures[idx];
 					std::string type = TextureTypeToString(TextureType(idx));
 
@@ -123,34 +123,42 @@ namespace Engine {
 	bool Material::drawUICoefficients(unsigned int id) {
 		bool hasUpdate = false;
 
-		std::string sAmbient       = "Ambient##Object"       + std::to_string(id);
-		std::string sDiffuse       = "Diffuse##Object"       + std::to_string(id);
-		std::string sSpecular      = "Specular##Object"      + std::to_string(id);
-		std::string sTransmittance = "Transmittance##Object" + std::to_string(id);
-		std::string sEmission      = "Emission##Object"      + std::to_string(id);
+		std::string sMesh = "Mesh: #" + std::to_string(id);
 
-		std::string sShininess = "Shininess##Object" + std::to_string(id);
-		std::string sIOR       = "Ior##Object"       + std::to_string(id);
+		if (ImGui::TreeNode(sMesh.c_str())) {
+			static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
 
-		std::string sRoughness = "Roughness##Object" + std::to_string(id);
-		std::string sMetallic  = "Metallic##Object"  + std::to_string(id);
-		std::string sSheen     = "Sheen##Object"     + std::to_string(id);
+			std::string sAmbient       = "Ambient##Object"       + std::to_string(id);
+			std::string sDiffuse       = "Diffuse##Object"       + std::to_string(id);
+			std::string sSpecular      = "Specular##Object"      + std::to_string(id);
+			std::string sTransmittance = "Transmittance##Object" + std::to_string(id);
+			std::string sEmission      = "Emission##Object"      + std::to_string(id);
 
-		ImGui::SeparatorText("Default");
+			std::string sShininess = "Shininess##Object" + std::to_string(id);
+			std::string sIOR       = "Ior##Object"       + std::to_string(id);
 
-		if(ImGui::ColorEdit3(sAmbient.c_str(),       &_mCoefficients.ambient[0]))       { hasUpdate = true; }
-		if(ImGui::ColorEdit3(sDiffuse.c_str(),       &_mCoefficients.diffuse[0]))       { hasUpdate = true; }
-		if(ImGui::ColorEdit3(sSpecular.c_str(),      &_mCoefficients.specular[0]))      { hasUpdate = true; }
-		if(ImGui::ColorEdit3(sTransmittance.c_str(), &_mCoefficients.transmittance[0])) { hasUpdate = true; }
-		if(ImGui::ColorEdit3(sEmission.c_str(),      &_mCoefficients.emission[0]))      { hasUpdate = true; }
-		if(ImGui::DragFloat(sShininess.c_str(),      &_mCoefficients.shininess))        { hasUpdate = true; }
-		if(ImGui::DragFloat(sIOR.c_str(),            &_mCoefficients.ior, 1))           { hasUpdate = true; }
+			std::string sRoughness = "Roughness##Object" + std::to_string(id);
+			std::string sMetallic  = "Metallic##Object"  + std::to_string(id);
+			std::string sSheen     = "Sheen##Object"     + std::to_string(id);
 
-		ImGui::SeparatorText("PBR");
+			ImGui::SeparatorText("Default");
 
-		if(ImGui::DragFloat(sRoughness.c_str(), &_mCoefficients.roughness, 1)) { hasUpdate = true; }
-		if(ImGui::DragFloat(sMetallic.c_str(),  &_mCoefficients.metallic,  1)) { hasUpdate = true; }
-		if(ImGui::DragFloat(sSheen.c_str(),     &_mCoefficients.sheen,     1)) { hasUpdate = true; }
+			if (ImGui::ColorEdit3(sAmbient.c_str(),       &_mCoefficients.ambient[0]))       { hasUpdate = true; }
+			if (ImGui::ColorEdit3(sDiffuse.c_str(),       &_mCoefficients.diffuse[0]))       { hasUpdate = true; }
+			if (ImGui::ColorEdit3(sSpecular.c_str(),      &_mCoefficients.specular[0]))      { hasUpdate = true; }
+			if (ImGui::ColorEdit3(sTransmittance.c_str(), &_mCoefficients.transmittance[0])) { hasUpdate = true; }
+			if (ImGui::ColorEdit3(sEmission.c_str(),      &_mCoefficients.emission[0]))      { hasUpdate = true; }
+			if (ImGui::DragFloat(sShininess.c_str(),      &_mCoefficients.shininess))        { hasUpdate = true; }
+			if (ImGui::DragFloat(sIOR.c_str(),            &_mCoefficients.ior, 1))           { hasUpdate = true; }
+
+			ImGui::SeparatorText("PBR");
+
+			if (ImGui::DragFloat(sRoughness.c_str(), &_mCoefficients.roughness, 1)) { hasUpdate = true; }
+			if (ImGui::DragFloat(sMetallic.c_str(),  &_mCoefficients.metallic,  1)) { hasUpdate = true; }
+			if (ImGui::DragFloat(sSheen.c_str(),     &_mCoefficients.sheen,     1)) { hasUpdate = true; }
+
+			ImGui::TreePop();
+		}
 
 		return hasUpdate;
 	}

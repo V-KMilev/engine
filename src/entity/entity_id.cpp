@@ -19,7 +19,7 @@ namespace Engine {
 		if (type == EntityType::OBJECT) {
 			_mID = _mObjectID++;
 		}
-		else if(type == EntityType::CAMERA) {
+		else if (type == EntityType::CAMERA) {
 			_mID = _mCameraID++;
 		}
 		else {

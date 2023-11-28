@@ -74,9 +74,6 @@ namespace Engine {
 			Material(const Material& other) = delete;
 			Material& operator = (const Material& other) = delete;
 
-			Material(Material && other) = delete;
-			Material& operator = (Material && other) = delete;
-
 			const Textures& getTextures() const;
 			Textures& getTextures();
 

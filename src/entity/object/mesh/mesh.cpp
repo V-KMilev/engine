@@ -28,14 +28,15 @@ namespace Engine {
 		_mVertices(new std::vector<Utils::Vertex>(vertices)),
 		_mIndices(new std::vector<unsigned int>(indices))
 	{
-			_mMaterial = material;
-			load_mesh();
+		// TODO: Check if this is correct
+		_mMaterial = material;
+		load_mesh();
 	}
 
 	void Mesh::load_mesh() {
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
 
-		for(std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures().textures) {
+		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures().textures) {
 			texture->init();
 		}
 
@@ -115,13 +116,13 @@ namespace Engine {
 		std::string sRotation = "Rotation##Mesh" + std::to_string(_mID.getID());
 		std::string sScale    = "Scale##Mesh"    + std::to_string(_mID.getID());
 
-		if(ImGui::TreeNode(sMesh.c_str())) {
+		if (ImGui::TreeNode(sMesh.c_str())) {
 
 			ImGui::SeparatorText(sMesh.c_str());
 
-			if(ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
-			if(ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
-			if(ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0],    1)) { ud.hasUpdate = true; }
+			if (ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
+			if (ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
+			if (ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0],    1)) { ud.hasUpdate = true; }
 
 			ImGui::TreePop();
 		}
