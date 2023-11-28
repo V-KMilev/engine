@@ -1,12 +1,20 @@
 #include "camera.h"
 
-#include "input_handler.h"
+#include "input_manager.h"
+
+#include "cube.h"
 
 #include "error_handle.h"
 
 namespace Engine {
 	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
 		_mCameraUseData.hasUpdate = true;
+
+		_mVisual = std::make_shared<Cube>();
+
+		_mVisual->getWorldData().position = _mCameraWorldData.position;
+		_mVisual->getWorldData().scale = glm::vec3(0.25f, 0.25f, 0.25f);
+		_mVisual->getUseData().hasUpdate = true;
 	}
 
 	CameraType Camera::getCameraTpye() const {
@@ -32,8 +40,6 @@ namespace Engine {
 	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
 		auto& ud = _mCameraUseData;
 
-		M_ASSERT(mouse);
-
 		if (ud.hasUpdate) {
 			if (ud.positionEvent != PositionEvent::NONE) {
 				updatePosition(deltaTime);
@@ -53,6 +59,8 @@ namespace Engine {
 			// Reset the update event
 			ud.hasUpdate = false;
 		}
+
+		_mVisual->onUpdate(mouse, deltaTime);
 	}
 
 	void Camera::updatePosition(float deltaTime) {
@@ -68,6 +76,9 @@ namespace Engine {
 		else {
 			return;
 		}
+
+		_mVisual->getWorldData().position = _mCameraWorldData.position;
+		_mVisual->getUseData().hasUpdate = true;
 
 		ud.positionEvent = PositionEvent::NONE;
 	}

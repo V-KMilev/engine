@@ -6,7 +6,9 @@
 
 #include "gl_shader.h"
 
-#include "input_handler.h"
+#include "input_manager.h"
+
+#include "object.h"
 
 namespace Engine {
 	PerspectiveCamera::PerspectiveCamera(unsigned int width, unsigned int height) : _mWidth(width), _mHeight(height), Camera(CameraType::PERSPECTIVE) {
@@ -57,7 +59,9 @@ namespace Engine {
 	}
 
 	void PerspectiveCamera::draw(const Core::Renderer& renderer, const Core::Shader& shader) const {
-		updateShader(shader);
+		shader.bind();
+
+		_mVisual->draw(renderer, shader);
 	}
 
 	void PerspectiveCamera::drawUIParams() {
@@ -75,24 +79,28 @@ namespace Engine {
 			ImGui::SeparatorText(sname.c_str());
 		}
 
-		if(ImGui::DragFloat3(sposition.c_str(), &_mCameraWorldData.position[0], 1))        { _mCameraUseData.hasUpdate = true; }
-		if(ImGui::DragFloat3(starget.c_str(),   &_mCameraWorldData.target[0],   1))        { _mCameraUseData.hasUpdate = true; }
-		if(ImGui::DragFloat(sfar.c_str(),       &_mCameraWorldData.c_far,  1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
-		if(ImGui::DragFloat(snear.c_str(),      &_mCameraWorldData.c_near, 1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
-		if(ImGui::DragFloat(sfov.c_str(),       &_mFov, 1))                                { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat3(sposition.c_str(), &_mCameraWorldData.position[0], 1))        {
+			_mCameraUseData.hasUpdate = true;
+
+			_mVisual->getWorldData().position = _mCameraWorldData.position;
+			_mVisual->getUseData().hasUpdate = true;
+		}
+		if (ImGui::DragFloat3(starget.c_str(),   &_mCameraWorldData.target[0], 1))          { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(sfar.c_str(),       &_mCameraWorldData.c_far,  1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(snear.c_str(),      &_mCameraWorldData.c_near, 1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(sfov.c_str(),       &_mFov, 1, 5, 175))                        { _mCameraUseData.hasUpdate = true; }
 
 		int width  = _mWidth;
 		int height = _mHeight;
 
-		if(ImGui::DragInt(swidth.c_str(),  &width,  1, 0, INT_MAX)) { _mWidth = width; _mCameraUseData.hasUpdate = true; }
-		if(ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) { _mHeight = height; _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragInt(swidth.c_str(),  &width,  1, 0, INT_MAX)) { _mWidth = width; _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) { _mHeight = height; _mCameraUseData.hasUpdate = true; }
 	}
 
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
 		auto& wd = _mCameraWorldData;
 
 		shader.bind();
-
 
 		shader.setUniformMatrix4fv("uCamera.view", wd.lookAt);
 		shader.setUniformMatrix4fv("uCamera.projection", wd.projection);
@@ -157,14 +165,14 @@ namespace Engine {
 
 	void PerspectiveCamera::zoom(const Mouse* mouse, float deltaTime) {
 		auto& ud = _mCameraUseData;
-		if(mouse->hasUpdate) {
+		if (mouse->hasUpdate) {
 			_mFov -= deltaTime * ud.zoomSpeed * mouse->scrollY;
 		}
 
 		if (_mFov < 1.0f) {
 			_mFov = 10.0f;
 		}
-		else if(_mFov > 120.0f) {
+		else if (_mFov > 120.0f) {
 			_mFov = 120.0f;
 		}
 	}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
@@ -7,6 +9,8 @@
 #include "entity.h"
 
 namespace Engine {
+	class Object;
+
 	struct Mouse;
 };
 
@@ -86,11 +90,12 @@ namespace Engine {
 			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override = 0;
 
 			virtual void drawUIParams() override = 0;
+
+			virtual void updateShader(const Core::Shader &shader) const override = 0;
+
 		protected:
 			void updatePosition(float deltaTime);
 			void updateLookAt();
-
-			virtual void updateShader(const Core::Shader &shader) const override = 0;
 
 			virtual void updateTarget(const Mouse* mouse, float deltaTime) = 0;
 			virtual void updateProjection() = 0;
@@ -102,5 +107,7 @@ namespace Engine {
 
 			CameraWorldData _mCameraWorldData;
 			CameraUseData _mCameraUseData;
+
+			std::shared_ptr<Object> _mVisual;
 	};
 }

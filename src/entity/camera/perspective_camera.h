@@ -20,9 +20,9 @@ namespace Engine {
 
 			void drawUIParams() override;
 
-		private:
 			void updateShader(const Core::Shader &shader) const override;
 
+		private:
 			void updateTarget(const Mouse* mouse, float deltaTime) override;
 			void updateProjection() override;
 
