@@ -24,21 +24,23 @@ namespace Engine {
 		bool hasUpdate = false;
 	};
 
-	class InputHandle {
+	using EventCallback = std::function<void()>;
+
+	class InputManager {
 		public:
-			InputHandle();
-			~InputHandle() = default;
+			InputManager();
+			~InputManager() = default;
 
-			InputHandle(const InputHandle& other) = delete;
-			InputHandle& operator =(const InputHandle& other) = delete;
+			InputManager(const InputManager& other) = delete;
+			InputManager& operator =(const InputManager& other) = delete;
 
-			InputHandle(InputHandle && other) = delete;
-			InputHandle& operator =(InputHandle && other) = delete;
+			InputManager(InputManager && other) = delete;
+			InputManager& operator =(InputManager && other) = delete;
 
 			const Mouse& getMouse() const;
 			Mouse& getMouse();
 
-			void mapKeyandStatetoEvent(int key, State state, std::function<void()> event, const std::string& event_hint = "");
+			void mapKeyandStatetoEvent(int key, State state, const EventCallback& event, const std::string& event_hint = "");
 
 			void processMouse(GLFWwindow* window);
 
@@ -52,6 +54,6 @@ namespace Engine {
 		private:
 			Mouse _mMouse;
 
-			std::unordered_map<InputKey, std::function<void()>> _mapOfEvents;
+			std::unordered_map<InputKey, EventCallback> _mMapOfEvents;
 	};
 };

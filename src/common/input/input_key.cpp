@@ -6,21 +6,21 @@
 namespace Engine{
 	State getState(GLFWwindow *window, int key, KeyType type) {
 		if (type == KeyType::KEYBORD) {
-			if(glfwGetKey(window, key) == GLFW_PRESS) {
+			if (glfwGetKey(window, key) == GLFW_PRESS) {
 				return State::PRESS;
 			}
-			else if(glfwGetKey(window, key) == GLFW_RELEASE) {
+			else if (glfwGetKey(window, key) == GLFW_RELEASE) {
 				return State::RELEASE;
 			}
 			else if (glfwGetKey(window, key) == GLFW_REPEAT) {
 				return State::REPEAT;
 			}
 		}
-		else if(type == KeyType::MOUSE) {
-			if(glfwGetMouseButton(window, key) == GLFW_PRESS) {
+		else if (type == KeyType::MOUSE) {
+			if (glfwGetMouseButton(window, key) == GLFW_PRESS) {
 				return State::PRESS;
 			}
-			else if(glfwGetMouseButton(window, key) == GLFW_RELEASE) {
+			else if (glfwGetMouseButton(window, key) == GLFW_RELEASE) {
 				return State::RELEASE;
 			}
 		}
@@ -28,21 +28,13 @@ namespace Engine{
 	}
 
 	std::string stateToString(State state) {
-		std::string state_str = "Invalid";
-
-		if(state == State::PRESS) {
-			state_str = "PRESS";
+		switch (state) {
+			case State::PRESS:   return "PRESS";
+			case State::RELEASE: return "RELEASE";
+			case State::REPEAT:  return "REPEAT";
+			case State::IDLE:    return "IDLE";
+			default:             return "INVALID";
 		}
-		else if(state == State::RELEASE) {
-			state_str = "RELEASE";
-		}
-		else if(state == State::REPEAT) {
-			state_str = "REPEAT";
-		}
-		else if(state == State::IDLE) {
-			state_str = "IDLE";
-		}
-		return state_str;
 	}
 
 	bool InputKey::operator == (const InputKey& other) const {
