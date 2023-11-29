@@ -15,26 +15,29 @@
 #include "gl_pick_texture.h"
 #include "gl_texture.h"
 
+#include "input_manager.h"
+#include "event_manager.h"
+
+#include "ui.h"
+
 #include "orientation.h"
 #include "grid.h"
-
-#include "object.h"
-
-#include "input_handler.h"
-#include "ui.h"
+#include "gizmo.h"
 
 #include "camera.h"
 #include "perspective_camera.h"
+
+#include "object.h"
 
 namespace Engine {
 	Scene::Scene(
 		GLFWwindow* window,
 		const char* gl_version,
-		std::shared_ptr<InputHandle> inputHandle,
+		std::shared_ptr<InputManager> InputManager,
 		unsigned int width,
 		unsigned int height
 	) :
-		_mInput(inputHandle),
+		_mInputManager(InputManager),
 		_mWidth(width),
 		_mHeight(height),
 		_mTextures({}),
@@ -42,12 +45,16 @@ namespace Engine {
 		_mCameras({}),
 		_mShaders({})
 	{
+		// TODO: Make the event system
+		_mEventManager = std::make_shared<EventManager>();
+
 		_mUI = std::make_shared<UI>(window, gl_version, _mWidth, _mHeight);
 
 		_mRenderer = std::make_shared<Core::Renderer>();
 
 		_mOrientation = std::make_shared<Orientation>();
 		_mGrid = std::make_shared<Grid>();
+		_mGizmo = std::make_shared<Gizmo>();
 
 		_mPickTexture = std::make_shared<Core::PickTexture>(_mWidth, _mHeight);
 
@@ -58,18 +65,26 @@ namespace Engine {
 		_mRenderer->clearColor();
 		_mRenderer->clear();
 
-		for(const std::shared_ptr<Core::Shader>& shader : _mShaders) {
+		for (const std::shared_ptr<Core::Shader>& shader : _mShaders) {
 			if (shader->getName() == "infinite_grid") {
 				drawGrid(shader);
 			}
 			else if (shader->getName() == "orientation") {
 				drawOrientation(shader);
 			}
+			else if (shader->getName() == "gizmo") {
+				drawGizmo(shader);
+			}
 			else if (shader->getName() == "pick") {
 				drawPick(shader);
 			}
-			else if(shader->getName() == "triangle") {
-				moveEntity(shader);
+			else if (shader->getName() == "selected") {
+				drawSelected(shader);
+			}
+			else if (shader->getName() == "camera") {
+				drawCameras(shader);
+			}
+			else if (shader->getName() == "triangle") {
 				drawGeometry(shader);
 			}
 		}
@@ -86,21 +101,23 @@ namespace Engine {
 	void Scene::onUpdate(float deltaTime) {
 		_mDeltaTime = deltaTime;
 
-		for(const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
-				camera->onUpdate(&_mInput->getMouse(), _mDeltaTime);
+		for (const std::shared_ptr<Camera>& camera : _mCameras) {
+			camera->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
+		}
+
+		for (const std::shared_ptr<Object>& object : _mObjects) {
+			object->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
+
+			if (object->getUseData().isSelected) {
+				_mGizmo->onUpdate(&_mInputManager->getMouse(), _mDeltaTime, *object);
 			}
 		}
 
-		for(const std::shared_ptr<Object>& object : _mObjects) {
-			object->onUpdate(&_mInput->getMouse(), _mDeltaTime);
-		}
-
-		_mOrientation->onUpdate(&_mInput->getMouse(), _mDeltaTime);
+		_mOrientation->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
 
 		// TODO: Think of where this should be
 		// Reset the update event
-		_mInput->getMouse().hasUpdate = false;
+		_mInputManager->getMouse().hasUpdate = false;
 	}
 
 	void Scene::addObject(std::shared_ptr<Object> && object) {
@@ -113,33 +130,33 @@ namespace Engine {
 
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
 		// Set the first camera as main (active) camera
-		if(_mCameras.size() == 0) {
+		if (_mCameras.size() == 0) {
 			camera->getUseData().isActive = true;
 		}
 
 		_mCameras.push_back(camera);
 	}
 
-	void Scene::drawView(const std::shared_ptr<Core::Shader>& shader) const {
-		shader->bind();
+	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {
+		updateShaderCameras(shader);
 
-		for(const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
-				camera->draw(*_mRenderer, *shader);
-			}
-		}
+		_mOrientation->draw(*_mRenderer, *shader);
 	}
 
 	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
-		drawView(shader);
+		updateShaderCameras(shader);
 
 		_mGrid->draw(*_mRenderer, *shader);
 	}
 
-	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {
-		drawView(shader);
+	void Scene::drawGizmo(const std::shared_ptr<Core::Shader>& shader) const {
+		updateShaderCameras(shader);
 
-		_mOrientation->draw(*_mRenderer, *shader);
+		for (const std::shared_ptr<Object>& object : _mObjects) {
+			if (object->getUseData().isSelected) {
+				// _mGizmo->draw(*_mRenderer, *shader);
+			}
+		}
 	}
 
 	void Scene::drawPick(const std::shared_ptr<Core::Shader>& shader) const {
@@ -154,30 +171,64 @@ namespace Engine {
 		_mPickTexture->disableWriting();
 	}
 
-	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
-		drawView(shader);
+	void Scene::drawSelected(const std::shared_ptr<Core::Shader>& shader) const {
+		updateShaderCameras(shader);
 
-		for(const std::shared_ptr<Object>& object : _mObjects) {
+		for (const std::shared_ptr<Object>& object : _mObjects) {
+			if (object->getUseData().isSelected) {
+				MY_GL_CHECK(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
+				MY_GL_CHECK(glStencilMask(0x00));
+				MY_GL_CHECK(glDisable(GL_DEPTH_TEST));
+
+				object->draw(*_mRenderer, *shader);
+
+				MY_GL_CHECK(glEnable(GL_DEPTH_TEST));
+				MY_GL_CHECK(glStencilMask(0xFF));
+				MY_GL_CHECK(glStencilFunc(GL_ALWAYS, 0, 0xFF));
+			}
+		}
+	}
+
+	void Scene::drawCameras(const std::shared_ptr<Core::Shader>& shader) const {
+		updateShaderCameras(shader);
+
+		for (const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (!camera->getUseData().isActive) {
+				camera->draw(*_mRenderer, *shader);
+			}
+		}
+	}
+
+	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
+		updateShaderCameras(shader);
+
+		for (const std::shared_ptr<Object>& object : _mObjects) {
 			object->draw(*_mRenderer, *shader);
 		}
 	}
 
+	void Scene::updateShaderCameras(const std::shared_ptr<Core::Shader>& shader) const {
+		for (const std::shared_ptr<Camera>& camera : _mCameras) {
+			if (camera->getUseData().isActive) {
+				camera->updateShader(*shader);
+			}
+		}
+	}
+
 	void Scene::pickEntity() {
-		int x = _mInput->getMouse().x;
-		int y = _mHeight - _mInput->getMouse().y - 1;
+		int x = _mInputManager->getMouse().x;
+		int y = _mHeight - _mInputManager->getMouse().y - 1;
 
 		Core::PixelInfo pixel = _mPickTexture->readPixel(x, y);
 
 		if (pixel.objectID > 0) {
-			for(const std::shared_ptr<Object>& object : _mObjects) {
+			for (const std::shared_ptr<Object>& object : _mObjects) {
 				object->getUseData().isSelected = (object->getID() == pixel.objectID && !object->getUseData().isSelected) ? true : false;
 			}
 		}
 	}
 
-	void Scene::moveEntity(const std::shared_ptr<Core::Shader>& shader) const {
-		// Function to move an entity in world space based on mouse coordinates
-
+	void Scene::moveEntity() {
 		glm::mat4 view       = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 
@@ -185,7 +236,7 @@ namespace Engine {
 		float width  = 0.0f;
 		float height = 0.0f;
 
-		for(const std::shared_ptr<Camera>& camera : _mCameras) {
+		for (const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
 				view       = camera->getWorldData().lookAt;
 				projection = camera->getWorldData().projection;
@@ -198,14 +249,12 @@ namespace Engine {
 			}
 		}
 
-		for(const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData().isSelected && _mMoveWithMouse) {
-				// Get the position of the object in world space
+		for (const std::shared_ptr<Object>& object : _mObjects) {
+			if (object->getUseData().isSelected) {
 				glm::vec3 position = object->getWorldData().position;
 
-				// Get mouse coordinates
-				float x = (float)_mInput->getMouse().x;
-				float y = (float)_mInput->getMouse().y;
+				float x = (float)_mInputManager->getMouse().x;
+				float y = (float)_mInputManager->getMouse().y;
 
 				// Convert mouse coordinates to NDC space
 				float xNDC = (2.0f * x) / width - 1.0f;
@@ -221,6 +270,7 @@ namespace Engine {
 				glm::vec4 viewPosition = view * glm::vec4(position, 1.0f);
 				// Calculate the intersection point of the ray with the object's Z plane in view space
 				// Note: I have no idea why we need to get the negative value of viewPosition's z
+				// TODO: Find a fix for that, i'm pretty sure its a bug
 				glm::vec4 view_space_intersect = glm::vec4(glm::vec3(rayView) * -viewPosition.z, 1.0f);
 
 				object->getWorldData().position = glm::inverse(view) * view_space_intersect;
@@ -229,12 +279,8 @@ namespace Engine {
 		}
 	}
 
-	void Scene::moveEvent() {
-		_mMoveWithMouse = _mMoveWithMouse ? false : true;
-	}
-
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
-		for(std::shared_ptr<Camera>& camera : _mCameras) {
+		for (std::shared_ptr<Camera>& camera : _mCameras) {
 			if (camera->getUseData().isActive) {
 				camera->getUseData().hasUpdate = true;
 				camera->getUseData().updateEvent = event;
@@ -244,19 +290,20 @@ namespace Engine {
 	}
 
 	void Scene::keyBinds() {
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_E, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_E, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
-		_mInput->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
 
-		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEntity(); } ), "Select ability");
-		_mInput->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_RIGHT, State::PRESS, std::function<void()>( [this] { moveEvent(); } ), "Move flag");
+		_mInputManager->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEntity(); } ), "Select ability");
+		// TODO: Make the move event on hold
+		_mInputManager->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_RIGHT, State::PRESS, std::function<void()>( [this] { moveEntity(); } ), "Move ability");
 	}
 };

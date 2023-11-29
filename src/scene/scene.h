@@ -13,11 +13,14 @@ namespace Core {
 }
 
 namespace Engine {
-	class InputHandle;
+	class InputManager;
+	class EventManager;
+
 	class UI;
 
-	class Grid;
 	class Orientation;
+	class Gizmo;
+	class Grid;
 
 	class Object;
 }
@@ -36,7 +39,7 @@ namespace Engine {
 			Scene(
 				GLFWwindow* window,
 				const char* gl_version,
-				std::shared_ptr<InputHandle> inputHandler,
+				std::shared_ptr<InputManager> InputManagerr,
 				unsigned int width,
 				unsigned int height
 			);
@@ -57,30 +60,38 @@ namespace Engine {
 			void addCamera(std::shared_ptr<Camera> && camera);
 
 		private:
-			void drawView(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawOrientation(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGrid(const std::shared_ptr<Core::Shader>& shader) const;
+			void drawGizmo(const std::shared_ptr<Core::Shader>& shader) const;
+
 			void drawPick(const std::shared_ptr<Core::Shader>& shader) const;
+			void drawSelected(const std::shared_ptr<Core::Shader>& shader) const;
+
+			void drawCameras(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGeometry(const std::shared_ptr<Core::Shader>& shader) const;
 
 			void pickEntity();
-			void moveEntity(const std::shared_ptr<Core::Shader>& shader) const;
-			void moveEvent();
+			void moveEntity();
 
+		private:
+			void updateShaderCameras(const std::shared_ptr<Core::Shader>& shader) const;
+
+		private:
 			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
 
 			void keyBinds();
 
 		private:
-			std::shared_ptr<InputHandle> _mInput;
-			std::shared_ptr<UI> _mUI;
+			std::shared_ptr<InputManager> _mInputManager;
+			std::shared_ptr<EventManager> _mEventManager;
 
 			std::shared_ptr<Core::Renderer> _mRenderer;
+			std::shared_ptr<Core::PickTexture> _mPickTexture;
+			std::shared_ptr<UI> _mUI;
 
 			std::shared_ptr<Orientation> _mOrientation;
 			std::shared_ptr<Grid> _mGrid;
-
-			std::shared_ptr<Core::PickTexture> _mPickTexture;
+			std::shared_ptr<Gizmo> _mGizmo;
 
 			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
 
@@ -92,7 +103,5 @@ namespace Engine {
 
 			unsigned int _mWidth;
 			unsigned int _mHeight;
-
-			bool _mMoveWithMouse = false;
 	};
 }
