@@ -48,7 +48,7 @@ namespace Engine {
 			ud.hasUpdate = false;
 		}
 
-		for(std::shared_ptr<Mesh>& mesh : _mMeshes) {
+		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
 			mesh->updateModel(_mObjectWorldData.model);
 			mesh->onUpdate(mouse, deltaTime);
 		}
@@ -61,7 +61,7 @@ namespace Engine {
 			MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
 		}
 
-		for(const std::shared_ptr<Mesh>& mesh : _mMeshes) {
+		for (const std::shared_ptr<Mesh>& mesh : _mMeshes) {
 			mesh->draw(renderer, shader);
 		}
 
@@ -89,7 +89,7 @@ namespace Engine {
 		wd.model = glm::scale(wd.model, wd.scale);
 	}
 
-	void Object::drawUIParams() {
+	void Object::UIWorld() {
 		auto& ud = _mObjectUseData;
 		auto& wd = _mObjectWorldData;
 
@@ -106,26 +106,26 @@ namespace Engine {
 
 		ImGui::SeparatorText("World Data");
 
-		if(ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
-		if(ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
-		if(ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0], 1))    { ud.hasUpdate = true; }
+		if (ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
+		if (ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
+		if (ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0], 1))    { ud.hasUpdate = true; }
 	}
 
-	void Object::drawUIRenderData() {
-		_mMaterial->drawUICoefficients(_mID.getID());
-	}
-
-	void Object::drawUIMeshList() {
-		std::string sMeshList  = "Mesh List##Object" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sMeshList.c_str());
-
-		for(std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->drawUIParams();
+	void Object::UIMeshsWorld() {
+		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
+			mesh->UIWorld();
 		}
 	}
 
-	void Object::drawUITextures() {
-		_mMaterial->drawUITextures(_mID.getID());
+	void Object::UIMeshsMaterialTextures() {
+		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
+			mesh->UIMaterialTextures();
+		}
+	}
+
+	void Object::UIMeshsMaterialCoefficients() {
+		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
+			mesh->UIMaterialCoefficients();
+		}
 	}
 };

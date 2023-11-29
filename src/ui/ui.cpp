@@ -127,9 +127,9 @@ namespace Engine {
 
 		ImGui::Begin("##Left", nullptr, staticWindow);
 
-		for(std::shared_ptr<Object>& object : objects) {
+		for (std::shared_ptr<Object>& object : objects) {
 			if (object->getUseData().isSelected) {
-				object->drawUIParams();
+				object->UIWorld();
 			}
 		}
 
@@ -147,8 +147,8 @@ namespace Engine {
 
 		ImGui::Begin("##Right", nullptr, staticWindow);
 
-		for(std::shared_ptr<Camera>& camera : cameras) {
-			camera->drawUIParams();
+		for (std::shared_ptr<Camera>& camera : cameras) {
+			camera->UIWorld();
 		}
 
 		ImGui::End();
@@ -178,9 +178,9 @@ namespace Engine {
 			ImGui::EndTabBar();
 		}
 
-		for(std::shared_ptr<Object>& object : objects) {
+		for (std::shared_ptr<Object>& object : objects) {
 			if (object->getUseData().isSelected) {
-				object->drawUIMeshList();
+				object->UIMeshsWorld();
 			}
 		}
 
@@ -211,9 +211,9 @@ namespace Engine {
 			ImGui::EndTabBar();
 		}
 
-		for(std::shared_ptr<Object>& object : objects) {
+		for (std::shared_ptr<Object>& object : objects) {
 			if (object->getUseData().isSelected) {
-				object->drawUIRenderData();
+				object->UIMeshsMaterialCoefficients();
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace Engine {
 
 		ImGui::Begin("##Top", nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
 
-		for(std::shared_ptr<Camera>& camera : cameras) {
+		for (std::shared_ptr<Camera>& camera : cameras) {
 			if (camera->getUseData().isActive) {
 				ImGui::BulletText("Camera");
 				ImGui::SameLine();
@@ -269,9 +269,9 @@ namespace Engine {
 			ImGui::EndMenuBar();
 		}
 
-		for(std::shared_ptr<Object>& object : objects) {
+		for (std::shared_ptr<Object>& object : objects) {
 			if (object->getUseData().isSelected) {
-				object->drawUITextures();
+				object->UIMeshsMaterialTextures();
 			}
 		}
 

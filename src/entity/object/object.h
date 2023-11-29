@@ -78,19 +78,18 @@ namespace Engine {
 
 			virtual void load_mesh() = 0;
 
-		public:
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override;
 
-			void drawUIParams() override;
-			void drawUIRenderData();
-			void drawUIMeshList();
-			void drawUITextures();
-
-		protected:
 			void updateShader(const Core::Shader &shader) const override;
 
+			void UIWorld() override;
+			void UIMeshsWorld();
+			void UIMeshsMaterialTextures();
+			void UIMeshsMaterialCoefficients();
+
+		protected:
 			void updateModel();
 
 		protected:

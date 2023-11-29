@@ -58,12 +58,14 @@ namespace Engine {
 
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override;
 
-			void drawUIParams() override;
-
-			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
-
-		private:
 			void updateShader(const Core::Shader &shader) const override;
+
+			void UIWorld() override;
+			void UIMaterialTextures();
+			void UIMaterialCoefficients();
+
+		public:
+			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
 
 		private:
 			std::shared_ptr<Core::VertexArray>        _mVA;

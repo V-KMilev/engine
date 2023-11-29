@@ -82,8 +82,8 @@ namespace Engine {
 
 			void updateShader(const Core::Shader &shader) const;
 
-			void drawUITextures(unsigned int id);
-			bool drawUICoefficients(unsigned int id);
+			void UITextures(unsigned int id);
+			bool UICoefficients(unsigned int id);
 
 		private:
 			Textures _mTextures;

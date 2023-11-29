@@ -64,39 +64,6 @@ namespace Engine {
 		_mVisual->draw(renderer, shader);
 	}
 
-	void PerspectiveCamera::drawUIParams() {
-		std::string sname = "Main Camera: #" + std::to_string(_mID.getID());
-
-		std::string sposition = "Position##Camera" + std::to_string(_mID.getID());
-		std::string starget   = "Target##Camera"   + std::to_string(_mID.getID());
-		std::string sfar      = "Far##Camera"      + std::to_string(_mID.getID());
-		std::string snear     = "Near##Camera"     + std::to_string(_mID.getID());
-		std::string sfov      = "FOV##Camera"      + std::to_string(_mID.getID());
-		std::string swidth    = "Width##Camera"    + std::to_string(_mID.getID());
-		std::string sheight   = "Height##Camera"   + std::to_string(_mID.getID());
-
-		if (_mCameraUseData.isActive) {
-			ImGui::SeparatorText(sname.c_str());
-		}
-
-		if (ImGui::DragFloat3(sposition.c_str(), &_mCameraWorldData.position[0], 1))        {
-			_mCameraUseData.hasUpdate = true;
-
-			_mVisual->getWorldData().position = _mCameraWorldData.position;
-			_mVisual->getUseData().hasUpdate = true;
-		}
-		if (ImGui::DragFloat3(starget.c_str(),   &_mCameraWorldData.target[0], 1))          { _mCameraUseData.hasUpdate = true; }
-		if (ImGui::DragFloat(sfar.c_str(),       &_mCameraWorldData.c_far,  1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
-		if (ImGui::DragFloat(snear.c_str(),      &_mCameraWorldData.c_near, 1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
-		if (ImGui::DragFloat(sfov.c_str(),       &_mFov, 1, 5, 175))                        { _mCameraUseData.hasUpdate = true; }
-
-		int width  = _mWidth;
-		int height = _mHeight;
-
-		if (ImGui::DragInt(swidth.c_str(),  &width,  1, 0, INT_MAX)) { _mWidth = width; _mCameraUseData.hasUpdate = true; }
-		if (ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) { _mHeight = height; _mCameraUseData.hasUpdate = true; }
-	}
-
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
 		auto& wd = _mCameraWorldData;
 
@@ -176,4 +143,38 @@ namespace Engine {
 			_mFov = 120.0f;
 		}
 	}
+
+	void PerspectiveCamera::UIWorld() {
+		std::string sname = "Main Camera: #" + std::to_string(_mID.getID());
+
+		std::string sposition = "Position##Camera" + std::to_string(_mID.getID());
+		std::string starget   = "Target##Camera"   + std::to_string(_mID.getID());
+		std::string sfar      = "Far##Camera"      + std::to_string(_mID.getID());
+		std::string snear     = "Near##Camera"     + std::to_string(_mID.getID());
+		std::string sfov      = "FOV##Camera"      + std::to_string(_mID.getID());
+		std::string swidth    = "Width##Camera"    + std::to_string(_mID.getID());
+		std::string sheight   = "Height##Camera"   + std::to_string(_mID.getID());
+
+		if (_mCameraUseData.isActive) {
+			ImGui::SeparatorText(sname.c_str());
+		}
+
+		if (ImGui::DragFloat3(sposition.c_str(), &_mCameraWorldData.position[0], 1))        {
+			_mCameraUseData.hasUpdate = true;
+
+			_mVisual->getWorldData().position = _mCameraWorldData.position;
+			_mVisual->getUseData().hasUpdate = true;
+		}
+		if (ImGui::DragFloat3(starget.c_str(),   &_mCameraWorldData.target[0], 1))          { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(sfar.c_str(),       &_mCameraWorldData.c_far,  1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(snear.c_str(),      &_mCameraWorldData.c_near, 1, 0, FLT_MAX)) { _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragFloat(sfov.c_str(),       &_mFov, 1, 5, 175))                        { _mCameraUseData.hasUpdate = true; }
+
+		int width  = _mWidth;
+		int height = _mHeight;
+
+		if (ImGui::DragInt(swidth.c_str(),  &width,  1, 0, INT_MAX)) { _mWidth = width; _mCameraUseData.hasUpdate = true; }
+		if (ImGui::DragInt(sheight.c_str(), &height, 1, 0, INT_MAX)) { _mHeight = height; _mCameraUseData.hasUpdate = true; }
+	}
+
 };

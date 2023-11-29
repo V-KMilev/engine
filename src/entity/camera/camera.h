@@ -89,9 +89,9 @@ namespace Engine {
 
 			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override = 0;
 
-			virtual void drawUIParams() override = 0;
-
 			virtual void updateShader(const Core::Shader &shader) const override = 0;
+
+			virtual void UIWorld() override = 0;
 
 		protected:
 			void updatePosition(float deltaTime);

@@ -18,9 +18,9 @@ namespace Engine {
 
 			void draw(const Core::Renderer& renderer, const Core::Shader& shader) const override;
 
-			void drawUIParams() override;
-
 			void updateShader(const Core::Shader &shader) const override;
+
+			void UIWorld() override;
 
 		private:
 			void updateTarget(const Mouse* mouse, float deltaTime) override;

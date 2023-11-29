@@ -54,9 +54,9 @@ namespace Engine {
 
 			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const = 0;
 
-			virtual void drawUIParams() = 0;
-
 			virtual void updateShader(const Core::Shader &shader) const = 0;
+
+			virtual void UIWorld() = 0;
 
 		protected:
 			EntityID _mID;

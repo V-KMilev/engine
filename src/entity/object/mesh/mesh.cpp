@@ -20,10 +20,9 @@
 
 namespace Engine {
 	Mesh::Mesh(
-			const std::vector<Utils::Vertex>& vertices,
-			const std::vector<unsigned int>& indices,
-			std::shared_ptr<Material> material
-
+		const std::vector<Utils::Vertex>& vertices,
+		const std::vector<unsigned int>& indices,
+		std::shared_ptr<Material> material
 	) : Object(ObjectType::MESH),
 		_mVertices(new std::vector<Utils::Vertex>(vertices)),
 		_mIndices(new std::vector<unsigned int>(indices))
@@ -83,7 +82,7 @@ namespace Engine {
 
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		shader.bind();
-		
+
 		_mMaterial->updateShader(shader);
 
 		shader.setUniformMatrix4fv("uModel", _mObjectWorldData.model);
@@ -106,7 +105,7 @@ namespace Engine {
 		wd.model *= objectModel;
 	}
 
-	void Mesh::drawUIParams() {
+	void Mesh::UIWorld() {
 		auto& ud = _mObjectUseData;
 		auto& wd = _mObjectWorldData;
 
@@ -126,5 +125,13 @@ namespace Engine {
 
 			ImGui::TreePop();
 		}
+	}
+
+	void Mesh::UIMaterialTextures() {
+		_mMaterial->UITextures(_mID.getID());
+	}
+
+	void Mesh::UIMaterialCoefficients() {
+		_mMaterial->UICoefficients(_mID.getID());
 	}
 };

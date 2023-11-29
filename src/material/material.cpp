@@ -52,7 +52,6 @@ namespace Engine {
 		shader.bind();
 
 		for (int idx = 0; idx < _mTextures.textures.size(); idx++) {
-
 			_mTextures.textures[idx]->bind(idx);
 
 			std::string material = "uMaterial." + TextureTypeToString(TextureType(idx));
@@ -61,7 +60,7 @@ namespace Engine {
 		}
 	}
 
-	void Material::drawUITextures(unsigned int id) {
+	void Material::UITextures(unsigned int id) {
 		std::string sMesh = "Mesh: #" + std::to_string(id);
 
 		if (ImGui::TreeNode(sMesh.c_str())) {
@@ -120,7 +119,7 @@ namespace Engine {
 		}
 	}
 
-	bool Material::drawUICoefficients(unsigned int id) {
+	bool Material::UICoefficients(unsigned int id) {
 		bool hasUpdate = false;
 
 		std::string sMesh = "Mesh: #" + std::to_string(id);

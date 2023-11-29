@@ -10,7 +10,8 @@
 
 #include "logger.h"
 
-#include "input_handler.h"
+#include "input_manager.h"
+#include "event_manager.h"
 #include "scene.h"
 
 #include "perspective_camera.h"
@@ -105,17 +106,17 @@ namespace Engine {
 	}
 
 	void Window::input_config() {
-		_mInput = std::make_shared<InputHandle>();
+		_mInputManager = std::make_shared<InputManager>();
 
 		// TODO: Find better "hack" for this to work
-		glfwSetKeyCallback(_mWindow, _mInput->keyCallback);
-		glfwSetMouseButtonCallback(_mWindow, _mInput->mouseButtonCallback);
-		glfwSetScrollCallback(_mWindow, _mInput->mouseScrollCallback);
+		glfwSetKeyCallback(_mWindow, _mInputManager->keyCallback);
+		glfwSetMouseButtonCallback(_mWindow, _mInputManager->mouseButtonCallback);
+		glfwSetScrollCallback(_mWindow, _mInputManager->mouseScrollCallback);
 
-		glfwSetWindowUserPointer(_mWindow, _mInput.get());
+		glfwSetWindowUserPointer(_mWindow, _mInputManager.get());
 
 		// Mapping exit button
-		_mInput->mapKeyandStatetoEvent(
+		_mInputManager->mapKeyandStatetoEvent(
 			GLFW_KEY_C,
 			State::PRESS,
 			std::function<void()>(
@@ -144,11 +145,12 @@ namespace Engine {
 		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(
 			_mWindow,
 			"#version 330",
-			_mInput,
+			_mInputManager,
 			_mWidth,
 			_mHeight
 		);
 
+		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 
 		_mScene->addObject(std::make_shared<Quad>());
@@ -157,14 +159,17 @@ namespace Engine {
 		_mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
 		_mScene->addObject(std::make_shared<Model>("../asset/models/airplane/11805_airplane_v2_L2.obj"));
 
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\gizmo"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\orientation"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\selected"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\camera"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
 
 		while(!glfwWindowShouldClose(_mWindow)) {
-			_mInput->processMouse(_mWindow);
+			_mInputManager->processMouse(_mWindow);
 
 			_mScene->onUpdate(time_tick());
 
@@ -177,7 +182,7 @@ namespace Engine {
 			// Poll for and process events
 			glfwPollEvents();
 
-			if(_mClose) {
+			if (_mClose) {
 				glfwSetWindowShouldClose(_mWindow, _mClose);
 			}
 		}

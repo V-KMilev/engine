@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace Engine {
-	class InputHandle;
+	class InputManager;
 }
 
 #include <glad/gl.h>
@@ -52,7 +52,7 @@ namespace Engine {
 		private:
 			GLFWwindow* _mWindow;
 
-			std::shared_ptr<InputHandle> _mInput;
+			std::shared_ptr<InputManager> _mInputManager;
 
 			DeltaTime _mDelta;
 
