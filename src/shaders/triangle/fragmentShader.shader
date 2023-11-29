@@ -46,13 +46,7 @@ uniform Camera uCamera;
 uniform Material uMaterial;
 
 void main() {
-	vec3 localPosition = fs_in.local_position.xyz;
-
 	gl_FragDepth = fs_in.depth;
 
-	outColor = texture(uMaterial.Diffuse, fs_in.texCoords) + vec4(localPosition, 1.0);
-
-	if(bool(uSelected)) {
-		outColor *= vec4(1.0, 0.7, 0.7, 0.5);
-	}
+	outColor = texture(uMaterial.Diffuse, fs_in.texCoords);// + vec4(fs_in.local_position.xyz, 1.0);
 }

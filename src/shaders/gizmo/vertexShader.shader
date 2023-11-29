@@ -42,5 +42,7 @@ void main() {
 
 	vs_out.depth = mvp_position.z / mvp_position.w;
 
+	vs_out. normal = normal;
+
 	gl_Position = mvp_position;
 }

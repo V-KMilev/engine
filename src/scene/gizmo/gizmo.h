@@ -4,6 +4,8 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
+#include <memory>
+
 namespace Core {
 	class Renderer;
 	class Shader;
@@ -15,12 +17,12 @@ namespace Engine {
 }
 
 namespace Engine {
-	struct WorldData {
+	struct GizmoWorldData {
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	};
 
-	struct UseData {
+	struct GizmoUseData {
 		bool useTranslation = true;
 		bool useRotation    = false;
 	};
@@ -36,18 +38,20 @@ namespace Engine {
 			Gizmo(Gizmo && other) = delete;
 			Gizmo& operator = (Gizmo && other) = delete;
 
-			const WorldData& getWorldData() const;
-			WorldData& getWorldData();
+			const GizmoWorldData& getWorldData() const;
+			GizmoWorldData& getWorldData();
 
-			const UseData& getUseData() const;
-			UseData& getUseData();
+			const GizmoUseData& getUseData() const;
+			GizmoUseData& getUseData();
+
+			void onUpdate(const Mouse* mouse, float deltaTime, const Object& object);
 
 			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const;
 
-			void onUpdate(const glm::vec3& position, const glm::vec3& rotation);
-
 		private:
-			WorldData _mWolrdData;
-			UseData _mUseData;
+			std::shared_ptr<Object> _mCube;
+
+			GizmoWorldData _mWolrdData;
+			GizmoUseData _mUseData;
 	};
 };
