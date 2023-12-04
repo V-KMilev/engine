@@ -64,13 +64,11 @@ namespace Engine {
 	}
 
 	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
-		auto& ud = _mObjectUseData;
-
 		// TODO: Think of what we can do in this situation
-		if (ud.hasUpdate) {
+		if (_mUseData->hasUpdate) {
 
 			// Reset the update event
-			ud.hasUpdate = false;
+			_mUseData->hasUpdate = false;
 		}
 	}
 
@@ -81,47 +79,42 @@ namespace Engine {
 	}
 
 	void Mesh::updateShader(const Core::Shader &shader) const {
+		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+
 		shader.bind();
 
 		_mMaterial->updateShader(shader);
 
-		shader.setUniformMatrix4fv("uModel", _mObjectWorldData.model);
+		shader.setUniformMatrix4fv("uModel", worldData->model);
 	}
 
 	void Mesh::updateModel(glm::mat4 objectModel) {
-		auto& wd = _mObjectWorldData;
+		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
 
-		wd.model = glm::mat4(1.0f);
+		worldData->model = glm::mat4(1.0f);
 
-		wd.model = glm::translate(wd.model, wd.position);
+		worldData->model = glm::translate(worldData->model, worldData->position);
 
-		wd.model = glm::rotate(wd.model, glm::radians(wd.rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-		wd.model = glm::rotate(wd.model, glm::radians(wd.rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-		wd.model = glm::rotate(wd.model, glm::radians(wd.rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		wd.model = glm::scale(wd.model, wd.scale);
+		worldData->model = glm::scale(worldData->model, worldData->scale);
 
 		// TODO: Think if we can fix the "problem"
-		wd.model *= objectModel;
+		worldData->model *= objectModel;
 	}
 
 	void Mesh::UIWorld() {
-		auto& ud = _mObjectUseData;
-		auto& wd = _mObjectWorldData;
-
 		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
-
-		std::string sPosition = "Position##Mesh" + std::to_string(_mID.getID());
-		std::string sRotation = "Rotation##Mesh" + std::to_string(_mID.getID());
-		std::string sScale    = "Scale##Mesh"    + std::to_string(_mID.getID());
 
 		if (ImGui::TreeNode(sMesh.c_str())) {
 
-			ImGui::SeparatorText(sMesh.c_str());
+			_mUseData->drawUI(_mID.getID());
 
-			if (ImGui::DragFloat3(sPosition.c_str(), &wd.position[0], 1)) { ud.hasUpdate = true; }
-			if (ImGui::DragFloat3(sRotation.c_str(), &wd.rotation[0], 1)) { ud.hasUpdate = true; }
-			if (ImGui::DragFloat3(sScale.c_str(),    &wd.scale[0],    1)) { ud.hasUpdate = true; }
+			ImGui::SeparatorText("World Data");
+
+			_mWorldData->drawUI(_mID.getID());
 
 			ImGui::TreePop();
 		}

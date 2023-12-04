@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+
+#include "component.h"
 #include "entity_id.h"
 
 namespace Core {
@@ -18,17 +21,6 @@ namespace Engine {
 		CAMERA = 2
 	};
 
-	// Base WorldData struct
-	struct WorldData {};
-
-	// Base UseData struct
-	struct UseData {
-		public:
-			bool isActive   = false;
-			bool isSelected = false;
-			bool hasUpdate  = false;
-	};
-
 	class Entity {
 		public:
 			Entity(EntityType type);
@@ -44,11 +36,11 @@ namespace Engine {
 
 			EntityType getTpye() const;
 
-			virtual const WorldData& getWorldData() const = 0;
-			virtual WorldData& getWorldData() = 0;
+			virtual const std::shared_ptr<WorldData>& getWorldData() const;
+			virtual std::shared_ptr<WorldData>& getWorldData();
 
-			virtual const UseData& getUseData() const = 0;
-			virtual UseData& getUseData() = 0;
+			virtual const std::shared_ptr<UseData>& getUseData() const;
+			virtual std::shared_ptr<UseData>& getUseData();
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
@@ -63,7 +55,7 @@ namespace Engine {
 
 			EntityType _mType;
 
-			WorldData _mWorldData;
-			UseData _mUseData;
+			std::shared_ptr<WorldData> _mWorldData;
+			std::shared_ptr<UseData> _mUseData;
 	};
 };

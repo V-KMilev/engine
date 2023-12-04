@@ -12,8 +12,11 @@
 namespace Engine {
 	Orientation::Orientation() {
 		_mOrientation = std::make_shared<Cube>();
-		_mOrientation->getWorldData().position = glm::vec3(0.85f, -0.75f, 0.0f);
-		_mOrientation->getWorldData().scale    = glm::vec3(0.07f, 0.07f, 0.07f);
+
+		auto orientationWorldData = static_cast<ObjectWorldData*>(_mOrientation->getWorldData().get());
+
+		orientationWorldData->position = glm::vec3(0.85f, -0.75f, 0.0f);
+		orientationWorldData->scale    = glm::vec3(0.07f, 0.07f, 0.07f);
 	}
 
 	void Orientation::draw(

@@ -46,21 +46,6 @@ namespace Engine {
 		MESH      = 4
 	};
 
-	struct ObjectWorldData : WorldData {
-		public:
-			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 scale    = glm::vec3(1.0f, 1.0f, 1.0f);
-			// roll, pitch, yaw
-			glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
-			glm::mat4 model = glm::mat4(1.0f);
-	};
-
-	struct ObjectUseData : UseData {
-		public:
-			bool linesOnly = false;
-	};
-
 	class Object : public Entity {
 		public:
 			Object() = delete;
@@ -69,12 +54,6 @@ namespace Engine {
 			Object(ObjectType type);
 
 			ObjectType getObjectTpye() const;
-
-			const ObjectWorldData& getWorldData() const override;
-			ObjectWorldData& getWorldData() override;
-
-			const ObjectUseData& getUseData() const override;
-			ObjectUseData& getUseData() override;
 
 			virtual void load_mesh() = 0;
 
@@ -94,9 +73,6 @@ namespace Engine {
 
 		protected:
 			ObjectType _mObjectType;
-
-			ObjectWorldData _mObjectWorldData;
-			ObjectUseData _mObjectUseData;
 
 			std::shared_ptr<Material> _mMaterial;
 

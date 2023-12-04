@@ -8,84 +8,79 @@
 
 namespace Engine {
 	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
-		_mCameraUseData.hasUpdate = true;
+		// TODO: Fix this when you add more cameras
+		_mWorldData = std::make_shared<PerspectiveCameraWorldData>();
+		_mUseData   = std::make_shared<PerspectiveCameraUseData>();
 
 		_mVisual = std::make_shared<Cube>();
 
-		_mVisual->getWorldData().position = _mCameraWorldData.position;
-		_mVisual->getWorldData().scale = glm::vec3(0.25f, 0.25f, 0.25f);
-		_mVisual->getUseData().hasUpdate = true;
+		auto visualWorldData = static_cast<ObjectWorldData*>(_mVisual->getWorldData().get());
+
+		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
+
+		visualWorldData->position = worldData->position;
+		visualWorldData->scale    = glm::vec3(0.25f, 0.25f, 0.25f);
+
+		_mVisual->getUseData()->hasUpdate = true;
+		_mUseData->hasUpdate = true;
 	}
 
 	CameraType Camera::getCameraTpye() const {
 		return _mCameraType;
 	}
 
-	const CameraWorldData& Camera::getWorldData() const {
-		return _mCameraWorldData;
-	}
-
-	CameraWorldData& Camera::getWorldData() {
-		return _mCameraWorldData;
-	}
-
-	const CameraUseData& Camera::getUseData() const {
-		return _mCameraUseData;
-	}
-
-	CameraUseData& Camera::getUseData() {
-		return _mCameraUseData;
-	}
-
 	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
-		auto& ud = _mCameraUseData;
+		if (_mUseData->hasUpdate) {
+			auto useData = static_cast<CameraUseData*>(_mUseData.get());
 
-		if (ud.hasUpdate) {
-			if (ud.positionEvent != PositionEvent::NONE) {
-				updatePosition(deltaTime);
-			}
-			else if (ud.updateEvent == UpdateEvent::TARGET) {
-				updateTarget(mouse, deltaTime);
-			}
-			else if (ud.updateEvent == UpdateEvent::FOV) {
-				zoom(mouse, deltaTime);
+			switch (useData->updateEvent) {
+				case UpdateEvent::POSITION: updatePosition(deltaTime);    break;
+				case UpdateEvent::TARGET: updateTarget(mouse, deltaTime); break;
+				case UpdateEvent::FOV: zoom(mouse, deltaTime);            break;
+				default: break;
 			}
 
 			updateProjection();
 			updateLookAt();
 
-			ud.updateEvent = UpdateEvent::NONE;
+			_mVisual->onUpdate(mouse, deltaTime);
 
 			// Reset the update event
-			ud.hasUpdate = false;
+			useData->updateEvent = UpdateEvent::NONE;
+			useData->hasUpdate = false;
 		}
-
-		_mVisual->onUpdate(mouse, deltaTime);
 	}
 
 	void Camera::updatePosition(float deltaTime) {
-		auto& ud = _mCameraUseData;
-		auto& wd = _mCameraWorldData;
+		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
+		auto useData = static_cast<CameraUseData*>(_mUseData.get());
 
-		if      (ud.positionEvent == PositionEvent::POSX) { wd.position += deltaTime * ud.moveSpeed * wd.front; }
-		else if (ud.positionEvent == PositionEvent::NEGX) { wd.position -= deltaTime * ud.moveSpeed * wd.front; }
-		else if (ud.positionEvent == PositionEvent::POSY) { wd.position += deltaTime * ud.moveSpeed * wd.up;    }
-		else if (ud.positionEvent == PositionEvent::NEGY) { wd.position -= deltaTime * ud.moveSpeed * wd.up;    }
-		else if (ud.positionEvent == PositionEvent::POSZ) { wd.position += deltaTime * ud.moveSpeed * wd.right; }
-		else if (ud.positionEvent == PositionEvent::NEGZ) { wd.position -= deltaTime * ud.moveSpeed * wd.right; }
-		else {
-			return;
+		auto visualWorldData = static_cast<ObjectWorldData*>(_mVisual->getWorldData().get());
+
+		glm::vec3 moveDirection(0.0f);
+
+		switch (useData->positionEvent) {
+			case PositionEvent::POSX: moveDirection = worldData->front;  break;
+			case PositionEvent::NEGX: moveDirection = -worldData->front; break;
+			case PositionEvent::POSY: moveDirection = worldData->up;     break;
+			case PositionEvent::NEGY: moveDirection = -worldData->up;    break;
+			case PositionEvent::POSZ: moveDirection = worldData->right;  break;
+			case PositionEvent::NEGZ: moveDirection = -worldData->right; break;
+			default: moveDirection = glm::vec3(0.0f); break;
 		}
 
-		_mVisual->getWorldData().position = _mCameraWorldData.position;
-		_mVisual->getUseData().hasUpdate = true;
+		worldData->position += deltaTime * useData->moveSpeed * moveDirection;
 
-		ud.positionEvent = PositionEvent::NONE;
+		// Update the visual representation
+		visualWorldData->position = worldData->position;
+		_mVisual->getUseData()->hasUpdate = true;
+
+		useData->positionEvent = PositionEvent::NONE;
 	}
 
 	void Camera::updateLookAt() {
-		auto& wd = _mCameraWorldData;
+		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
 
-		wd.lookAt = glm::lookAt(wd.position, wd.target, wd.up);
+		worldData->lookAt = glm::lookAt(worldData->position, worldData->target, worldData->up);
 	}
 };

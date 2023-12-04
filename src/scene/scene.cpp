@@ -108,8 +108,8 @@ namespace Engine {
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			object->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
 
-			if (object->getUseData().isSelected) {
-				_mGizmo->onUpdate(&_mInputManager->getMouse(), _mDeltaTime, *object);
+			if (object->getUseData()->isSelected) {
+				// _mGizmo->onUpdate(&_mInputManager->getMouse(), _mDeltaTime, *object);
 			}
 		}
 
@@ -131,7 +131,7 @@ namespace Engine {
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
 		// Set the first camera as main (active) camera
 		if (_mCameras.size() == 0) {
-			camera->getUseData().isActive = true;
+			camera->getUseData()->isActive = true;
 		}
 
 		_mCameras.push_back(camera);
@@ -153,7 +153,7 @@ namespace Engine {
 		updateShaderCameras(shader);
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData().isSelected) {
+			if (object->getUseData()->isSelected) {
 				// _mGizmo->draw(*_mRenderer, *shader);
 			}
 		}
@@ -175,7 +175,7 @@ namespace Engine {
 		updateShaderCameras(shader);
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData().isSelected) {
+			if (object->getUseData()->isSelected) {
 				MY_GL_CHECK(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
 				MY_GL_CHECK(glStencilMask(0x00));
 				MY_GL_CHECK(glDisable(GL_DEPTH_TEST));
@@ -193,7 +193,7 @@ namespace Engine {
 		updateShaderCameras(shader);
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (!camera->getUseData().isActive) {
+			if (!camera->getUseData()->isActive) {
 				camera->draw(*_mRenderer, *shader);
 			}
 		}
@@ -209,7 +209,7 @@ namespace Engine {
 
 	void Scene::updateShaderCameras(const std::shared_ptr<Core::Shader>& shader) const {
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
+			if (camera->getUseData()->isActive) {
 				camera->updateShader(*shader);
 			}
 		}
@@ -223,7 +223,7 @@ namespace Engine {
 
 		if (pixel.objectID > 0) {
 			for (const std::shared_ptr<Object>& object : _mObjects) {
-				object->getUseData().isSelected = (object->getID() == pixel.objectID && !object->getUseData().isSelected) ? true : false;
+				object->getUseData()->isSelected = (object->getID() == pixel.objectID && !object->getUseData()->isSelected) ? true : false;
 			}
 		}
 	}
@@ -237,21 +237,22 @@ namespace Engine {
 		float height = 0.0f;
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
-				view       = camera->getWorldData().lookAt;
-				projection = camera->getWorldData().projection;
+			if (camera->getUseData()->isActive) {
+				auto worldData = static_cast<PerspectiveCameraWorldData*>(camera->getWorldData().get());
 
-				PerspectiveCamera* cam = static_cast<PerspectiveCamera*>(camera.get());
+				view       = worldData->lookAt;
+				projection = worldData->projection;
 
-				fov    = cam->getFov();
-				width  = cam->getWidth();
-				height = cam->getHeight();
+				fov    = worldData->fov;
+				width  = worldData->width;
+				height = worldData->height;
 			}
 		}
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData().isSelected) {
-				glm::vec3 position = object->getWorldData().position;
+			if (object->getUseData()->isSelected) {
+				auto worldData = static_cast<ObjectWorldData*>(object->getWorldData().get());
+				glm::vec3 position = worldData->position;
 
 				float x = (float)_mInputManager->getMouse().x;
 				float y = (float)_mInputManager->getMouse().y;
@@ -273,18 +274,21 @@ namespace Engine {
 				// TODO: Find a fix for that, i'm pretty sure its a bug
 				glm::vec4 view_space_intersect = glm::vec4(glm::vec3(rayView) * -viewPosition.z, 1.0f);
 
-				object->getWorldData().position = glm::inverse(view) * view_space_intersect;
-				object->getUseData().hasUpdate = true;
+				worldData->position = glm::inverse(view) * view_space_intersect;
+				object->getUseData()->hasUpdate = true;
 			}
 		}
 	}
 
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
 		for (std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData().isActive) {
-				camera->getUseData().hasUpdate = true;
-				camera->getUseData().updateEvent = event;
-				camera->getUseData().positionEvent = pEvent;
+			if (camera->getUseData()->isActive) {
+				camera->getUseData()->hasUpdate = true;
+
+				auto useData = static_cast<CameraUseData*>(camera->getUseData().get());
+
+				useData->updateEvent = event;
+				useData->positionEvent = pEvent;
 			}
 		}
 	}

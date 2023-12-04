@@ -14,7 +14,9 @@ namespace Engine {
 	Gizmo::Gizmo() {
 		_mCube = std::make_shared<Cube>();
 
-		_mCube->getWorldData().scale = glm::vec3(0.5f, 0.5f, 0.5f);
+		auto cubeWorldData = static_cast<ObjectWorldData*>(_mCube->getWorldData().get());
+
+		cubeWorldData->scale = glm::vec3(0.5f, 0.5f, 0.5f);
 	}
 
 	const GizmoWorldData& Gizmo::getWorldData() const {
@@ -39,19 +41,22 @@ namespace Engine {
 	}
 
 	void Gizmo::onUpdate(const Mouse* mouse, float deltaTime, const Object& object) {
-		glm::vec3& position = _mCube->getWorldData().position;
-		glm::vec3& rotation = _mCube->getWorldData().rotation;
+		auto cubeWorldData   = static_cast<ObjectWorldData*>(_mCube->getWorldData().get());
+		auto objectWorldData = static_cast<ObjectWorldData*>(object.getWorldData().get());
 
-		const glm::vec3& objPosition = object.getWorldData().position;
-		const glm::vec3& objRotation = object.getWorldData().rotation;
+		glm::vec3& position = cubeWorldData->position;
+		glm::vec3& rotation = cubeWorldData->rotation;
+
+		const glm::vec3& objPosition = objectWorldData->position;
+		const glm::vec3& objRotation = objectWorldData->rotation;
 
 		if (position != objPosition) {
 			position = objPosition;
-			_mCube->getUseData().hasUpdate = true;
+			_mCube->getUseData()->hasUpdate = true;
 		}
 		else if (rotation != objRotation) {
 			rotation = objRotation;
-			_mCube->getUseData().hasUpdate = true;
+			_mCube->getUseData()->hasUpdate = true;
 		}
 
 		_mCube->onUpdate(mouse, deltaTime);
