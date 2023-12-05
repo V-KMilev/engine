@@ -28,7 +28,7 @@ namespace Engine {
 		// Default texture
 		std::string defaultPath = "../asset/textures/default/texture.png";
 
-		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures().textures) {
+		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures()->textures) {
 			texture = std::make_shared<Core::Texture>(defaultPath);
 		}
 

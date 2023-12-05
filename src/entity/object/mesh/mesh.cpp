@@ -35,7 +35,7 @@ namespace Engine {
 	void Mesh::load_mesh() {
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
 
-		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures().textures) {
+		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures()->textures) {
 			texture->init();
 		}
 

@@ -122,18 +122,18 @@ namespace Engine {
 
 		// Load the material data
 		for (const tinyobj::material_t& material : materials[0]) {
-			my_material.ambient       = glm::make_vec3(material.ambient);
-			my_material.diffuse       = glm::make_vec3(material.diffuse);
-			my_material.specular      = glm::make_vec3(material.specular);
-			my_material.transmittance = glm::make_vec3(material.transmittance);
-			my_material.emission      = glm::make_vec3(material.emission);
+			my_material->ambient       = glm::make_vec3(material.ambient);
+			my_material->diffuse       = glm::make_vec3(material.diffuse);
+			my_material->specular      = glm::make_vec3(material.specular);
+			my_material->transmittance = glm::make_vec3(material.transmittance);
+			my_material->emission      = glm::make_vec3(material.emission);
 
-			my_material.shininess = material.shininess;
-			my_material.ior       = material.ior;
+			my_material->shininess = material.shininess;
+			my_material->ior       = material.ior;
 
-			my_material.roughness = material.roughness;
-			my_material.metallic  = material.metallic;
-			my_material.sheen     = material.sheen;
+			my_material->roughness = material.roughness;
+			my_material->metallic  = material.metallic;
+			my_material->sheen     = material.sheen;
 
 			std::vector<std::string> texnames = {
 				material.ambient_texname,
@@ -153,10 +153,10 @@ namespace Engine {
 
 			for (int idx = 0; idx < texnames.size(); idx++) {
 				if (texnames[idx] != "") {
-					my_textures.textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
+					my_textures->textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
 				}
 				else {
-					my_textures.textures[idx] = std::make_shared<Core::Texture>(defaultPath);
+					my_textures->textures[idx] = std::make_shared<Core::Texture>(defaultPath);
 				}
 			}
 		}
