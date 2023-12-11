@@ -45,12 +45,12 @@ namespace Engine {
 			bool update_file(const std::string& message);
 
 		private:
-			std::string _fileName;
-			std::ofstream _file;
+			std::string _mFileName;
+			std::ofstream _mFile;
 
-			std::string _folder;
+			std::string _mFolder;
 
-			std::vector<std::string> _messages;
+			std::vector<std::string> _mMessages;
 	};
 
 	extern Logger logger;

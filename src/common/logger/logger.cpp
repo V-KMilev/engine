@@ -7,7 +7,7 @@
 namespace fs = std::filesystem;
 
 namespace Engine {
-	Logger::Logger() : _folder(""), _fileName(""), _file(), _messages({}) {
+	Logger::Logger() : _mFolder(""), _mFileName(""), _mFile(), _mMessages({}) {
 		init();
 	}
 
@@ -18,29 +18,29 @@ namespace Engine {
 	bool Logger::init() {
 		const std::string time = Engine::Utils::get_current_time("%Y-%m-%d_%H-%M-%S");
 
-		_folder = "log";
+		_mFolder = "log";
 
-		if (!fs::exists(_folder) && !fs::create_directories(_folder)) {
-			printf("[ERROR] Failed to create directory: %s\n", _folder.c_str());
+		if (!fs::exists(_mFolder) && !fs::create_directories(_mFolder)) {
+			printf("[ERROR] Failed to create directory: %s\n", _mFolder.c_str());
 			return false;
 		}
 
-		_fileName = _folder + "/log-" + time + ".txt";
-		_file     = std::ofstream(_fileName);
+		_mFileName = _mFolder + "/log-" + time + ".txt";
+		_mFile     = std::ofstream(_mFileName);
 
-		if (!_file.is_open()) {
-			printf("[ERROR] Failed to open log file: %s\n", _fileName.c_str());
+		if (!_mFile.is_open()) {
+			printf("[ERROR] Failed to open log file: %s\n", _mFileName.c_str());
 			return false;
 		}
 
-		_messages.clear();
+		_mMessages.clear();
 
 		return true;
 	}
 
 	bool Logger::deinit() {
-		if (_file.is_open()) {
-			_file.close();
+		if (_mFile.is_open()) {
+			_mFile.close();
 		}
 
 		return true;
@@ -74,7 +74,7 @@ namespace Engine {
 			printf("[ERROR] Failed to update current log file\n");
 		}
 
-		_messages.push_back(out_message);
+		_mMessages.push_back(out_message);
 	}
 
 	std::string Logger::leveled_message(
@@ -103,8 +103,8 @@ namespace Engine {
 	}
 
 	bool Logger::update_file(const std::string& message) {
-		if (_file) {
-			_file << message;
+		if (_mFile) {
+			_mFile << message;
 
 			return true;
 		}
