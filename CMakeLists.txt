@@ -10,6 +10,7 @@ set(SOURCES
 	main.cpp
 )
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/modules/minitrace)
 add_subdirectory(${PROJECT_SOURCE_DIR}/modules/vkmGL)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -19,6 +20,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 # Link the main target with external libraries
 target_link_libraries(${PROJECT_NAME}
+	minitrace
 	vkmGL
 	glfw
 	imgui

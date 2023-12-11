@@ -5,7 +5,9 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/common/input/input_key.cpp
 
 	${ENGINE_SRC_DIR}/common/logger/logger.cpp
-	
+
+	${ENGINE_SRC_DIR}/common/profiler/tracer.cpp
+
 	${ENGINE_SRC_DIR}/entity/camera/camera.cpp
 	${ENGINE_SRC_DIR}/entity/camera/perspective_camera.cpp
 	
@@ -38,7 +40,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/common/input
 
 	${ENGINE_SRC_DIR}/common/logger
-	
+
+	${ENGINE_SRC_DIR}/common/profiler
+
 	${ENGINE_SRC_DIR}/common/utils
 
 	${ENGINE_SRC_DIR}/entity/camera
