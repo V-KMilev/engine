@@ -2,8 +2,12 @@
 
 #include "window.h"
 
+#include "tracer.h"
+
 int main(void) {
-	printf("Staring..\n");
+	printf("Staring...\n");
+
+	Profiler::Tracer tracer("tracer.json", "Engine Process", "Main Thread");
 
 	const uint32_t width  = 1920;
 	const uint32_t hight  = 1080;
@@ -18,7 +22,7 @@ int main(void) {
 
 	window.main_loop();
 
-	printf("Ending..\n");
+	printf("Ending...\n");
 
 	return 0;
 }
