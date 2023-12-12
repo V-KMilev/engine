@@ -15,14 +15,14 @@ namespace Core {
 };
 
 namespace Engine {
-	// Base WorldData struct
-	class WorldData : public UIElement {
+	// Base Transform struct
+	class Transform : public UIElement {
 		public:
 			virtual bool drawUI(unsigned int id) override = 0;
 	};
 
-	// Base UseData struct
-	class UseData : public UIElement {
+	// Base InteractionState struct
+	class InteractionState : public UIElement {
 		public:
 			virtual bool drawUI(unsigned int id) override = 0;
 
@@ -34,7 +34,7 @@ namespace Engine {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	class ObjectWorldData : public WorldData {
+	class ObjectTransform : public Transform {
 		public:
 			bool drawUI(unsigned int id) override;
 
@@ -47,7 +47,7 @@ namespace Engine {
 			glm::mat4 model = glm::mat4(1.0f);
 	};
 
-	class ObjectUseData : public UseData {
+	class ObjectInteractionState : public InteractionState {
 		public:
 			bool drawUI(unsigned int id) override;
 
@@ -74,7 +74,7 @@ namespace Engine {
 		NEGZ = 6
 	};
 
-	class CameraWorldData : public WorldData {
+	class CameraTransform : public Transform {
 		public:
 			virtual bool drawUI(unsigned int id) override = 0;
 
@@ -101,7 +101,7 @@ namespace Engine {
 			float maxUpAngle = 1.57f;
 	};
 
-	class CameraUseData : public UseData {
+	class CameraInteractionState : public InteractionState {
 		public:
 			virtual bool drawUI(unsigned int id) override = 0;
 
@@ -118,7 +118,7 @@ namespace Engine {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	class PerspectiveCameraWorldData : public CameraWorldData {
+	class PerspectiveCameraTransform : public CameraTransform {
 		public:
 			bool drawUI(unsigned int id) override;
 
@@ -134,7 +134,7 @@ namespace Engine {
 			float minFOV = 5.0f;
 	};
 
-	class PerspectiveCameraUseData : public CameraUseData {
+	class PerspectiveCameraInteractionState : public CameraInteractionState {
 		public:
 			bool drawUI(unsigned int id) override;
 

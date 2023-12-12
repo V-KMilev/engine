@@ -128,7 +128,7 @@ namespace Engine {
 		ImGui::Begin("##Left", nullptr, staticWindow);
 
 		for (std::shared_ptr<Object>& object : objects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				object->UIWorld();
 			}
 		}
@@ -179,7 +179,7 @@ namespace Engine {
 		}
 
 		for (std::shared_ptr<Object>& object : objects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				object->UIMeshsWorld();
 			}
 		}
@@ -212,7 +212,7 @@ namespace Engine {
 		}
 
 		for (std::shared_ptr<Object>& object : objects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				object->UIMeshsMaterialCoefficients();
 			}
 		}
@@ -232,7 +232,7 @@ namespace Engine {
 		ImGui::Begin("##Top", nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
 
 		for (std::shared_ptr<Camera>& camera : cameras) {
-			if (camera->getUseData()->isActive) {
+			if (camera->getInteractionState()->isActive) {
 				ImGui::BulletText("Camera");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
@@ -270,7 +270,7 @@ namespace Engine {
 		}
 
 		for (std::shared_ptr<Object>& object : objects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				object->UIMeshsMaterialTextures();
 			}
 		}

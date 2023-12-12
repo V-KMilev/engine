@@ -15,30 +15,30 @@
 namespace Engine {
 	PerspectiveCamera::PerspectiveCamera(unsigned int width, unsigned int height) : Camera(CameraType::PERSPECTIVE) {
 		// TODO: Fix this when you add more cameras and fix the Camera class
-		// _mWorldData = std::make_shared<PerspectiveCameraWorldData>();
-		// _mUseData   = std::make_shared<PerspectiveCameraUseData>();
+		// _mTransform        = std::make_shared<PerspectiveCameraTransform>();
+		// _mInteractionState = std::make_shared<PerspectiveCameraInteractionState>();
 
-		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
+		auto transform = static_cast<PerspectiveCameraTransform*>(_mTransform.get());
 
-		worldData->width  = width;
-		worldData->height = height;
+		transform->width  = width;
+		transform->height = height;
 
-		worldData->projection = glm::perspective(
-			glm::radians(worldData->fov),
-			worldData->width / float(worldData->height),
-			worldData->c_near,
-			worldData->c_far
+		transform->projection = glm::perspective(
+			glm::radians(transform->fov),
+			transform->width / float(transform->height),
+			transform->c_near,
+			transform->c_far
 		);
 
 		// Calculate initial camera orientation
-		worldData->front = glm::normalize(worldData->target - worldData->position);
-		worldData->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), worldData->front));
-		worldData->up    = glm::cross(worldData->front, worldData->right);
+		transform->front = glm::normalize(transform->target - transform->position);
+		transform->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), transform->front));
+		transform->up    = glm::cross(transform->front, transform->right);
 
 		// Ensure that the up vector is perpendicular to the direction vector
-		if (glm::length(worldData->up) < 0.9f) {
-			worldData->right = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), worldData->front));
-			worldData->up    = glm::cross(worldData->front, worldData->right);
+		if (glm::length(transform->up) < 0.9f) {
+			transform->right = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), transform->front));
+			transform->up    = glm::cross(transform->front, transform->right);
 		}
 
 		updateLookAt();
@@ -53,50 +53,50 @@ namespace Engine {
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Camera", "Camera Update Shader");
 
-		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
+		auto transform = static_cast<PerspectiveCameraTransform*>(_mTransform.get());
 
 		shader.bind();
 
-		shader.setUniformMatrix4fv("uCamera.view", worldData->lookAt);
-		shader.setUniformMatrix4fv("uCamera.projection", worldData->projection);
+		shader.setUniformMatrix4fv("uCamera.view", transform->lookAt);
+		shader.setUniformMatrix4fv("uCamera.projection", transform->projection);
 
-		shader.setUniform1f("uCamera.FOV", worldData->fov);
-		shader.setUniform1f("uCamera.width", (float)worldData->width);
-		shader.setUniform1f("uCamera.height", (float)worldData->height);
+		shader.setUniform1f("uCamera.FOV", transform->fov);
+		shader.setUniform1f("uCamera.width", (float)transform->width);
+		shader.setUniform1f("uCamera.height", (float)transform->height);
 
-		shader.setUniform1f("uCamera.near", worldData->c_near);
-		shader.setUniform1f("uCamera.far", worldData->c_far);
+		shader.setUniform1f("uCamera.near", transform->c_near);
+		shader.setUniform1f("uCamera.far", transform->c_far);
 
 		PROFILER_END("Camera", "Camera Update Shader");
 	}
 
 	void PerspectiveCamera::updateTarget(const Mouse* mouse, float deltaTime) {
-		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
-		auto useData   = static_cast<PerspectiveCameraUseData*>(_mUseData.get());
+		auto transform        = static_cast<PerspectiveCameraTransform*>(_mTransform.get());
+		auto interactionState = static_cast<PerspectiveCameraInteractionState*>(_mInteractionState.get());
 
 		// Calculate the mouse movement angles
-		float horizontalDelta = deltaTime * useData->mouseSpeed * (worldData->width / 2.0f - mouse->x);
-		float verticalDelta = deltaTime * useData->mouseSpeed * (worldData->height / 2.0f - mouse->y);
+		float horizontalDelta = deltaTime * interactionState->mouseSpeed * (transform->width / 2.0f - mouse->x);
+		float verticalDelta = deltaTime * interactionState->mouseSpeed * (transform->height / 2.0f - mouse->y);
 
 		// Update the vertical & horizontal angle
-		worldData->verticalAngle += verticalDelta;
-		worldData->horizontalAngle += horizontalDelta;
+		transform->verticalAngle += verticalDelta;
+		transform->horizontalAngle += horizontalDelta;
 
 		// Clamp the vertical angle
-		worldData->verticalAngle = glm::clamp(worldData->verticalAngle, -worldData->maxUpAngle, worldData->maxUpAngle);
+		transform->verticalAngle = glm::clamp(transform->verticalAngle, -transform->maxUpAngle, transform->maxUpAngle);
 
 		// Calculate the new front direction
 		glm::vec3 front(
-			cos(worldData->verticalAngle) * sin(worldData->horizontalAngle),
-			sin(worldData->verticalAngle),
-			cos(worldData->verticalAngle) * cos(worldData->horizontalAngle)
+			cos(transform->verticalAngle) * sin(transform->horizontalAngle),
+			sin(transform->verticalAngle),
+			cos(transform->verticalAngle) * cos(transform->horizontalAngle)
 		);
 
 		// Calculate the new right direction
 		glm::vec3 right(
-			sin(worldData->horizontalAngle - glm::pi<float>() / 2.0f),
+			sin(transform->horizontalAngle - glm::pi<float>() / 2.0f),
 			0,
-			cos(worldData->horizontalAngle - glm::pi<float>() / 2.0f)
+			cos(transform->horizontalAngle - glm::pi<float>() / 2.0f)
 		);
 
 		// Calculate the new up direction
@@ -106,33 +106,33 @@ namespace Engine {
 
 		// Update camera properties
 		// front * 2.0f so when you try to move you dont start spining
-		worldData->target = worldData->position + (front * 2.0f);
+		transform->target = transform->position + (front * 2.0f);
 	}
 
 	void PerspectiveCamera::updateProjection() {
-		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
+		auto transform = static_cast<PerspectiveCameraTransform*>(_mTransform.get());
 
-		worldData->projection = glm::perspective(
-			glm::radians(worldData->fov),
-			worldData->width / float(worldData->height),
-			worldData->c_near,
-			worldData->c_far
+		transform->projection = glm::perspective(
+			glm::radians(transform->fov),
+			transform->width / float(transform->height),
+			transform->c_near,
+			transform->c_far
 		);
 	}
 
 	void PerspectiveCamera::zoom(const Mouse* mouse, float deltaTime) {
-		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
-		auto useData   = static_cast<PerspectiveCameraUseData*>(_mUseData.get());
+		auto transform        = static_cast<PerspectiveCameraTransform*>(_mTransform.get());
+		auto interactionState = static_cast<PerspectiveCameraInteractionState*>(_mInteractionState.get());
 
 		if (mouse->hasUpdate) {
-			worldData->fov -= deltaTime * useData->zoomSpeed * mouse->scrollY;
+			transform->fov -= deltaTime * interactionState->zoomSpeed * mouse->scrollY;
 		}
 
-		if (worldData->fov > worldData->maxFOV) {
-			worldData->fov = worldData->maxFOV;
+		if (transform->fov > transform->maxFOV) {
+			transform->fov = transform->maxFOV;
 		}
-		else if (worldData->fov < worldData->minFOV) {
-			worldData->fov = worldData->minFOV;
+		else if (transform->fov < transform->minFOV) {
+			transform->fov = transform->minFOV;
 		}
 	}
 
@@ -141,10 +141,10 @@ namespace Engine {
 
 		ImGui::SeparatorText(sCamera.c_str());
 
-		if (_mUseData->drawUI(_mID.getID())) { _mUseData->hasUpdate = true; }
+		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 
-		ImGui::SeparatorText("World Data");
+		ImGui::SeparatorText("Transform");
 
-		if (_mWorldData->drawUI(_mID.getID())) { _mUseData->hasUpdate = true; }
+		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 	}
 };

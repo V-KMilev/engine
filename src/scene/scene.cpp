@@ -71,7 +71,7 @@ namespace Engine {
 		for (const std::shared_ptr<Core::Shader>& shader : _mShaders) {
 			// Update the shader with the active camera's data
 			for (const std::shared_ptr<Camera>& camera : _mCameras) {
-				if (camera->getUseData()->isActive) {
+				if (camera->getInteractionState()->isActive) {
 					camera->updateShader(*shader);
 				}
 			}
@@ -124,7 +124,7 @@ namespace Engine {
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			object->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
 
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				// _mGizmo->onUpdate(&_mInputManager->getMouse(), _mDeltaTime, *object);
 			}
 		}
@@ -149,7 +149,7 @@ namespace Engine {
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
 		// Set the first camera as main (active) camera
 		if (_mCameras.size() == 0) {
-			camera->getUseData()->isActive = true;
+			camera->getInteractionState()->isActive = true;
 		}
 
 		_mCameras.push_back(camera);
@@ -175,7 +175,7 @@ namespace Engine {
 		PROFILER_BEGIN("Gizmo", "Draw Gizmo");
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				// _mGizmo->draw(*_mRenderer, *shader);
 			}
 		}
@@ -203,7 +203,7 @@ namespace Engine {
 		PROFILER_BEGIN("Pick Entity", "Entity Draw Selected");
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData()->isSelected) {
+			if (object->getInteractionState()->isSelected) {
 				MY_GL_CHECK(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
 				MY_GL_CHECK(glStencilMask(0x00));
 				MY_GL_CHECK(glDisable(GL_DEPTH_TEST));
@@ -223,7 +223,7 @@ namespace Engine {
 		PROFILER_BEGIN("Cameras", "Cameras Draw");
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (!camera->getUseData()->isActive) {
+			if (!camera->getInteractionState()->isActive) {
 				camera->draw(*_mRenderer, *shader);
 			}
 		}
@@ -251,7 +251,7 @@ namespace Engine {
 
 		if (pixel.objectID > 0) {
 			for (const std::shared_ptr<Object>& object : _mObjects) {
-				object->getUseData()->isSelected = (object->getID() == pixel.objectID && !object->getUseData()->isSelected) ? true : false;
+				object->getInteractionState()->isSelected = (object->getID() == pixel.objectID && !object->getInteractionState()->isSelected) ? true : false;
 			}
 		}
 
@@ -267,22 +267,22 @@ namespace Engine {
 		float height = 0.0f;
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData()->isActive) {
-				auto worldData = static_cast<PerspectiveCameraWorldData*>(camera->getWorldData().get());
+			if (camera->getInteractionState()->isActive) {
+				auto transform = static_cast<PerspectiveCameraTransform*>(camera->getTransform().get());
 
-				view       = worldData->lookAt;
-				projection = worldData->projection;
+				view       = transform->lookAt;
+				projection = transform->projection;
 
-				fov    = worldData->fov;
-				width  = worldData->width;
-				height = worldData->height;
+				fov    = transform->fov;
+				width  = transform->width;
+				height = transform->height;
 			}
 		}
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
-			if (object->getUseData()->isSelected) {
-				auto worldData = static_cast<ObjectWorldData*>(object->getWorldData().get());
-				glm::vec3 position = worldData->position;
+			if (object->getInteractionState()->isSelected) {
+				auto transform = static_cast<ObjectTransform*>(object->getTransform().get());
+				glm::vec3 position = transform->position;
 
 				float x = (float)_mInputManager->getMouse().x;
 				float y = (float)_mInputManager->getMouse().y;
@@ -304,21 +304,21 @@ namespace Engine {
 				// TODO: Find a fix for that, i'm pretty sure its a bug
 				glm::vec4 view_space_intersect = glm::vec4(glm::vec3(rayView) * -viewPosition.z, 1.0f);
 
-				worldData->position = glm::inverse(view) * view_space_intersect;
-				object->getUseData()->hasUpdate = true;
+				transform->position = glm::inverse(view) * view_space_intersect;
+				object->getInteractionState()->hasUpdate = true;
 			}
 		}
 	}
 
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
 		for (std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData()->isActive) {
-				camera->getUseData()->hasUpdate = true;
+			if (camera->getInteractionState()->isActive) {
+				camera->getInteractionState()->hasUpdate = true;
 
-				auto useData = static_cast<CameraUseData*>(camera->getUseData().get());
+				auto interactionState = static_cast<CameraInteractionState*>(camera->getInteractionState().get());
 
-				useData->updateEvent = event;
-				useData->positionEvent = pEvent;
+				interactionState->updateEvent = event;
+				interactionState->positionEvent = pEvent;
 			}
 		}
 	}

@@ -14,25 +14,25 @@ namespace Engine {
 	Gizmo::Gizmo() {
 		_mCube = std::make_shared<Cube>();
 
-		auto cubeWorldData = static_cast<ObjectWorldData*>(_mCube->getWorldData().get());
+		auto cubeTransform = static_cast<ObjectTransform*>(_mCube->getTransform().get());
 
-		cubeWorldData->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+		cubeTransform->scale = glm::vec3(0.5f, 0.5f, 0.5f);
 	}
 
-	const GizmoWorldData& Gizmo::getWorldData() const {
+	const GizmoTransform& Gizmo::getTransform() const {
 		return _mWolrdData;
 	}
 
-	GizmoWorldData& Gizmo::getWorldData() {
+	GizmoTransform& Gizmo::getTransform() {
 		return _mWolrdData;
 	}
 
-	const GizmoUseData& Gizmo::getUseData() const {
-		return _mUseData;
+	const GizmoInteractionState& Gizmo::getInteractionState() const {
+		return _mInteractionState;
 	}
 
-	GizmoUseData& Gizmo::getUseData() {
-		return _mUseData;
+	GizmoInteractionState& Gizmo::getInteractionState() {
+		return _mInteractionState;
 	}
 
 	void Gizmo::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
@@ -41,31 +41,31 @@ namespace Engine {
 	}
 
 	void Gizmo::onUpdate(const Mouse* mouse, float deltaTime, const Object& object) {
-		auto cubeWorldData   = static_cast<ObjectWorldData*>(_mCube->getWorldData().get());
-		auto objectWorldData = static_cast<ObjectWorldData*>(object.getWorldData().get());
+		auto cubeTransform   = static_cast<ObjectTransform*>(_mCube->getTransform().get());
+		auto objectTransform = static_cast<ObjectTransform*>(object.getTransform().get());
 
-		glm::vec3& position = cubeWorldData->position;
-		glm::vec3& rotation = cubeWorldData->rotation;
+		glm::vec3& position = cubeTransform->position;
+		glm::vec3& rotation = cubeTransform->rotation;
 
-		const glm::vec3& objPosition = objectWorldData->position;
-		const glm::vec3& objRotation = objectWorldData->rotation;
+		const glm::vec3& objPosition = objectTransform->position;
+		const glm::vec3& objRotation = objectTransform->rotation;
 
 		if (position != objPosition) {
 			position = objPosition;
-			_mCube->getUseData()->hasUpdate = true;
+			_mCube->getInteractionState()->hasUpdate = true;
 		}
 		else if (rotation != objRotation) {
 			rotation = objRotation;
-			_mCube->getUseData()->hasUpdate = true;
+			_mCube->getInteractionState()->hasUpdate = true;
 		}
 
 		_mCube->onUpdate(mouse, deltaTime);
 
-		if (_mUseData.useTranslation) {
-			_mUseData.useRotation = false;
+		if (_mInteractionState.useTranslation) {
+			_mInteractionState.useRotation = false;
 		}
 		else {
-			_mUseData.useTranslation = false;
+			_mInteractionState.useTranslation = false;
 		}
 	}
 };

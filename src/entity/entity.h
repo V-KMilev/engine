@@ -36,11 +36,11 @@ namespace Engine {
 
 			EntityType getTpye() const;
 
-			virtual const std::shared_ptr<WorldData>& getWorldData() const;
-			virtual std::shared_ptr<WorldData>& getWorldData();
+			virtual const std::shared_ptr<Transform>& getTransform() const;
+			virtual std::shared_ptr<Transform>& getTransform();
 
-			virtual const std::shared_ptr<UseData>& getUseData() const;
-			virtual std::shared_ptr<UseData>& getUseData();
+			virtual const std::shared_ptr<InteractionState>& getInteractionState() const;
+			virtual std::shared_ptr<InteractionState>& getInteractionState();
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
@@ -55,7 +55,7 @@ namespace Engine {
 
 			EntityType _mType;
 
-			std::shared_ptr<WorldData> _mWorldData;
-			std::shared_ptr<UseData> _mUseData;
+			std::shared_ptr<Transform> _mTransform;
+			std::shared_ptr<InteractionState> _mInteractionState;
 	};
 };

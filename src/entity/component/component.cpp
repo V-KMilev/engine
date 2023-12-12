@@ -14,14 +14,14 @@ namespace Engine {
 
 // TODO: Add all members as UI part
 
-	bool ObjectWorldData::drawUI(unsigned int id) {
+	bool ObjectTransform::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
 		std::string sPosition = "Position##Object" + std::to_string(id);
 		std::string sRotation = "Rotation##Object" + std::to_string(id);
 		std::string sScale    = "Scale##Object"    + std::to_string(id);
 
-		ImGui::SeparatorText("World Data");
+		ImGui::SeparatorText("Transform");
 
 		if (ImGui::DragFloat3(sPosition.c_str(), &position[0], _mDragSpeed)) { hasUpdate = true; }
 		if (ImGui::DragFloat3(sRotation.c_str(), &rotation[0], _mDragSpeed)) { hasUpdate = true; }
@@ -30,7 +30,7 @@ namespace Engine {
 		return hasUpdate;
 	}
 
-	bool ObjectUseData::drawUI(unsigned int id) {
+	bool ObjectInteractionState::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
 		std::string sLinesOnly = "Lines Only##Object" + std::to_string(id);
@@ -40,7 +40,7 @@ namespace Engine {
 		return hasUpdate;
 	}
 
-	bool PerspectiveCameraWorldData::drawUI(unsigned int id) {
+	bool PerspectiveCameraTransform::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
 		std::string sPosition = "Position##Camera" + std::to_string(id);
@@ -66,7 +66,7 @@ namespace Engine {
 		return hasUpdate;
 	}
 
-	bool PerspectiveCameraUseData::drawUI(unsigned int id) {
+	bool PerspectiveCameraInteractionState::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
 		std::string smoveSpeed  = "Move Speed##Camera"  + std::to_string(id);

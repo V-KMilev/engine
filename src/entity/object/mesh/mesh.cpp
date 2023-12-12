@@ -76,11 +76,11 @@ namespace Engine {
 
 	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
 		// TODO: Think of what we can do in this situation
-		if (_mUseData->hasUpdate) {
+		if (_mInteractionState->hasUpdate) {
 			PROFILER_BEGIN("Mesh", "Mesh Update");
 
 			// Reset the update event
-			_mUseData->hasUpdate = false;
+			_mInteractionState->hasUpdate = false;
 
 			PROFILER_END("Mesh", "Mesh Update");
 		}
@@ -99,13 +99,15 @@ namespace Engine {
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Shader Update");
 
-		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+		auto transform = static_cast<ObjectTransform*>(_mTransform.get());
 
 		shader.bind();
 
+		// TODO: Fix the material
+
 		_mMaterial->updateShader(shader);
 
-		shader.setUniformMatrix4fv("uModel", worldData->model);
+		shader.setUniformMatrix4fv("uModel", transform->model);
 
 		PROFILER_END("Mesh", "Mesh Shader Update");
 	}
@@ -113,20 +115,20 @@ namespace Engine {
 	void Mesh::updateModel(glm::mat4 objectModel) {
 		PROFILER_BEGIN("Mesh", "Mesh Update Model");
 
-		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+		auto transform = static_cast<ObjectTransform*>(_mTransform.get());
 
-		worldData->model = glm::mat4(1.0f);
+		transform->model = glm::mat4(1.0f);
 
-		worldData->model = glm::translate(worldData->model, worldData->position);
+		transform->model = glm::translate(transform->model, transform->position);
 
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		worldData->model = glm::scale(worldData->model, worldData->scale);
+		transform->model = glm::scale(transform->model, transform->scale);
 
 		// TODO: Think if we can fix the "problem"
-		worldData->model *= objectModel;
+		transform->model *= objectModel;
 
 		PROFILER_END("Mesh", "Mesh Update Model");
 	}
@@ -136,11 +138,11 @@ namespace Engine {
 
 		if (ImGui::TreeNode(sMesh.c_str())) {
 
-			_mUseData->drawUI(_mID.getID());
+			_mInteractionState->drawUI(_mID.getID());
 
-			ImGui::SeparatorText("World Data");
+			ImGui::SeparatorText("Transform");
 
-			_mWorldData->drawUI(_mID.getID());
+			_mTransform->drawUI(_mID.getID());
 
 			ImGui::TreePop();
 		}

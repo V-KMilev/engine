@@ -13,19 +13,19 @@ namespace Engine {
 		return _mType;
 	}
 
-	const std::shared_ptr<WorldData>& Entity::getWorldData() const {
-		return _mWorldData;
+	const std::shared_ptr<Transform>& Entity::getTransform() const {
+		return _mTransform;
 	}
 
-	std::shared_ptr<WorldData>& Entity::getWorldData() {
-		return _mWorldData;
+	std::shared_ptr<Transform>& Entity::getTransform() {
+		return _mTransform;
 	}
 
-	const std::shared_ptr<UseData>& Entity::getUseData() const {
-		return _mUseData;
+	const std::shared_ptr<InteractionState>& Entity::getInteractionState() const {
+		return _mInteractionState;
 	}
 
-	std::shared_ptr<UseData>& Entity::getUseData() {
-		return _mUseData;
+	std::shared_ptr<InteractionState>& Entity::getInteractionState() {
+		return _mInteractionState;
 	}
 };

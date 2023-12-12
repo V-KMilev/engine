@@ -14,11 +14,11 @@ namespace Engine {
 	Object::Object(ObjectType type) : _mObjectType(type), Entity(EntityType::OBJECT) {
 		_mMaterial = std::make_shared<Material>();
 
-		_mWorldData = std::make_shared<ObjectWorldData>();
-		_mUseData   = std::make_shared<ObjectUseData>();
+		_mTransform        = std::make_shared<ObjectTransform>();
+		_mInteractionState = std::make_shared<ObjectInteractionState>();
 
 		// Initial setup
-		_mUseData->hasUpdate = true;
+		_mInteractionState->hasUpdate = true;
 	}
 
 	ObjectType Object::getObjectTpye() const {
@@ -26,21 +26,21 @@ namespace Engine {
 	}
 
 	void Object::onUpdate(const Mouse* mouse, float deltaTime) {
-		if (_mUseData->hasUpdate) {
+		if (_mInteractionState->hasUpdate) {
 			PROFILER_BEGIN("Object", "Object Update");
 
 			updateModel();
 
 			// TODO: Think of a solution to this update prblem (Idea: to scene update)
 			for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
-				auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+				auto transform = static_cast<ObjectTransform*>(_mTransform.get());
 
-				mesh->updateModel(worldData->model);
+				mesh->updateModel(transform->model);
 				mesh->onUpdate(mouse, deltaTime);
 			}
 
 			// Reset the update event
-			_mUseData->hasUpdate = false;
+			_mInteractionState->hasUpdate = false;
 
 			PROFILER_END("Object", "Object Update");
 		}
@@ -51,9 +51,9 @@ namespace Engine {
 
 		updateShader(shader);
 
-		auto useData = static_cast<ObjectUseData*>(_mUseData.get());
+		auto interactionState = static_cast<ObjectInteractionState*>(_mInteractionState.get());
 
-		if (useData->linesOnly) {
+		if (interactionState->linesOnly) {
 			MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
 		}
 
@@ -72,7 +72,7 @@ namespace Engine {
 		shader.bind();
 
 		shader.setUniform1ui("uObjectID", _mID.getID());
-		shader.setUniform1i("uSelected", _mUseData->isSelected);
+		shader.setUniform1i("uSelected", _mInteractionState->isSelected);
 
 		PROFILER_END("Object", "Object Shader Update");
 	}
@@ -80,17 +80,17 @@ namespace Engine {
 	void Object::updateModel() {
 		PROFILER_BEGIN("Object", "Object Update Model");
 
-		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+		auto transform = static_cast<ObjectTransform*>(_mTransform.get());
 
-		worldData->model = glm::mat4(1.0f);
+		transform->model = glm::mat4(1.0f);
 
-		worldData->model = glm::translate(worldData->model, worldData->position);
+		transform->model = glm::translate(transform->model, transform->position);
 
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		worldData->model = glm::scale(worldData->model, worldData->scale);
+		transform->model = glm::scale(transform->model, transform->scale);
 
 		PROFILER_END("Object", "Object Update Model");
 	}
@@ -100,11 +100,11 @@ namespace Engine {
 
 		ImGui::SeparatorText(sObject.c_str());
 
-		if (_mUseData->drawUI(_mID.getID())) { _mUseData->hasUpdate = true; }
+		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 
-		ImGui::SeparatorText("World Data");
+		ImGui::SeparatorText("Transform");
 
-		if (_mWorldData->drawUI(_mID.getID())) { _mUseData->hasUpdate = true; }
+		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 	}
 
 	void Object::UIMeshsWorld() {

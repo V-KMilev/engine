@@ -17,12 +17,12 @@ namespace Engine {
 }
 
 namespace Engine {
-	struct GizmoWorldData {
+	struct GizmoTransform {
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	};
 
-	struct GizmoUseData {
+	struct GizmoInteractionState {
 		bool useTranslation = true;
 		bool useRotation    = false;
 	};
@@ -38,11 +38,11 @@ namespace Engine {
 			Gizmo(Gizmo && other) = delete;
 			Gizmo& operator = (Gizmo && other) = delete;
 
-			const GizmoWorldData& getWorldData() const;
-			GizmoWorldData& getWorldData();
+			const GizmoTransform& getTransform() const;
+			GizmoTransform& getTransform();
 
-			const GizmoUseData& getUseData() const;
-			GizmoUseData& getUseData();
+			const GizmoInteractionState& getInteractionState() const;
+			GizmoInteractionState& getInteractionState();
 
 			void onUpdate(const Mouse* mouse, float deltaTime, const Object& object);
 
@@ -51,7 +51,7 @@ namespace Engine {
 		private:
 			std::shared_ptr<Object> _mCube;
 
-			GizmoWorldData _mWolrdData;
-			GizmoUseData _mUseData;
+			GizmoTransform _mWolrdData;
+			GizmoInteractionState _mInteractionState;
 	};
 };

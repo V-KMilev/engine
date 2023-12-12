@@ -10,20 +10,20 @@
 namespace Engine {
 	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
 		// TODO: Fix this when you add more cameras
-		_mWorldData = std::make_shared<PerspectiveCameraWorldData>();
-		_mUseData   = std::make_shared<PerspectiveCameraUseData>();
+		_mTransform        = std::make_shared<PerspectiveCameraTransform>();
+		_mInteractionState = std::make_shared<PerspectiveCameraInteractionState>();
 
 		_mVisual = std::make_shared<Cube>();
 
-		auto visualWorldData = static_cast<ObjectWorldData*>(_mVisual->getWorldData().get());
+		auto visualTransform = static_cast<ObjectTransform*>(_mVisual->getTransform().get());
 
-		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
+		auto transform = static_cast<CameraTransform*>(_mTransform.get());
 
-		visualWorldData->position = worldData->position;
-		visualWorldData->scale    = glm::vec3(0.25f, 0.25f, 0.25f);
+		visualTransform->position = transform->position;
+		visualTransform->scale    = glm::vec3(0.25f, 0.25f, 0.25f);
 
-		_mVisual->getUseData()->hasUpdate = true;
-		_mUseData->hasUpdate = true;
+		_mVisual->getInteractionState()->hasUpdate = true;
+		_mInteractionState->hasUpdate = true;
 	}
 
 	CameraType Camera::getCameraTpye() const {
@@ -31,12 +31,12 @@ namespace Engine {
 	}
 
 	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
-		if (_mUseData->hasUpdate) {
+		if (_mInteractionState->hasUpdate) {
 			PROFILER_BEGIN("Camera", "Camera Update");
 
-			auto useData = static_cast<CameraUseData*>(_mUseData.get());
+			auto interactionState = static_cast<CameraInteractionState*>(_mInteractionState.get());
 
-			switch (useData->updateEvent) {
+			switch (interactionState->updateEvent) {
 				case UpdateEvent::POSITION: updatePosition(deltaTime);    break;
 				case UpdateEvent::TARGET: updateTarget(mouse, deltaTime); break;
 				case UpdateEvent::FOV: zoom(mouse, deltaTime);            break;
@@ -49,43 +49,43 @@ namespace Engine {
 			_mVisual->onUpdate(mouse, deltaTime);
 
 			// Reset the update event
-			useData->updateEvent = UpdateEvent::NONE;
-			useData->hasUpdate = false;
+			interactionState->updateEvent = UpdateEvent::NONE;
+			interactionState->hasUpdate = false;
 
 			PROFILER_END("Camera", "Camera Update");
 		}
 	}
 
 	void Camera::updatePosition(float deltaTime) {
-		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
-		auto useData = static_cast<CameraUseData*>(_mUseData.get());
+		auto transform        = static_cast<CameraTransform*>(_mTransform.get());
+		auto interactionState = static_cast<CameraInteractionState*>(_mInteractionState.get());
 
-		auto visualWorldData = static_cast<ObjectWorldData*>(_mVisual->getWorldData().get());
+		auto visualTransform = static_cast<ObjectTransform*>(_mVisual->getTransform().get());
 
 		glm::vec3 moveDirection(0.0f);
 
-		switch (useData->positionEvent) {
-			case PositionEvent::POSX: moveDirection = worldData->front;  break;
-			case PositionEvent::NEGX: moveDirection = -worldData->front; break;
-			case PositionEvent::POSY: moveDirection = worldData->up;     break;
-			case PositionEvent::NEGY: moveDirection = -worldData->up;    break;
-			case PositionEvent::POSZ: moveDirection = worldData->right;  break;
-			case PositionEvent::NEGZ: moveDirection = -worldData->right; break;
+		switch (interactionState->positionEvent) {
+			case PositionEvent::POSX: moveDirection = transform->front;  break;
+			case PositionEvent::NEGX: moveDirection = -transform->front; break;
+			case PositionEvent::POSY: moveDirection = transform->up;     break;
+			case PositionEvent::NEGY: moveDirection = -transform->up;    break;
+			case PositionEvent::POSZ: moveDirection = transform->right;  break;
+			case PositionEvent::NEGZ: moveDirection = -transform->right; break;
 			default: moveDirection = glm::vec3(0.0f); break;
 		}
 
-		worldData->position += deltaTime * useData->moveSpeed * moveDirection;
+		transform->position += deltaTime * interactionState->moveSpeed * moveDirection;
 
 		// Update the visual representation
-		visualWorldData->position = worldData->position;
-		_mVisual->getUseData()->hasUpdate = true;
+		visualTransform->position = transform->position;
+		_mVisual->getInteractionState()->hasUpdate = true;
 
-		useData->positionEvent = PositionEvent::NONE;
+		interactionState->positionEvent = PositionEvent::NONE;
 	}
 
 	void Camera::updateLookAt() {
-		auto worldData = static_cast<CameraWorldData*>(_mWorldData.get());
+		auto transform = static_cast<CameraTransform*>(_mTransform.get());
 
-		worldData->lookAt = glm::lookAt(worldData->position, worldData->target, worldData->up);
+		transform->lookAt = glm::lookAt(transform->position, transform->target, transform->up);
 	}
 };
