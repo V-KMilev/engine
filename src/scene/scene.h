@@ -74,9 +74,6 @@ namespace Engine {
 			void moveEntity();
 
 		private:
-			void updateShaderCameras(const std::shared_ptr<Core::Shader>& shader) const;
-
-		private:
 			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
 
 			void keyBinds();

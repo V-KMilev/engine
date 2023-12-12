@@ -1,5 +1,7 @@
 #include "object.h"
 
+#include "tracer.h"
+
 #include "gl_render.h"
 #include "gl_shader.h"
 
@@ -24,24 +26,29 @@ namespace Engine {
 	}
 
 	void Object::onUpdate(const Mouse* mouse, float deltaTime) {
-
 		if (_mUseData->hasUpdate) {
+			PROFILER_BEGIN("Object", "Object Update");
 
 			updateModel();
 
+			// TODO: Think of a solution to this update prblem (Idea: to scene update)
+			for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
+				auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
+
+				mesh->updateModel(worldData->model);
+				mesh->onUpdate(mouse, deltaTime);
+			}
+
 			// Reset the update event
 			_mUseData->hasUpdate = false;
-		}
 
-		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
-
-			mesh->updateModel(worldData->model);
-			mesh->onUpdate(mouse, deltaTime);
+			PROFILER_END("Object", "Object Update");
 		}
 	}
 
 	void Object::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
+		PROFILER_BEGIN("Object", "Object Draw");
+
 		updateShader(shader);
 
 		auto useData = static_cast<ObjectUseData*>(_mUseData.get());
@@ -55,16 +62,24 @@ namespace Engine {
 		}
 
 		MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+
+		PROFILER_END("Object", "Object Draw");
 	}
 
 	void Object::updateShader(const Core::Shader &shader) const {
+		PROFILER_BEGIN("Object", "Object Shader Update");
+
 		shader.bind();
 
 		shader.setUniform1ui("uObjectID", _mID.getID());
 		shader.setUniform1i("uSelected", _mUseData->isSelected);
+
+		PROFILER_END("Object", "Object Shader Update");
 	}
 
 	void Object::updateModel() {
+		PROFILER_BEGIN("Object", "Object Update Model");
+
 		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
 
 		worldData->model = glm::mat4(1.0f);
@@ -76,6 +91,8 @@ namespace Engine {
 		worldData->model = glm::rotate(worldData->model, glm::radians(worldData->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		worldData->model = glm::scale(worldData->model, worldData->scale);
+
+		PROFILER_END("Object", "Object Update Model");
 	}
 
 	void Object::UIWorld() {

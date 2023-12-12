@@ -4,6 +4,9 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "error_handle.h"
+#include "tracer.h"
+
 #include "gl_vertex_array.h"
 #include "gl_vertex_buffer.h"
 #include "gl_index_buffer.h"
@@ -12,8 +15,6 @@
 #include "gl_render.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
-
-#include "error_handle.h"
 
 #include "material.h"
 #include "utils.h"
@@ -33,11 +34,15 @@ namespace Engine {
 	}
 
 	void Mesh::load_mesh() {
+		PROFILER_BEGIN("Mesh", "Mesh Load");
+
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
 
+		PROFILER_BEGIN("Mesh", "Mesh Texture init");
 		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures()->textures) {
 			texture->init();
 		}
+		PROFILER_END("Mesh", "Mesh Texture init");
 
 		_mVB = std::make_shared<Core::VertexBuffer>(_mVertices->data(), _mVertices->size() * sizeof(Utils::Vertex));
 		_mIB = std::make_shared<Core::IndexBuffer>(_mIndices->data(), _mIndices->size());
@@ -52,7 +57,11 @@ namespace Engine {
 		_mVBL->push<float>(3);
 		_mVBL->push<float>(2);
 
+		PROFILER_BEGIN("Mesh", "Mesh Add Buffer");
+
 		_mVA->addBuffer(*_mVB, *_mVBL);
+
+		PROFILER_END("Mesh", "Mesh Add Buffer");
 
 		// Clean the cashe data
 		_mVertices->clear();
@@ -61,24 +70,35 @@ namespace Engine {
 		_mIndices->shrink_to_fit();
 
 		updateModel();
+
+		PROFILER_END("Mesh", "Mesh Load");
 	}
 
 	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
 		// TODO: Think of what we can do in this situation
 		if (_mUseData->hasUpdate) {
+			PROFILER_BEGIN("Mesh", "Mesh Update");
 
 			// Reset the update event
 			_mUseData->hasUpdate = false;
+
+			PROFILER_END("Mesh", "Mesh Update");
 		}
 	}
 
 	void Mesh::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
+		PROFILER_BEGIN("Mesh", "Mesh Draw");
+
 		updateShader(shader);
 
 		renderer.draw(*_mVA, *_mIB, shader);
+
+		PROFILER_END("Mesh", "Mesh Draw");
 	}
 
 	void Mesh::updateShader(const Core::Shader &shader) const {
+		PROFILER_BEGIN("Mesh", "Mesh Shader Update");
+
 		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
 
 		shader.bind();
@@ -86,9 +106,13 @@ namespace Engine {
 		_mMaterial->updateShader(shader);
 
 		shader.setUniformMatrix4fv("uModel", worldData->model);
+
+		PROFILER_END("Mesh", "Mesh Shader Update");
 	}
 
 	void Mesh::updateModel(glm::mat4 objectModel) {
+		PROFILER_BEGIN("Mesh", "Mesh Update Model");
+
 		auto worldData = static_cast<ObjectWorldData*>(_mWorldData.get());
 
 		worldData->model = glm::mat4(1.0f);
@@ -103,6 +127,8 @@ namespace Engine {
 
 		// TODO: Think if we can fix the "problem"
 		worldData->model *= objectModel;
+
+		PROFILER_END("Mesh", "Mesh Update Model");
 	}
 
 	void Mesh::UIWorld() {

@@ -31,7 +31,6 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/scene/scene.cpp
 
 	${ENGINE_SRC_DIR}/ui/ui.cpp
-	${ENGINE_SRC_DIR}/ui/ui_element.cpp
 
 	${ENGINE_SRC_DIR}/window/window.cpp
 )

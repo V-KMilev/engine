@@ -1,10 +1,11 @@
 #include "camera.h"
 
+#include "error_handle.h"
+#include "tracer.h"
+
 #include "input_manager.h"
 
 #include "cube.h"
-
-#include "error_handle.h"
 
 namespace Engine {
 	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
@@ -31,6 +32,8 @@ namespace Engine {
 
 	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
 		if (_mUseData->hasUpdate) {
+			PROFILER_BEGIN("Camera", "Camera Update");
+
 			auto useData = static_cast<CameraUseData*>(_mUseData.get());
 
 			switch (useData->updateEvent) {
@@ -48,6 +51,8 @@ namespace Engine {
 			// Reset the update event
 			useData->updateEvent = UpdateEvent::NONE;
 			useData->hasUpdate = false;
+
+			PROFILER_END("Camera", "Camera Update");
 		}
 	}
 

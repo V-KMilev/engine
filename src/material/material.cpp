@@ -4,6 +4,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "tracer.h"
+
 #include "gl_shader.h"
 #include "gl_texture.h"
 
@@ -32,6 +34,8 @@ namespace Engine {
 	}
 
 	void Material::updateShader(const Core::Shader &shader) const {
+		PROFILER_BEGIN("Material", "Material Shader Update");
+
 		shader.bind();
 
 		for (int idx = 0; idx < _mTextures->textures.size(); idx++) {
@@ -41,6 +45,8 @@ namespace Engine {
 
 			shader.setUniform1i(material, idx);
 		}
+
+		PROFILER_END("Material", "Material Shader Update");
 	}
 
 	void Material::UITextures(unsigned int id) {

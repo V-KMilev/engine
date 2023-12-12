@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "gl_error_handle.h"
+#include "tracer.h"
 
 #include "gl_render.h"
 #include "gl_shader.h"
@@ -65,7 +66,16 @@ namespace Engine {
 		_mRenderer->clearColor();
 		_mRenderer->clear();
 
+		// TODO: Think of way to update the shaders only if there is a change
+
 		for (const std::shared_ptr<Core::Shader>& shader : _mShaders) {
+			// Update the shader with the active camera's data
+			for (const std::shared_ptr<Camera>& camera : _mCameras) {
+				if (camera->getUseData()->isActive) {
+					camera->updateShader(*shader);
+				}
+			}
+
 			if (shader->getName() == "infinite_grid") {
 				drawGrid(shader);
 			}
@@ -91,14 +101,20 @@ namespace Engine {
 	}
 
 	void Scene::renderUI() {
+		PROFILER_BEGIN("UI", "UI Draw");
+
 		if (_mUI->getData().isActive) {
 			_mUI->newFrame();
 			_mUI->ui(_mObjects, _mCameras);
 			_mUI->render();
 		}
+
+		PROFILER_END("UI", "UI Draw");
 	}
 
 	void Scene::onUpdate(float deltaTime) {
+		PROFILER_BEGIN("Scene", "Scene Update check");
+
 		_mDeltaTime = deltaTime;
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
@@ -118,6 +134,8 @@ namespace Engine {
 		// TODO: Think of where this should be
 		// Reset the update event
 		_mInputManager->getMouse().hasUpdate = false;
+
+		PROFILER_END("Scene", "Scene Update check");
 	}
 
 	void Scene::addObject(std::shared_ptr<Object> && object) {
@@ -138,28 +156,36 @@ namespace Engine {
 	}
 
 	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Orientation", "Orientation Draw");
 
 		_mOrientation->draw(*_mRenderer, *shader);
+
+		PROFILER_END("Orientation", "Orientation Draw");
 	}
 
 	void Scene::drawGrid(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Grid", "Draw Grid");
 
 		_mGrid->draw(*_mRenderer, *shader);
+
+		PROFILER_END("Grid", "Draw Grid");
 	}
 
 	void Scene::drawGizmo(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Gizmo", "Draw Gizmo");
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			if (object->getUseData()->isSelected) {
 				// _mGizmo->draw(*_mRenderer, *shader);
 			}
 		}
+
+		PROFILER_END("Gizmo", "Draw Gizmo");
 	}
 
 	void Scene::drawPick(const std::shared_ptr<Core::Shader>& shader) const {
+		PROFILER_BEGIN("Pick Entity", "Entity Draw Pick");
+
 		_mPickTexture->enableWriting();
 
 		_mRenderer->clear();
@@ -169,10 +195,12 @@ namespace Engine {
 		drawGeometry(shader);
 
 		_mPickTexture->disableWriting();
+
+		PROFILER_END("Pick Entity", "Entity Draw Pick");
 	}
 
 	void Scene::drawSelected(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Pick Entity", "Entity Draw Selected");
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			if (object->getUseData()->isSelected) {
@@ -187,35 +215,35 @@ namespace Engine {
 				MY_GL_CHECK(glStencilFunc(GL_ALWAYS, 0, 0xFF));
 			}
 		}
+
+		PROFILER_END("Pick Entity", "Entity Draw Selected");
 	}
 
 	void Scene::drawCameras(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Cameras", "Cameras Draw");
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
 			if (!camera->getUseData()->isActive) {
 				camera->draw(*_mRenderer, *shader);
 			}
 		}
+
+		PROFILER_END("Cameras", "Cameras Draw");
 	}
 
 	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
-		updateShaderCameras(shader);
+		PROFILER_BEGIN("Geometry", "Geometry Draw");
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			object->draw(*_mRenderer, *shader);
 		}
-	}
 
-	void Scene::updateShaderCameras(const std::shared_ptr<Core::Shader>& shader) const {
-		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getUseData()->isActive) {
-				camera->updateShader(*shader);
-			}
-		}
+		PROFILER_END("Geometry", "Geometry Draw");
 	}
 
 	void Scene::pickEntity() {
+		PROFILER_BEGIN("Pick Entity", "Entity Pick");
+
 		int x = _mInputManager->getMouse().x;
 		int y = _mHeight - _mInputManager->getMouse().y - 1;
 
@@ -226,6 +254,8 @@ namespace Engine {
 				object->getUseData()->isSelected = (object->getID() == pixel.objectID && !object->getUseData()->isSelected) ? true : false;
 			}
 		}
+
+		PROFILER_END("Pick Entity", "Entity Pick");
 	}
 
 	void Scene::moveEntity() {

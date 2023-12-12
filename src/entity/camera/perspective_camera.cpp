@@ -4,6 +4,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "tracer.h"
+
 #include "gl_shader.h"
 
 #include "input_manager.h"
@@ -49,6 +51,8 @@ namespace Engine {
 	}
 
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
+		PROFILER_BEGIN("Camera", "Camera Update Shader");
+
 		auto worldData = static_cast<PerspectiveCameraWorldData*>(_mWorldData.get());
 
 		shader.bind();
@@ -62,6 +66,8 @@ namespace Engine {
 
 		shader.setUniform1f("uCamera.near", worldData->c_near);
 		shader.setUniform1f("uCamera.far", worldData->c_far);
+
+		PROFILER_END("Camera", "Camera Update Shader");
 	}
 
 	void PerspectiveCamera::updateTarget(const Mouse* mouse, float deltaTime) {
