@@ -56,8 +56,17 @@ namespace Engine {
 			void onUpdate(float deltaTime);
 
 			void addObject(std::shared_ptr<Object> && object);
-			void addShader(std::shared_ptr<Core::Shader> && shader);
 			void addCamera(std::shared_ptr<Camera> && camera);
+			void addShader(std::shared_ptr<Core::Shader> && shader);
+
+			const std::vector<std::shared_ptr<Entity>>& getEntitys() const;
+			std::vector<std::shared_ptr<Entity>>& getEntitys();
+
+			const std::vector<std::shared_ptr<Object>>& getObjects() const;
+			std::vector<std::shared_ptr<Object>>& getObjects();
+
+			const std::vector<std::shared_ptr<Camera>>& getCameras() const;
+			std::vector<std::shared_ptr<Camera>>& getCameras();
 
 		private:
 			void drawOrientation(const std::shared_ptr<Core::Shader>& shader) const;
@@ -93,6 +102,9 @@ namespace Engine {
 			std::vector<std::shared_ptr<Core::Texture>> _mTextures;
 
 			std::vector<std::shared_ptr<Core::Shader>> _mShaders;
+
+			std::vector<std::shared_ptr<Entity>> _mEntitys;
+
 			std::vector<std::shared_ptr<Object>> _mObjects;
 			std::vector<std::shared_ptr<Camera>> _mCameras;
 

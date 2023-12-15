@@ -33,9 +33,18 @@ namespace Engine {
 	bool ObjectInteractionState::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
-		std::string sLinesOnly = "Lines Only##Object" + std::to_string(id);
+		std::string sLinesOnly  = "Lines Only##Object" + std::to_string(id);
+		std::string sIsActive   = "Is Active##Object" + std::to_string(id);
+		std::string sIsSelected = "Is Selected##Object" + std::to_string(id);
+		std::string sHasUpdate  = "Has Update##Object" + std::to_string(id);
 
-		if(ImGui::Checkbox(sLinesOnly.c_str(), &linesOnly)) { hasUpdate = true; }
+		if (ImGui::Checkbox(sLinesOnly.c_str(), &linesOnly)) { hasUpdate = true; }
+		ImGui::SameLine();
+		if (ImGui::Checkbox(sIsActive.c_str(), &isActive)) { hasUpdate = true; }
+		ImGui::SameLine();
+		if (ImGui::Checkbox(sIsSelected.c_str(), &isSelected)) { hasUpdate = true; }
+		ImGui::SameLine();
+		if (ImGui::Checkbox(sHasUpdate.c_str(), &hasUpdate)) { hasUpdate = true; }
 
 		return hasUpdate;
 	}
@@ -72,6 +81,15 @@ namespace Engine {
 		std::string smoveSpeed  = "Move Speed##Camera"  + std::to_string(id);
 		std::string smouseSpeed = "Mouse Speed##Camera" + std::to_string(id);
 		std::string szoomSpeed  = "Zoom Speed##Camera"  + std::to_string(id);
+		std::string sIsActive   = "Is Active##Camera" + std::to_string(id);
+		std::string sIsSelected = "Is Selected##Camera" + std::to_string(id);
+		std::string sHasUpdate  = "Has Update##Camera" + std::to_string(id);
+
+		if (ImGui::Checkbox(sIsActive.c_str(), &isActive)) { hasUpdate = true; }
+		ImGui::SameLine();
+		if (ImGui::Checkbox(sIsSelected.c_str(), &isSelected)) { hasUpdate = true; }
+		ImGui::SameLine();
+		if (ImGui::Checkbox(sHasUpdate.c_str(), &hasUpdate)) { hasUpdate = true; }
 
 		if (ImGui::DragFloat(smoveSpeed.c_str(), &moveSpeed, _mDragSpeed, 0, FLT_MAX))   { hasUpdate = true; }
 		if (ImGui::DragFloat(smouseSpeed.c_str(), &mouseSpeed, _mDragSpeed, 0, FLT_MAX)) { hasUpdate = true; }
@@ -88,8 +106,6 @@ namespace Engine {
 		bool hasUpdate = false;
 
 		static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
-
-		ImGui::Unindent();
 
 		if (ImGui::BeginTable("table1", 3, tableFlags)) {
 			ImGui::TableSetupColumn("Texture Tpye:");

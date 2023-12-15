@@ -8,7 +8,12 @@
 #include "perspective_camera.h"
 
 #include "object.h"
+#include "mesh.h"
+
+#include "cube.h"
 #include "quad.h"
+#include "triangle.h"
+#include "model.h"
 
 #include "gl_error_handle.h"
 
@@ -23,12 +28,20 @@ namespace Engine {
 		isActive(isActive) {}
 
 	UI::UI(
+		Scene& scene,
 		GLFWwindow* window,
 		const char* gl_version,
 		unsigned int width,
 		unsigned int height
-	) : _mData(uiData(width, height, true))
-	{
+	) : _mData(
+			uiData(
+				width,
+				height,
+				true
+			)
+		),
+		_mScene(scene) {
+
 		if (_mData.isActive) {
 			setViewPort();
 		}
@@ -70,21 +83,20 @@ namespace Engine {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void UI::ui(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
+	void UI::ui() {
 		ImGui::ShowDemoWindow();
 		mainManu();
 
-		leftPanel(objects, cameras);
-		rightPanel(objects, cameras);
+		leftPanel();
+		rightPanel();
 
-		lowLeftPanel(objects, cameras);
-		LowRightPanel(objects, cameras);
+		lowLeftPanel();
+		LowRightPanel();
 
-		topPanel(objects, cameras);
-		botPanel(objects, cameras);
+		topPanel();
+		botPanel();
+
+		addToScene();
 	}
 
 	void UI::showUI() {
@@ -104,132 +116,200 @@ namespace Engine {
 		if (ImGui::BeginMainMenuBar()) {
 			ImGui::TextColored(ImVec4(0.75f, 0.25f, 0.25f, 1.0f), "VKM ENGINE");
 
-			if (ImGui::BeginMenu("Test0")) {
+			if (ImGui::BeginMenu("File")) {
+				ImGui::MenuItem("Save", "Ctrl + S", &_mCallSave);
+				ImGui::MenuItem("Load", "Ctrl + L", &_mCallLoad);
+				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Test1")) {
+			if (ImGui::BeginMenu("Edit")) {
+				ImGui::MenuItem("Undo", "Ctrl + Z", &_mCallUndo);
+				ImGui::MenuItem("Redo", "Ctrl + Y", &_mCallRedo);
+				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Test2")) {
+			if (ImGui::BeginMenu("View")) {
+				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Test3")) {
+			if (ImGui::BeginMenu("Scene")) {
+				if (ImGui::BeginMenu("Add Entity")) {
+
+					if (ImGui::BeginMenu("Cameras")) {
+						ImGui::MenuItem("Perspective", nullptr, &_mCallAddPerspective);
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("Objects")) {
+						ImGui::MenuItem("Cube", nullptr, &_mCallAddCube);
+						ImGui::MenuItem("Quad", nullptr, &_mCallAddQuad);
+						ImGui::MenuItem("Triangle", nullptr, &_mCallAddTriangle);
+						ImGui::MenuItem("Model", nullptr, &_mCallAddModel);
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("Lights")) {
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenu();
+				}
+
+				ImGui::MenuItem("Remove Entity","Ctrl + R", &_mCallRemove);
+				ImGui::EndMenu();
 			}
 			ImGui::EndMainMenuBar();
 		}
 	}
 
-	void UI::leftPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Object Data
+	void UI::leftPanel() {
 		ImGui::SetNextWindowPos(ImVec2(0, MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth - (_mData.height * 1 / 4 + MainBarWidth * 4)), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Left", nullptr, staticWindow);
 
-		for (std::shared_ptr<Object>& object : objects) {
-			if (object->getInteractionState()->isSelected) {
-				object->UIWorld();
+		auto& entitys = _mScene.getEntitys();
+		auto& objects = _mScene.getObjects();
+
+		ImGui::BeginChild("Entity list", ImVec2(_mData.width * 1 / 9, 0), true);
+
+		for (auto& entity : entitys) {
+			EntityType type = entity->getTpye();
+
+			std::string labe = "Entity #" + std::to_string(entity->getID());
+
+			if (type == EntityType::OBJECT) {
+				labe = "Object #" + std::to_string(entity->getID());
+			}
+			else if (type == EntityType::CAMERA) {
+				labe = "Camera #" + std::to_string(entity->getID());
+			}
+
+			if (ImGui::Selectable(labe.c_str(), entity->getInteractionState()->isSelected)) {
+				entity->getInteractionState()->isSelected = !entity->getInteractionState()->isSelected;
 			}
 		}
+
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+
+		ImGui::BeginChild("Mesh list", ImVec2(_mData.width * 1 / 8, 0), true);
+
+		for (auto& object : objects) {
+
+			if (object->getInteractionState()->isSelected) {
+
+				for(auto& mesh : object->getMeshes()) {
+					std::string labe = "Mesh #" + std::to_string(mesh->getID());
+
+					if (ImGui::Selectable(labe.c_str(), mesh->getInteractionState()->isSelected)) {
+						mesh->getInteractionState()->isSelected = !mesh->getInteractionState()->isSelected;
+					}
+				}
+			}
+		}
+
+		ImGui::EndChild();
 
 		ImGui::End();
 	}
 
-	void UI::rightPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Object Params
+	void UI::rightPanel() {
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4, MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height - MainBarWidth - (_mData.height * 1 / 4 + MainBarWidth * 4)), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Right", nullptr, staticWindow);
 
-		for (std::shared_ptr<Camera>& camera : cameras) {
-			camera->UIWorld();
+		auto& entitys = _mScene.getEntitys();
+
+		for (auto& entity : entitys) {
+			if (entity->getInteractionState()->isSelected) {
+				entity->UIWorld();
+			}
 		}
 
 		ImGui::End();
 	}
 
-	void UI::lowLeftPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Object Data
+	void UI::lowLeftPanel() {
 		ImGui::SetNextWindowPos(ImVec2(0, _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
-		ImGui::Begin("##LowLeft", nullptr, staticWindow);
+		ImGui::Begin("##LowLeft", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
-		if (ImGui::BeginTabBar("##lowLeftTabBar")) {
-			if (ImGui::BeginTabItem("test1")) {
-				ImGui::EndTabItem();
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("Soon 0")) {
 			}
-			if (ImGui::BeginTabItem("test2")) {
-				ImGui::EndTabItem();
+			if (ImGui::BeginMenu("Soon 1")) {
 			}
-			if (ImGui::BeginTabItem("test3")) {
-				ImGui::EndTabItem();
+			if (ImGui::BeginMenu("Soon 2")) {
 			}
-			ImGui::EndTabBar();
+			if (ImGui::BeginMenu("Soon 3")) {
+			}
+			ImGui::EndMenuBar();
 		}
 
-		for (std::shared_ptr<Object>& object : objects) {
+		auto& objects = _mScene.getObjects();
+
+		for (auto& object : objects) {
+
 			if (object->getInteractionState()->isSelected) {
-				object->UIMeshsWorld();
+
+				for(auto& mesh : object->getMeshes()) {
+					if (mesh->getInteractionState()->isSelected) {
+						mesh->UIWorld();
+					}
+				}
 			}
 		}
 
 		ImGui::End();
 	}
 
-	void UI::LowRightPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Object Data
+	void UI::LowRightPanel() {
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 3 / 4, _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 1 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
-		ImGui::Begin("##LowRight", nullptr, staticWindow);
+		ImGui::Begin("##LowRight", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
-		if (ImGui::BeginTabBar("##lowRightTabBar")) {
-			if (ImGui::BeginTabItem("test1")) {
-				ImGui::EndTabItem();
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("Soon 0")) {
 			}
-			if (ImGui::BeginTabItem("test2")) {
-				ImGui::EndTabItem();
+			if (ImGui::BeginMenu("Soon 1")) {
 			}
-			if (ImGui::BeginTabItem("test3")) {
-				ImGui::EndTabItem();
+			if (ImGui::BeginMenu("Soon 2")) {
 			}
-			ImGui::EndTabBar();
+			if (ImGui::BeginMenu("Soon 3")) {
+			}
+			ImGui::EndMenuBar();
 		}
 
-		for (std::shared_ptr<Object>& object : objects) {
+		auto& objects = _mScene.getObjects();
+
+		for (auto& object : objects) {
+
 			if (object->getInteractionState()->isSelected) {
-				object->UIMeshsMaterialCoefficients();
+
+				for(auto& mesh : object->getMeshes()) {
+					if (mesh->getInteractionState()->isSelected) {
+						mesh->UIMaterialCoefficients();
+					}
+				}
 			}
 		}
 
 		ImGui::End();
 	}
 
-	void UI::topPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Activity information
+	void UI::topPanel() {
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  MainBarWidth), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, ActivityBarWidth * 2), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
 		ImGui::Begin("##Top", nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
+
+		auto& cameras = _mScene.getCameras();
 
 		for (std::shared_ptr<Camera>& camera : cameras) {
 			if (camera->getInteractionState()->isActive) {
@@ -246,11 +326,7 @@ namespace Engine {
 		ImGui::End();
 	}
 
-	void UI::botPanel(
-		std::vector<std::shared_ptr<Object>>& objects,
-		std::vector<std::shared_ptr<Camera>>& cameras
-	) {
-		// Assets
+	void UI::botPanel() {
 		ImGui::SetNextWindowPos(ImVec2(_mData.width * 1 / 4,  _mData.height * 3 / 4 - MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
@@ -258,20 +334,28 @@ namespace Engine {
 		ImGui::Begin("##Bot", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
 		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("test0")) {
+			if (ImGui::BeginMenu("Soon 0")) {
 			}
-			if (ImGui::BeginMenu("test1")) {
+			if (ImGui::BeginMenu("Soon 1")) {
 			}
-			if (ImGui::BeginMenu("test2")) {
+			if (ImGui::BeginMenu("Soon 2")) {
 			}
-			if (ImGui::BeginMenu("test3")) {
+			if (ImGui::BeginMenu("Soon 3")) {
 			}
 			ImGui::EndMenuBar();
 		}
 
-		for (std::shared_ptr<Object>& object : objects) {
+		auto& objects = _mScene.getObjects();
+
+		for (auto& object : objects) {
+
 			if (object->getInteractionState()->isSelected) {
-				object->UIMeshsMaterialTextures();
+
+				for(auto& mesh : object->getMeshes()) {
+					if (mesh->getInteractionState()->isSelected) {
+						mesh->UIMaterialTextures();
+					}
+				}
 			}
 		}
 
@@ -284,6 +368,59 @@ namespace Engine {
 		// }
 
 		ImGui::End();
+	}
+
+	void UI::addToScene() {
+		if (_mCallAddPerspective) {
+			_mScene.addCamera(std::make_shared<PerspectiveCamera>(_mData.width, _mData.height));
+			_mCallAddPerspective = false;
+		}
+		if (_mCallAddCube) {
+			_mScene.addObject(std::make_shared<Cube>());
+			_mCallAddCube = false;
+		}
+		if (_mCallAddQuad) {
+			_mScene.addObject(std::make_shared<Quad>());
+			_mCallAddQuad = false;
+		}
+		if (_mCallAddTriangle) {
+			_mScene.addObject(std::make_shared<Triangle>());
+			_mCallAddTriangle = false;
+		}
+		if (_mCallAddModel) {
+			ImGui::OpenPopup("Add Model");
+			_mCallAddModel = false;
+		}
+
+		addModel();
+	}
+
+	void UI::addModel() {
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Add Model", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static char path[128] = "";
+			ImGui::InputTextWithHint("Model path", "/home/models/model.obj", &path[0], 128);
+
+			if (ImGui::Button("Add", ImVec2(120, 0))) {
+				_mScene.addObject(std::make_shared<Model>(path));
+
+				// Reset path
+				memset(path, 0, sizeof(path));
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
 	}
 
 	void UI::setViewPort() {

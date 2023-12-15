@@ -50,23 +50,13 @@ namespace Engine {
 	}
 
 	void Material::UITextures(unsigned int id) {
-		std::string sMesh = "Mesh: #" + std::to_string(id);
-
-		if (ImGui::TreeNode(sMesh.c_str())) {
-			_mTextures->drawUI(id);
-			ImGui::TreePop();
-		}
+		_mTextures->drawUI(id);
 	}
 
 	bool Material::UICoefficients(unsigned int id) {
 		bool hasUpdate = false;
 
-		std::string sMesh = "Mesh: #" + std::to_string(id);
-
-		if (ImGui::TreeNode(sMesh.c_str())) {
-			_mCoefficients->drawUI(id);
-			ImGui::TreePop();
-		}
+		_mCoefficients->drawUI(id);
 
 		return hasUpdate;
 	}

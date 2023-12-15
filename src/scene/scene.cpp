@@ -49,7 +49,7 @@ namespace Engine {
 		// TODO: Make the event system
 		_mEventManager = std::make_shared<EventManager>();
 
-		_mUI = std::make_shared<UI>(window, gl_version, _mWidth, _mHeight);
+		_mUI = std::make_shared<UI>(*this, window, gl_version, _mWidth, _mHeight);
 
 		_mRenderer = std::make_shared<Core::Renderer>();
 
@@ -105,7 +105,7 @@ namespace Engine {
 
 		if (_mUI->getData().isActive) {
 			_mUI->newFrame();
-			_mUI->ui(_mObjects, _mCameras);
+			_mUI->ui();
 			_mUI->render();
 		}
 
@@ -139,11 +139,8 @@ namespace Engine {
 	}
 
 	void Scene::addObject(std::shared_ptr<Object> && object) {
+		_mEntitys.push_back(object);
 		_mObjects.push_back(object);
-	}
-
-	void Scene::addShader(std::shared_ptr<Core::Shader> && shader) {
-		_mShaders.push_back(shader);
 	}
 
 	void Scene::addCamera(std::shared_ptr<Camera> && camera) {
@@ -152,7 +149,34 @@ namespace Engine {
 			camera->getInteractionState()->isActive = true;
 		}
 
+		_mEntitys.push_back(camera);
 		_mCameras.push_back(camera);
+	}
+
+	void Scene::addShader(std::shared_ptr<Core::Shader> && shader) {
+		_mShaders.push_back(shader);
+	}
+
+
+	const std::vector<std::shared_ptr<Entity>>& Scene::getEntitys() const {
+		return _mEntitys;
+	}
+	std::vector<std::shared_ptr<Entity>>& Scene::getEntitys() {
+		return _mEntitys;
+	}
+
+	const std::vector<std::shared_ptr<Object>>& Scene::getObjects() const {
+		return _mObjects;
+	}
+	std::vector<std::shared_ptr<Object>>& Scene::getObjects() {
+		return _mObjects;
+	}
+
+	const std::vector<std::shared_ptr<Camera>>& Scene::getCameras() const {
+		return _mCameras;
+	}
+	std::vector<std::shared_ptr<Camera>>& Scene::getCameras() {
+		return _mCameras;
 	}
 
 	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {

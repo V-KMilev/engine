@@ -34,6 +34,7 @@ namespace Engine {
 			~UI();
 
 			UI(
+				Scene& scene,
 				GLFWwindow* window,
 				const char* gl_version,
 				unsigned int width,
@@ -53,51 +54,48 @@ namespace Engine {
 
 			void render();
 
-			void ui(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
-
-			void update();
+			void ui();
 
 			void showUI();
 
 		private:
 			void mainManu();
 
-			void leftPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
-			void rightPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
+			void leftPanel();
+			void rightPanel();
 
-			void lowLeftPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
-			void LowRightPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
+			void lowLeftPanel();
+			void LowRightPanel();
 
-			void topPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
-			void botPanel(
-				std::vector<std::shared_ptr<Object>>& objects,
-				std::vector<std::shared_ptr<Camera>>& cameras
-			);
+			void topPanel();
+			void botPanel();
 
-			void panelPosition();
+			void addToScene();
 
+			void addModel();
+
+		private:
 			void setViewPort();
 
 			void setStyle();
 		private:
 			uiData _mData;
+
+			Scene& _mScene;
+
+			bool _mCallSave = false;
+			bool _mCallLoad = false;
+
+			bool _mCallUndo = false;
+			bool _mCallRedo = false;
+
+			bool _mCallAddPerspective = false;
+
+			bool _mCallAddCube     = false;
+			bool _mCallAddQuad     = false;
+			bool _mCallAddTriangle = false;
+			bool _mCallAddModel    = false;
+
+			bool _mCallRemove = false;
 	};
 };
