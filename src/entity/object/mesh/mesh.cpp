@@ -136,16 +136,10 @@ namespace Engine {
 	void Mesh::UIWorld() {
 		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
 
-		if (ImGui::TreeNode(sMesh.c_str())) {
+		ImGui::SeparatorText(sMesh.c_str());
 
-			_mInteractionState->drawUI(_mID.getID());
-
-			ImGui::SeparatorText("Transform");
-
-			_mTransform->drawUI(_mID.getID());
-
-			ImGui::TreePop();
-		}
+		_mInteractionState->drawUI(_mID.getID());
+		_mTransform->drawUI(_mID.getID());
 	}
 
 	void Mesh::UIMaterialTextures() {

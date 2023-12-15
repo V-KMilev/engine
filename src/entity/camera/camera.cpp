@@ -46,6 +46,8 @@ namespace Engine {
 			updateProjection();
 			updateLookAt();
 
+			// TODO: Think of way to update the visual from the UI
+
 			_mVisual->onUpdate(mouse, deltaTime);
 
 			// Reset the update event

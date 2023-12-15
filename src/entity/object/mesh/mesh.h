@@ -50,8 +50,6 @@ namespace Engine {
 				std::shared_ptr<Material> material
 			);
 
-			unsigned int getID() const;
-
 			void load_mesh() override;
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;

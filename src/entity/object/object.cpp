@@ -25,6 +25,13 @@ namespace Engine {
 		return _mObjectType;
 	}
 
+	const std::vector<std::shared_ptr<Mesh>>& Object::getMeshes() const {
+		return _mMeshes;
+	}
+	std::vector<std::shared_ptr<Mesh>>& Object::getMeshes() {
+		return _mMeshes;
+	}
+
 	void Object::onUpdate(const Mouse* mouse, float deltaTime) {
 		if (_mInteractionState->hasUpdate) {
 			PROFILER_BEGIN("Object", "Object Update");
@@ -101,27 +108,6 @@ namespace Engine {
 		ImGui::SeparatorText(sObject.c_str());
 
 		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
-
-		ImGui::SeparatorText("Transform");
-
 		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
-	}
-
-	void Object::UIMeshsWorld() {
-		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->UIWorld();
-		}
-	}
-
-	void Object::UIMeshsMaterialTextures() {
-		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->UIMaterialTextures();
-		}
-	}
-
-	void Object::UIMeshsMaterialCoefficients() {
-		for (std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->UIMaterialCoefficients();
-		}
 	}
 };

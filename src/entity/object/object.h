@@ -55,6 +55,9 @@ namespace Engine {
 
 			ObjectType getObjectTpye() const;
 
+			const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
+			std::vector<std::shared_ptr<Mesh>>& getMeshes();
+
 			virtual void load_mesh() = 0;
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
@@ -64,9 +67,6 @@ namespace Engine {
 			void updateShader(const Core::Shader &shader) const override;
 
 			void UIWorld() override;
-			void UIMeshsWorld();
-			void UIMeshsMaterialTextures();
-			void UIMeshsMaterialCoefficients();
 
 		protected:
 			void updateModel();
