@@ -28,4 +28,24 @@ namespace Engine {
 	std::shared_ptr<InteractionState>& Entity::getInteractionState() {
 		return _mInteractionState;
 	}
+
+	json Entity::toJson() const {
+		json entityJson;
+
+		// Add entity properties to the JSON object
+		entityJson["id"] = _mID.getID();
+		entityJson["type"] = static_cast<int>(_mType);
+
+		// Add transform properties
+		if (_mTransform) {
+			entityJson["transform"] = _mTransform->toJson();
+		}
+
+		// Add interaction state properties
+		if (_mInteractionState) {
+			entityJson["interactionState"] = _mInteractionState->toJson();
+		}
+
+		return entityJson;
+	}
 };

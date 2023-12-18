@@ -46,9 +46,9 @@ namespace Engine {
 
 		private:
 			std::string _mFileName;
-			std::ofstream _mFile;
-
 			std::string _mFolder;
+
+			std::ofstream _mFile;
 
 			std::vector<std::string> _mMessages;
 	};

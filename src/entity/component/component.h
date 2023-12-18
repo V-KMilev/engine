@@ -8,22 +8,30 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
+#include "json.hpp"
+
 #include "ui_element.h"
 
 namespace Core {
 	class Texture;
 };
 
+using json = nlohmann::json;
+
 namespace Engine {
 	// Base Transform struct
 	class Transform : public UIElement {
 		public:
+			virtual json toJson() const = 0;
+
 			virtual bool drawUI(unsigned int id) override = 0;
 	};
 
 	// Base InteractionState struct
 	class InteractionState : public UIElement {
 		public:
+			virtual json toJson() const = 0;
+
 			virtual bool drawUI(unsigned int id) override = 0;
 
 		public:
@@ -36,6 +44,8 @@ namespace Engine {
 
 	class ObjectTransform : public Transform {
 		public:
+			json toJson() const override;
+
 			bool drawUI(unsigned int id) override;
 
 		public:
@@ -49,6 +59,8 @@ namespace Engine {
 
 	class ObjectInteractionState : public InteractionState {
 		public:
+			json toJson() const override;
+
 			bool drawUI(unsigned int id) override;
 
 		public:
@@ -76,6 +88,8 @@ namespace Engine {
 
 	class CameraTransform : public Transform {
 		public:
+			virtual json toJson() const override = 0;
+
 			virtual bool drawUI(unsigned int id) override = 0;
 
 		public:
@@ -103,6 +117,8 @@ namespace Engine {
 
 	class CameraInteractionState : public InteractionState {
 		public:
+			virtual json toJson() const override = 0;
+
 			virtual bool drawUI(unsigned int id) override = 0;
 
 		public:
@@ -120,6 +136,8 @@ namespace Engine {
 
 	class PerspectiveCameraTransform : public CameraTransform {
 		public:
+			json toJson() const override;
+
 			bool drawUI(unsigned int id) override;
 
 		public:
@@ -136,6 +154,8 @@ namespace Engine {
 
 	class PerspectiveCameraInteractionState : public CameraInteractionState {
 		public:
+			json toJson() const override;
+
 			bool drawUI(unsigned int id) override;
 
 		public:
@@ -180,6 +200,8 @@ namespace Engine {
 
 	class Textures : public UIElement {
 		public:
+			json toJson() const;
+
 			bool drawUI(unsigned int id) override;
 
 		public:
@@ -202,6 +224,8 @@ namespace Engine {
 
 	class Coefficients : public UIElement {
 		public:
+			json toJson() const;
+
 			bool drawUI(unsigned int id) override;
 
 		public:

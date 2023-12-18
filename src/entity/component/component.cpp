@@ -14,6 +14,16 @@ namespace Engine {
 
 // TODO: Add all members as UI part
 
+	json ObjectTransform::toJson() const {
+		json componentJson;
+
+		componentJson["position"] = {position.x, position.y, position.z};
+		componentJson["scale"]    = {scale.x, scale.y, scale.z};
+		componentJson["rotation"] = {rotation.x, rotation.y, rotation.z};
+
+		return componentJson;
+	}
+
 	bool ObjectTransform::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
@@ -28,6 +38,14 @@ namespace Engine {
 		if (ImGui::DragFloat3(sScale.c_str(),    &scale[0], _mDragSpeed))    { hasUpdate = true; }
 
 		return hasUpdate;
+	}
+
+	json ObjectInteractionState::toJson() const {
+		json componentJson;
+
+		componentJson["linesOnly"] = linesOnly;
+
+		return componentJson;
 	}
 
 	bool ObjectInteractionState::drawUI(unsigned int id) {
@@ -47,6 +65,35 @@ namespace Engine {
 		if (ImGui::Checkbox(sHasUpdate.c_str(), &hasUpdate)) { hasUpdate = true; }
 
 		return hasUpdate;
+	}
+
+	json PerspectiveCameraTransform::toJson() const {
+		json componentJson;
+
+		componentJson["position"] = {position.x, position.y, position.z};
+		componentJson["target"]   = {target.x, target.y, target.z};
+
+		componentJson["c_near"] = c_near;
+		componentJson["c_far"]  = c_far;
+
+		componentJson["front"] = {front.x, front.y, front.z};
+		componentJson["right"] = {right.x, right.y, right.z};
+		componentJson["up"]    = {up.x, up.y, up.z};
+
+		componentJson["horizontalAngle"] = horizontalAngle;
+		componentJson["verticalAngle"]   = verticalAngle;
+
+		componentJson["maxUpAngle"] = maxUpAngle;
+
+		componentJson["fov"] = fov;
+
+		componentJson["width"]  = width;
+		componentJson["height"] = height;
+
+		componentJson["maxFOV"] = maxFOV;
+		componentJson["minFOV"] = minFOV;
+
+		return componentJson;
 	}
 
 	bool PerspectiveCameraTransform::drawUI(unsigned int id) {
@@ -75,6 +122,19 @@ namespace Engine {
 		return hasUpdate;
 	}
 
+	json PerspectiveCameraInteractionState::toJson() const {
+		json componentJson;
+
+		componentJson["moveSpeed"]  = moveSpeed;
+		componentJson["mouseSpeed"] = mouseSpeed;
+		componentJson["zoomSpeed"]  = zoomSpeed;
+
+		componentJson["updateEvent"]   = static_cast<int>(updateEvent);
+		componentJson["positionEvent"] = static_cast<int>(positionEvent);
+
+		return componentJson;
+	}
+
 	bool PerspectiveCameraInteractionState::drawUI(unsigned int id) {
 		bool hasUpdate = false;
 
@@ -100,6 +160,19 @@ namespace Engine {
 		// PositionEvent positionEvent = PositionEvent::NONE;
 
 		return hasUpdate;
+	}
+
+	json Textures::toJson() const {
+		json componentJson;
+
+		json texturesArray;
+		for (int i = 0; i < textures.size(); ++i) {
+			componentJson.push_back(textures[i]->getPath());
+		}
+
+		componentJson["textures"] = texturesArray;
+
+		return componentJson;
 	}
 
 	bool Textures::drawUI(unsigned int id) {
@@ -156,6 +229,26 @@ namespace Engine {
 		}
 
 		return hasUpdate;
+	}
+
+	json Coefficients::toJson() const {
+		json componentJson;
+
+		componentJson["ambient"]       = {ambient.x, ambient.y, ambient.z};
+		componentJson["diffuse"]       = {diffuse.x, diffuse.y, diffuse.z};
+		componentJson["specular"]      = {specular.x, specular.y, specular.z};
+		componentJson["transmittance"] = {transmittance.x, transmittance.y, transmittance.z};
+		componentJson["emission"]      = {emission.x, emission.y, emission.z};
+
+		componentJson["shininess"] = shininess;
+
+		componentJson["ior"] = ior;
+
+		componentJson["roughness"] = roughness;
+		componentJson["metallic"]  = metallic;
+		componentJson["sheen"]     = sheen;
+
+		return componentJson;
 	}
 
 	bool Coefficients::drawUI(unsigned int id) {

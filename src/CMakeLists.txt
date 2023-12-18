@@ -25,6 +25,7 @@ set(SOURCES
 
 	${ENGINE_SRC_DIR}/material/material.cpp
 
+	${ENGINE_SRC_DIR}/scene/system/scene_manager.cpp
 	${ENGINE_SRC_DIR}/scene/orientation/orientation.cpp
 	${ENGINE_SRC_DIR}/scene/gizmo/gizmo.cpp
 	${ENGINE_SRC_DIR}/scene/grid/grid.cpp
@@ -56,6 +57,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 	${ENGINE_SRC_DIR}/material
 
+	${ENGINE_SRC_DIR}/scene/system
 	${ENGINE_SRC_DIR}/scene/orientation
 	${ENGINE_SRC_DIR}/scene/gizmo
 	${ENGINE_SRC_DIR}/scene/grid

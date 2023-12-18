@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-message("[BUILDING:MINITRACE] Mini-Trace")
+message("[BUILDING:MINI-TRACE] Mini-Trace")
 
 add_library(${PROJECT_NAME} STATIC minitrace.c)
 

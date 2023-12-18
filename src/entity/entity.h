@@ -5,6 +5,8 @@
 #include "component.h"
 #include "entity_id.h"
 
+#include "json.hpp"
+
 namespace Core {
 	class Renderer;
 	class Shader;
@@ -13,6 +15,8 @@ namespace Core {
 namespace Engine {
 	struct Mouse;
 };
+
+using json = nlohmann::json;
 
 namespace Engine {
 	enum class EntityType {
@@ -41,6 +45,8 @@ namespace Engine {
 
 			virtual const std::shared_ptr<InteractionState>& getInteractionState() const;
 			virtual std::shared_ptr<InteractionState>& getInteractionState();
+
+			json toJson() const;
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
