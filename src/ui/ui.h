@@ -70,9 +70,15 @@ namespace Engine {
 			void topPanel();
 			void botPanel();
 
-			void addToScene();
+			void addOrRemoveToScene();
 
 			void addModel();
+			void remove();
+
+			void saveOrLoadScene();
+
+			void save();
+			void load();
 
 		private:
 			void setViewPort();

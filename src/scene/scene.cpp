@@ -16,6 +16,7 @@
 #include "gl_pick_texture.h"
 #include "gl_texture.h"
 
+#include "scene_manager.h"
 #include "input_manager.h"
 #include "event_manager.h"
 
@@ -46,6 +47,8 @@ namespace Engine {
 		_mCameras({}),
 		_mShaders({})
 	{
+		_mSceneManager = std::make_shared<SceneManager>(*this);
+
 		// TODO: Make the event system
 		_mEventManager = std::make_shared<EventManager>();
 
@@ -157,12 +160,33 @@ namespace Engine {
 		_mShaders.push_back(shader);
 	}
 
-
 	const std::vector<std::shared_ptr<Entity>>& Scene::getEntitys() const {
 		return _mEntitys;
 	}
 	std::vector<std::shared_ptr<Entity>>& Scene::getEntitys() {
 		return _mEntitys;
+	}
+
+	const std::shared_ptr<SceneManager>& Scene::getSceneManager() const {
+		return _mSceneManager;
+	}
+	std::shared_ptr<SceneManager>& Scene::getSceneManager() {
+		return _mSceneManager;
+	}
+
+	void Scene::removeSelectedEntitys() {
+		_mEntitys.erase(std::remove_if(_mEntitys.begin(), _mEntitys.end(), [] (std::shared_ptr<Entity>& entity) { return entity->getInteractionState()->isSelected; }), _mEntitys.end());
+		_mCameras.erase(std::remove_if(_mCameras.begin(), _mCameras.end(), [] (std::shared_ptr<Camera>& camera) { return camera->getInteractionState()->isSelected; }), _mCameras.end());
+		_mObjects.erase(std::remove_if(_mObjects.begin(), _mObjects.end(), [] (std::shared_ptr<Object>& object) { return object->getInteractionState()->isSelected; }), _mObjects.end());
+	}
+
+	bool Scene::isAnythingSelected() {
+		for(auto& entity : _mEntitys) {
+			if (entity->getInteractionState()->isSelected) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	const std::vector<std::shared_ptr<Object>>& Scene::getObjects() const {
@@ -208,6 +232,8 @@ namespace Engine {
 	}
 
 	void Scene::drawPick(const std::shared_ptr<Core::Shader>& shader) const {
+		// TODO: Make this draw only of pick event
+
 		PROFILER_BEGIN("Pick Entity", "Entity Draw Pick");
 
 		_mPickTexture->enableWriting();

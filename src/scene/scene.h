@@ -13,6 +13,7 @@ namespace Core {
 }
 
 namespace Engine {
+	class SceneManager;
 	class InputManager;
 	class EventManager;
 
@@ -68,6 +69,13 @@ namespace Engine {
 			const std::vector<std::shared_ptr<Camera>>& getCameras() const;
 			std::vector<std::shared_ptr<Camera>>& getCameras();
 
+			const std::shared_ptr<SceneManager>& getSceneManager() const;
+			std::shared_ptr<SceneManager>& getSceneManager();
+
+			void removeSelectedEntitys();
+
+			bool isAnythingSelected();
+
 		private:
 			void drawOrientation(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGrid(const std::shared_ptr<Core::Shader>& shader) const;
@@ -88,6 +96,7 @@ namespace Engine {
 			void keyBinds();
 
 		private:
+			std::shared_ptr<SceneManager> _mSceneManager;
 			std::shared_ptr<InputManager> _mInputManager;
 			std::shared_ptr<EventManager> _mEventManager;
 

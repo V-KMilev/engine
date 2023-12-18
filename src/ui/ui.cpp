@@ -4,6 +4,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "gl_error_handle.h"
+
+#include "scene_manager.h"
+
 #include "camera.h"
 #include "perspective_camera.h"
 
@@ -15,7 +19,7 @@
 #include "triangle.h"
 #include "model.h"
 
-#include "gl_error_handle.h"
+#include "utils.h"
 
 const ImGuiWindowFlags staticWindow = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing;
 namespace Engine {
@@ -96,7 +100,8 @@ namespace Engine {
 		topPanel();
 		botPanel();
 
-		addToScene();
+		addOrRemoveToScene();
+		saveOrLoadScene();
 	}
 
 	void UI::showUI() {
@@ -370,7 +375,7 @@ namespace Engine {
 		ImGui::End();
 	}
 
-	void UI::addToScene() {
+	void UI::addOrRemoveToScene() {
 		if (_mCallAddPerspective) {
 			_mScene.addCamera(std::make_shared<PerspectiveCamera>(_mData.width, _mData.height));
 			_mCallAddPerspective = false;
@@ -392,7 +397,15 @@ namespace Engine {
 			_mCallAddModel = false;
 		}
 
+		if (_mCallRemove) {
+			if(_mScene.isAnythingSelected()) {
+				ImGui::OpenPopup("Remove?");
+			}
+			_mCallRemove = false;
+		}
+
 		addModel();
+		remove();
 	}
 
 	void UI::addModel() {
@@ -405,6 +418,123 @@ namespace Engine {
 
 			if (ImGui::Button("Add", ImVec2(120, 0))) {
 				_mScene.addObject(std::make_shared<Model>(path));
+
+				// Reset path
+				memset(path, 0, sizeof(path));
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void UI::remove() {
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Remove?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::Text("Are you sure you want to remove:");
+
+			auto& entitys = _mScene.getEntitys();
+
+			for (auto& entity : entitys) {
+				EntityType type = entity->getTpye();
+
+				std::string labe = "Entity #" + std::to_string(entity->getID());
+
+				if (type == EntityType::OBJECT) {
+					labe = "Object #" + std::to_string(entity->getID());
+				}
+				else if (type == EntityType::CAMERA) {
+					labe = "Camera #" + std::to_string(entity->getID());
+				}
+
+				if (entity->getInteractionState()->isSelected) {
+					Utils::UI::ColoredBulletText("", labe, ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+				}
+			}
+
+			if (ImGui::Button("Remove", ImVec2(120, 0))) {
+				_mScene.removeSelectedEntitys();
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void UI::saveOrLoadScene() {
+		if (_mCallSave) {
+			ImGui::OpenPopup("Save Scene");
+			_mCallSave = false;
+		}
+		if (_mCallLoad) {
+			ImGui::OpenPopup("Load Scene");
+			_mCallLoad = false;
+		}
+
+		save();
+		load();
+	}
+
+	void UI::save() {
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Save Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static char path[128] = "";
+			ImGui::InputTextWithHint("Save path", "/home/models/Save.vkm", &path[0], 128);
+
+			if (ImGui::Button("Save", ImVec2(120, 0))) {
+				auto& ss = _mScene.getSceneManager();
+
+				ss->save(path);
+
+				// Reset path
+				memset(path, 0, sizeof(path));
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void UI::load() {
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Load Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			static char path[128] = "";
+			ImGui::InputTextWithHint("Scene path", "/home/models/Scene.vkm", &path[0], 128);
+
+			if (ImGui::Button("Load", ImVec2(120, 0))) {
+				auto& ss = _mScene.getSceneManager();
+
+				ss->load(path);
 
 				// Reset path
 				memset(path, 0, sizeof(path));

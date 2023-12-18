@@ -108,11 +108,11 @@ namespace Engine {
 	void Window::input_config() {
 		_mInputManager = std::make_shared<InputManager>();
 
-		// TODO: Find better "hack" for this to work
 		glfwSetKeyCallback(_mWindow, _mInputManager->keyCallback);
 		glfwSetMouseButtonCallback(_mWindow, _mInputManager->mouseButtonCallback);
 		glfwSetScrollCallback(_mWindow, _mInputManager->mouseScrollCallback);
 
+		// TODO: Find better "hack" for this to work
 		glfwSetWindowUserPointer(_mWindow, _mInputManager.get());
 
 		// Mapping exit button
