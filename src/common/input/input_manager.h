@@ -4,22 +4,20 @@
 #include <functional>
 
 #include "input_key.h"
+#include "input_key_combination.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 namespace Engine {
 	struct Mouse {
-		bool isLeftPressed  = false;
-		bool isRightPressed = false;
-
 		int x = 0.0f;
 		int y = 0.0f;
 
 		float scrollX = 0.0f;
 		float scrollY = 0.0f;
 
-		double speed = 0.1f;
+		float speed = 0.1f;
 
 		bool hasUpdate = false;
 	};
@@ -40,7 +38,8 @@ namespace Engine {
 			const Mouse& getMouse() const;
 			Mouse& getMouse();
 
-			void mapKeyandStatetoEvent(int key, State state, const EventCallback& event, const std::string& event_hint = "");
+			void mapInputKeyToEvent(const InputKey& key, const EventCallback& event, const std::string& event_hint = "");
+			void mapKeyCombinationToEvent(const KeyCombination& keyCombinations, const EventCallback& event, const std::string& event_hint = "");
 
 			void processMouse(GLFWwindow* window);
 
@@ -49,11 +48,11 @@ namespace Engine {
 			static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 			static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
-			void processKey(GLFWwindow* window, int key, KeyType tpye) const;
+			void processKey(GLFWwindow* window, int key, KeyType type) const;
 
 		private:
 			Mouse _mMouse;
 
-			std::unordered_map<InputKey, EventCallback> _mMapOfEvents;
+			std::unordered_map<KeyCombination, EventCallback> _mMapOfEvents;
 	};
 };

@@ -116,9 +116,8 @@ namespace Engine {
 		glfwSetWindowUserPointer(_mWindow, _mInputManager.get());
 
 		// Mapping exit button
-		_mInputManager->mapKeyandStatetoEvent(
-			GLFW_KEY_C,
-			State::PRESS,
+		_mInputManager->mapKeyCombinationToEvent(
+			{ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_C, State::PRESS} } },
 			std::function<void()>(
 				[this] { set_close(true); }
 			),

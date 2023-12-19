@@ -13,21 +13,84 @@ namespace Engine {
 		return _mMouse;
 	}
 
-	void InputManager::mapKeyandStatetoEvent(int key, State state, const EventCallback& event, const std::string& event_hint) {
-		if (state == State::IDLE) {
-			LOG("Mapping '%c' to '%s' state is not allowed", LOG_LEVEL::L_WARN, key, stateToString(state).c_str());
+	void InputManager::mapInputKeyToEvent(const InputKey& inputKey, const EventCallback& event, const std::string& event_hint) {
+		if (inputKey.state == State::IDLE) {
+			LOG("Mapping '%c' to '%s' state is not allowed", LOG_LEVEL::L_WARN, inputKey.key, stateToString(inputKey.state).c_str());
 			return;
 		}
 
-		if (key > 31 && key < 97) {
-			LOG("Mapped Key/State: '%c' & '%s' to '%s'", LOG_LEVEL::L_INFO, key, stateToString(state).c_str(), event_hint.c_str());
+		if (inputKey.key > 31 && inputKey.key < 97) {
+			LOG("Mapped Key/State: '%c' & '%s' to '%s'", LOG_LEVEL::L_INFO, inputKey.key, stateToString(inputKey.state).c_str(), event_hint.c_str());
 		}
 		else {
-			LOG("Mapped Key/State: '%d' & '%s' to '%s'", LOG_LEVEL::L_INFO, key, stateToString(state).c_str(), event_hint.c_str());
+			LOG("Mapped Key/State: '%d' & '%s' to '%s'", LOG_LEVEL::L_INFO, inputKey.key, stateToString(inputKey.state).c_str(), event_hint.c_str());
 		}
 
+
 		// Store the provided event in the map based on key and state.
-		_mMapOfEvents[{key, state}] = event;
+		_mMapOfEvents[{inputKey}] = event;
+	}
+
+	void InputManager::mapKeyCombinationToEvent(const KeyCombination& keyCombinations, const EventCallback& event, const std::string& event_hint) {
+		for (const auto& inputKey : keyCombinations.keys) {
+			if (inputKey.state == State::IDLE) {
+				LOG("Mapping '%c' to '%s' state is not allowed", LOG_LEVEL::L_WARN, inputKey.key, stateToString(inputKey.state).c_str());
+				return;
+			}
+		}
+
+		LOG("Mapped Key Combination:", LOG_LEVEL::L_INFO);
+
+		for(const auto& inputKey : keyCombinations.keys) {
+			if (inputKey.key > 31 && inputKey.key < 97) {
+				LOG("\tKey/State: '%c' & '%s'", LOG_LEVEL::L_INFO, inputKey.key, stateToString(inputKey.state).c_str());
+			}
+			else {
+				LOG("\tKey/State: '%d' & '%s'", LOG_LEVEL::L_INFO, inputKey.key, stateToString(inputKey.state).c_str());
+			}
+		}
+
+		LOG("to '%s'", LOG_LEVEL::L_INFO, event_hint.c_str());
+
+		// Store the provided event in the map based on the key combination.
+		_mMapOfEvents[keyCombinations] = event;
+	}
+
+	void InputManager::processKey(GLFWwindow* window, int key, KeyType type) const {
+		State state = getState(window, key, type);
+
+		// Process individual keys
+		InputKey individualKey{ key, state };
+
+		// Check for key combinations
+		for (const auto& [combination, event] : _mMapOfEvents) {
+			if (combination.keys.find(individualKey) == combination.keys.end()) {
+				// The individual key is not part of this combination
+				continue;
+			}
+
+			// Check if all keys in the combination are in the desired state
+			bool allKeysAreReady = true;
+
+			for (const auto& keyInCombination : combination.keys) {
+				if (getState(window, keyInCombination.key, type) != keyInCombination.state) {
+					allKeysAreReady = false;
+					break;
+				}
+			}
+
+			if (allKeysAreReady) {
+				event();
+			}
+		}
+	}
+
+	void InputManager::processMouse(GLFWwindow* window) {
+		double x = 0.0f;
+		double y = 0.0f;
+		glfwGetCursorPos(window, &x, &y);
+		_mMouse.x = x;
+		_mMouse.y = y;
 	}
 
 	// TODO: Think of way to process inputs parallel
@@ -59,25 +122,5 @@ namespace Engine {
 			inputManager->getMouse().scrollY = yoffset;
 			inputManager->getMouse().hasUpdate = true;
 		}
-	}
-
-	void InputManager::processKey(GLFWwindow* window, int key, KeyType tpye) const {
-		State state = getState(window, key, tpye);
-
-		// Check if an event is mapped for this key and state.
-		auto it = _mMapOfEvents.find({key, state});
-
-		// If an event is found, execute it.
-		if (it != _mMapOfEvents.end()) {
-			it->second();
-		}
-	}
-
-	void InputManager::processMouse(GLFWwindow* window) {
-		double x = 0.0f;
-		double y = 0.0f;
-		glfwGetCursorPos(window, &x, &y);
-		_mMouse.x = x;
-		_mMouse.y = y;
 	}
 };

@@ -39,7 +39,8 @@ namespace Engine {
 namespace std {
 	template <>
 	struct hash<Engine::InputKey> {
-		std::size_t operator()(const Engine::InputKey& k) const {
+
+		std::size_t operator () (const Engine::InputKey& k) const {
 			return std::hash<int>()(k.key) ^ std::hash<Engine::State>()(k.state);
 		}
 	};

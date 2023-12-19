@@ -3,6 +3,7 @@ set(ENGINE_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(SOURCES
 	${ENGINE_SRC_DIR}/common/input/input_manager.cpp
 	${ENGINE_SRC_DIR}/common/input/input_key.cpp
+	${ENGINE_SRC_DIR}/common/input/input_key_combination.cpp
 
 	${ENGINE_SRC_DIR}/common/logger/logger.cpp
 

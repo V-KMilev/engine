@@ -134,6 +134,14 @@ namespace Engine {
 
 		_mOrientation->onUpdate(&_mInputManager->getMouse(), _mDeltaTime);
 
+		if (_mSelectState == SelectState::SELECING) {
+			pickEntity();
+			_mSelectState = SelectState::IDELE;
+		}
+		if (_mSelectState == SelectState::MOVING) {
+			moveEntity();
+		}
+
 		// TODO: Think of where this should be
 		// Reset the update event
 		_mInputManager->getMouse().hasUpdate = false;
@@ -374,20 +382,22 @@ namespace Engine {
 	}
 
 	void Scene::keyBinds() {
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_W, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_S, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_Q, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_E, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_A, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_D, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_W, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_S, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Q, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_E, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_A, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_D, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
 
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_U, State::PRESS, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_U, State::PRESS} } }, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_LEFT_CONTROL, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "Target move");
-		_mInputManager->mapKeyandStatetoEvent(GLFW_KEY_LEFT_ALT, State::PRESS, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_F, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_G, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
 
-		_mInputManager->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_LEFT, State::PRESS, std::function<void()>( [this] { pickEntity(); } ), "Select ability");
-		// TODO: Make the move event on hold
-		_mInputManager->mapKeyandStatetoEvent(GLFW_MOUSE_BUTTON_RIGHT, State::PRESS, std::function<void()>( [this] { moveEntity(); } ), "Move ability");
+		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECING; } ), "Select ability");
+
+		// TODO: Make keyboard and Mouse work together
+		// _mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::PRESS} } }, std::function<void()>( [this] { _mSelectState = SelectState::MOVING; } ), "Move ability");
+		// _mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::RELEASE} } }, std::function<void()>( [this] { _mSelectState = SelectState::IDELE; } ), "Move ability");
 	}
 };

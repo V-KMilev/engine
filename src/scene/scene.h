@@ -32,6 +32,13 @@ namespace Engine {
 #include "camera.h"
 
 namespace Engine {
+	enum class SelectState {
+		IDELE      = 0,
+		OUTOFFOCUS = 1,
+		SELECING   = 2,
+		MOVING     = 3
+	};
+
 	class Scene {
 		public:
 			Scene() = delete;
@@ -121,5 +128,7 @@ namespace Engine {
 
 			unsigned int _mWidth;
 			unsigned int _mHeight;
+
+			SelectState _mSelectState = SelectState::IDELE;
 	};
 }
