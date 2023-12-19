@@ -53,7 +53,7 @@ namespace Engine {
 
 			Object(ObjectType type);
 
-			ObjectType getObjectTpye() const;
+			ObjectType getObjectType() const;
 
 			const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
 			std::vector<std::shared_ptr<Mesh>>& getMeshes();

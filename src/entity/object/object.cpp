@@ -21,7 +21,7 @@ namespace Engine {
 		_mInteractionState->hasUpdate = true;
 	}
 
-	ObjectType Object::getObjectTpye() const {
+	ObjectType Object::getObjectType() const {
 		return _mObjectType;
 	}
 

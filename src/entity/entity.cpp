@@ -9,7 +9,7 @@ namespace Engine {
 		return _mID.getID();
 	}
 
-	EntityType Entity::getTpye() const {
+	EntityType Entity::getType() const {
 		return _mType;
 	}
 

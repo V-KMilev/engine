@@ -26,7 +26,7 @@ namespace Engine {
 		_mInteractionState->hasUpdate = true;
 	}
 
-	CameraType Camera::getCameraTpye() const {
+	CameraType Camera::getCameraType() const {
 		return _mCameraType;
 	}
 

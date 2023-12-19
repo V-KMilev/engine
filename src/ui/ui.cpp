@@ -176,7 +176,7 @@ namespace Engine {
 		ImGui::BeginChild("Entity list", ImVec2(_mData.width * 1 / 9, 0), true);
 
 		for (auto& entity : entitys) {
-			EntityType type = entity->getTpye();
+			EntityType type = entity->getType();
 
 			std::string labe = "Entity #" + std::to_string(entity->getID());
 
@@ -446,7 +446,7 @@ namespace Engine {
 			auto& entitys = _mScene.getEntitys();
 
 			for (auto& entity : entitys) {
-				EntityType type = entity->getTpye();
+				EntityType type = entity->getType();
 
 				std::string labe = "Entity #" + std::to_string(entity->getID());
 

@@ -24,7 +24,7 @@ namespace Engine {
 		public:
 			Camera(CameraType Type = CameraType::NONE);
 
-			CameraType getCameraTpye() const;
+			CameraType getCameraType() const;
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 

@@ -38,7 +38,7 @@ namespace Engine {
 
 			unsigned int getID() const;
 
-			EntityType getTpye() const;
+			EntityType getType() const;
 
 			virtual const std::shared_ptr<Transform>& getTransform() const;
 			virtual std::shared_ptr<Transform>& getTransform();

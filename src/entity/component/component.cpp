@@ -181,7 +181,7 @@ namespace Engine {
 		static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
 
 		if (ImGui::BeginTable("table1", 3, tableFlags)) {
-			ImGui::TableSetupColumn("Texture Tpye:");
+			ImGui::TableSetupColumn("Texture Type:");
 			ImGui::TableSetupColumn("Texture:");
 			ImGui::TableSetupColumn("Data:");
 
