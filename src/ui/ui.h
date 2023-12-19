@@ -18,6 +18,9 @@ namespace Engine {
 namespace Engine {
 	struct uiData {
 		public:
+			uiData() = default;
+			~uiData() = default;
+
 			uiData(unsigned int width, unsigned int height, bool isActive);
 
 		public:
@@ -81,9 +84,8 @@ namespace Engine {
 			void load();
 
 		private:
-			void setViewPort();
-
 			void setStyle();
+
 		private:
 			uiData _mData;
 

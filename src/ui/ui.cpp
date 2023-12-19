@@ -37,18 +37,10 @@ namespace Engine {
 		const char* gl_version,
 		unsigned int width,
 		unsigned int height
-	) : _mData(
-			uiData(
-				width,
-				height,
-				true
-			)
-		),
-		_mScene(scene) {
+	) : _mScene(scene) {
+		_mData = uiData(width, height, false);
 
-		if (_mData.isActive) {
-			setViewPort();
-		}
+		showUI();
 
 		IMGUI_CHECKVERSION();
 
@@ -108,12 +100,18 @@ namespace Engine {
 		if (!_mData.isActive) {
 			_mData.isActive = true;
 
-			setViewPort();
+			// TODO: Write why * 2 / 4 and s.o
+			_mScene.setSceneViewPort(
+				_mData.width  * 1 / 4,
+				_mData.height * 1 / 4 + ActivityBarWidth * 4,
+				_mData.width  * 2 / 4,
+				_mData.height * 2 / 4
+			);
 		}
 		else {
 			_mData.isActive = false;
 
-			MY_GL_CHECK(glViewport(0, 0, _mData.width, _mData.height));
+			_mScene.setSceneViewPort(0, 0, _mData.width, _mData.height);
 		}
 	}
 
@@ -398,7 +396,7 @@ namespace Engine {
 		}
 
 		if (_mCallRemove) {
-			if(_mScene.isAnythingSelected()) {
+			if (_mScene.isAnythingSelected()) {
 				ImGui::OpenPopup("Remove?");
 			}
 			_mCallRemove = false;
@@ -551,17 +549,6 @@ namespace Engine {
 
 			ImGui::EndPopup();
 		}
-	}
-
-	void UI::setViewPort() {
-		MY_GL_CHECK(
-			glViewport(
-				_mData.width  * 1 / 4,
-				_mData.height * 1 / 4 + ActivityBarWidth * 4,
-				_mData.width  * 2 / 4,
-				_mData.height * 2 / 4
-			)
-		);
 	}
 
 	void UI::setStyle() {
