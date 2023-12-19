@@ -28,7 +28,7 @@ namespace Engine {
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
-			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const override = 0;
+			virtual void draw(const Core::Shader &shader) const override = 0;
 
 			virtual void updateShader(const Core::Shader &shader) const override = 0;
 

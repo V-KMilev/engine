@@ -19,13 +19,10 @@ namespace Engine {
 		orientationTransform->scale    = glm::vec3(0.07f, 0.07f, 0.07f);
 	}
 
-	void Orientation::draw(
-		const Core::Renderer& renderer,
-		const Core::Shader& shader
-	) const {
+	void Orientation::draw(const Core::Shader& shader) const {
 		shader.bind();
 
-		_mOrientation->draw(renderer, shader);
+		_mOrientation->draw(shader);
 	}
 
 	void Orientation::onUpdate(const Mouse* mouse, float deltaTime) {

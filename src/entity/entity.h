@@ -8,7 +8,6 @@
 #include "json.hpp"
 
 namespace Core {
-	class Renderer;
 	class Shader;
 }
 
@@ -50,7 +49,7 @@ namespace Engine {
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
-			virtual void draw(const Core::Renderer &renderer, const Core::Shader &shader) const = 0;
+			virtual void draw(const Core::Shader &shader) const = 0;
 
 			virtual void updateShader(const Core::Shader &shader) const = 0;
 

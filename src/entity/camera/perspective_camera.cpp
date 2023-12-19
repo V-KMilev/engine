@@ -44,10 +44,10 @@ namespace Engine {
 		updateLookAt();
 	}
 
-	void PerspectiveCamera::draw(const Core::Renderer& renderer, const Core::Shader& shader) const {
+	void PerspectiveCamera::draw(const Core::Shader& shader) const {
 		shader.bind();
 
-		_mVisual->draw(renderer, shader);
+		_mVisual->draw(shader);
 	}
 
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {

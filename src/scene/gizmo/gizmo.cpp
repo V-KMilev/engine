@@ -35,9 +35,9 @@ namespace Engine {
 		return _mInteractionState;
 	}
 
-	void Gizmo::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
+	void Gizmo::draw(const Core::Shader &shader) const {
 		// TODO: Fix depth render index, so it goes above the selected object
-		_mCube->draw(renderer, shader);
+		_mCube->draw(shader);
 	}
 
 	void Gizmo::onUpdate(const Mouse* mouse, float deltaTime, const Object& object) {

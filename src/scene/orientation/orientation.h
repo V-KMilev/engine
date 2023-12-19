@@ -24,7 +24,7 @@ namespace Engine {
 			Orientation(Orientation && other) = delete;
 			Orientation& operator = (Orientation && other) = delete;
 
-			void draw(const Core::Renderer &renderer, const Core::Shader &shader) const;
+			void draw(const Core::Shader &shader) const;
 
 			void onUpdate(const Mouse* mouse, float deltaTime);
 

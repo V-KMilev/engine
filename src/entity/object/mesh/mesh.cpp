@@ -86,7 +86,7 @@ namespace Engine {
 		}
 	}
 
-	void Mesh::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
+	void Mesh::draw(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Draw");
 
 		updateShader(shader);

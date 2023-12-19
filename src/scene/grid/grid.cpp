@@ -14,10 +14,10 @@ namespace Engine {
 		_mGrid = std::make_shared<Quad>();
 	}
 
-	void Grid::draw(const Core::Renderer& renderer, const Core::Shader& shader) const {
+	void Grid::draw(const Core::Shader& shader) const {
 		shader.bind();
 
-		_mGrid->draw(renderer, shader);
+		_mGrid->draw(shader);
 	}
 
 	void Grid::onUpdate(const Mouse* mouse, float deltaTime) {

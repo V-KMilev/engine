@@ -53,7 +53,7 @@ namespace Engine {
 		}
 	}
 
-	void Object::draw(const Core::Renderer &renderer, const Core::Shader &shader) const {
+	void Object::draw(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Object", "Object Draw");
 
 		updateShader(shader);
@@ -65,7 +65,7 @@ namespace Engine {
 		}
 
 		for (const std::shared_ptr<Mesh>& mesh : _mMeshes) {
-			mesh->draw(renderer, shader);
+			mesh->draw(shader);
 		}
 
 		MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
