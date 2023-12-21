@@ -8,7 +8,6 @@ namespace Engine {
 	const Mouse& InputManager::getMouse() const {
 		return _mMouse;
 	}
-
 	Mouse& InputManager::getMouse() {
 		return _mMouse;
 	}
@@ -25,7 +24,6 @@ namespace Engine {
 		else {
 			LOG("Mapped Key/State: '%d' & '%s' to '%s'", LOG_LEVEL::L_INFO, inputKey.key, stateToString(inputKey.state).c_str(), event_hint.c_str());
 		}
-
 
 		// Store the provided event in the map based on key and state.
 		_mMapOfEvents[{inputKey}] = event;
@@ -59,8 +57,18 @@ namespace Engine {
 	void InputManager::processKey(GLFWwindow* window, int key, KeyType type) const {
 		State state = getState(window, key, type);
 
+		static std::unordered_map<int, State> keyboardStateMap;
+		static std::unordered_map<int, State> mouseStateMap;
+
+		if (type == KeyType::KEYBOARD) {
+			keyboardStateMap[key] = state;
+		}
+		else if (type == KeyType::MOUSE) {
+			mouseStateMap[key] = state;
+		}
+
 		// Process individual keys
-		InputKey individualKey{ key, state };
+		InputKey individualKey{key, state, type};
 
 		// Check for key combinations
 		for (const auto& [combination, event] : _mMapOfEvents) {
@@ -73,7 +81,20 @@ namespace Engine {
 			bool allKeysAreReady = true;
 
 			for (const auto& keyInCombination : combination.keys) {
-				if (getState(window, keyInCombination.key, type) != keyInCombination.state) {
+				// Use the appropriate state map based on the type
+				const auto& stateMap = (keyInCombination.type == KeyType::KEYBOARD) ? keyboardStateMap : mouseStateMap;
+
+				auto it = stateMap.find(keyInCombination.key);
+
+				// Check if the key is found before accessing the state
+				if (it != stateMap.end()) {
+					State storedState = it->second;
+
+					if (storedState != keyInCombination.state) {
+						allKeysAreReady = false;
+						break;
+					}
+				} else {
 					allKeysAreReady = false;
 					break;
 				}
@@ -93,14 +114,12 @@ namespace Engine {
 		_mMouse.y = y;
 	}
 
-	// TODO: Think of way to process inputs parallel
-
 	void InputManager::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		// You can retrieve the user pointer to get the InputManager instance
 		InputManager* inputManager = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
 
 		if (inputManager) {
-			inputManager->processKey(window, key, KeyType::KEYBORD);
+			inputManager->processKey(window, key, KeyType::KEYBOARD);
 		}
 	}
 

@@ -5,7 +5,7 @@
 
 namespace Engine{
 	State getState(GLFWwindow *window, int key, KeyType type) {
-		if (type == KeyType::KEYBORD) {
+		if (type == KeyType::KEYBOARD) {
 			if (glfwGetKey(window, key) == GLFW_PRESS) {
 				return State::PRESS;
 			}
@@ -37,7 +37,27 @@ namespace Engine{
 		}
 	}
 
+	InputKey::InputKey() {
+		setType();
+	}
+
+	InputKey::InputKey(int key, State state) : key(key), state(state) {
+		setType();
+	}
+
+	InputKey::InputKey(int key, State state, KeyType type) : key(key), state(state), type(type) {}
+
 	bool InputKey::operator == (const InputKey& other) const {
-		return key == other.key && state == other.state;
+		return key == other.key && state == other.state && type == other.type;
+	}
+
+	void InputKey::setType() {
+		if (key >= GLFW_KEY_SPACE && key <= GLFW_KEY_LAST) {
+			type = KeyType::KEYBOARD;
+		} else if (key >= GLFW_MOUSE_BUTTON_1 && key <= GLFW_MOUSE_BUTTON_LAST) {
+			type = KeyType::MOUSE;
+		} else {
+			type = KeyType::NONE;
+		}
 	}
 };

@@ -8,9 +8,9 @@
 
 namespace Engine {
 	enum class KeyType {
-		NONE    = 0,
-		KEYBORD = 1,
-		MOUSE   = 2
+		NONE     = 0,
+		KEYBOARD = 1,
+		MOUSE    = 2
 	};
 
 	enum class State {
@@ -26,11 +26,19 @@ namespace Engine {
 
 	class InputKey {
 		public:
+			InputKey();
+			InputKey(int key, State state);
+			InputKey(int key, State state, KeyType type);
+
 			bool operator == (const InputKey& other) const;
+
+		private:
+			void setType();
 
 		public:
 			int key;
 			State state;
+			KeyType type;
 	};
 };
 
@@ -41,7 +49,7 @@ namespace std {
 	struct hash<Engine::InputKey> {
 
 		std::size_t operator () (const Engine::InputKey& k) const {
-			return std::hash<int>()(k.key) ^ std::hash<Engine::State>()(k.state);
+			return std::hash<int>()(k.key) ^ std::hash<Engine::State>()(k.state) ^ std::hash<Engine::KeyType>()(k.type);
 		}
 	};
 }

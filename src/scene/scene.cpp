@@ -142,7 +142,6 @@ namespace Engine {
 
 		if (_mSelectState == SelectState::SELECT) {
 			pickEntity();
-			_mSelectState = SelectState::IDLE;
 		}
 		else if (_mSelectState == SelectState::MOVE) {
 			moveEntity();
@@ -411,9 +410,9 @@ namespace Engine {
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_G, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
 
 		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECT; } ), "Select ability");
+		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::RELEASE}, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Select ability Stop]");
 
-		// TODO: Make keyboard and Mouse work together
-		// _mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::PRESS} } }, std::function<void()>( [this] { _mSelectState = SelectState::MOVING; } ), "Move ability");
-		// _mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::RELEASE} } }, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Move ability");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::PRESS} } }, std::function<void()>( [this] { _mSelectState = SelectState::MOVE; } ), "Move ability");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::RELEASE} } }, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Move ability Stop]");
 	}
 };

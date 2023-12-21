@@ -8,7 +8,7 @@ namespace Engine {
 
 	enum class EventType {
 		NONE     = 0,
-		KEYBORD  = 1,
+		KEYBOARD  = 1,
 		MOUSE    = 2,
 		GEOMETRY = 3,
 		CAMERA   = 4,
