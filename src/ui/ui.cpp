@@ -14,9 +14,10 @@
 #include "object.h"
 #include "mesh.h"
 
-#include "cube.h"
-#include "quad.h"
 #include "triangle.h"
+#include "quad.h"
+#include "cube.h"
+#include "sphere.h"
 #include "model.h"
 
 #include "utils.h"
@@ -141,9 +142,10 @@ namespace Engine {
 					}
 
 					if (ImGui::BeginMenu("Objects")) {
-						ImGui::MenuItem("Cube", nullptr, &_mCallAddCube);
-						ImGui::MenuItem("Quad", nullptr, &_mCallAddQuad);
 						ImGui::MenuItem("Triangle", nullptr, &_mCallAddTriangle);
+						ImGui::MenuItem("Quad", nullptr, &_mCallAddQuad);
+						ImGui::MenuItem("Cube", nullptr, &_mCallAddCube);
+						ImGui::MenuItem("Sphere", nullptr, &_mCallAddSphere);
 						ImGui::MenuItem("Model", nullptr, &_mCallAddModel);
 						ImGui::EndMenu();
 					}
@@ -378,17 +380,21 @@ namespace Engine {
 			_mScene.addCamera(std::make_shared<PerspectiveCamera>(_mData.width, _mData.height));
 			_mCallAddPerspective = false;
 		}
-		if (_mCallAddCube) {
-			_mScene.addObject(std::make_shared<Cube>());
-			_mCallAddCube = false;
+		if (_mCallAddTriangle) {
+			_mScene.addObject(std::make_shared<Triangle>());
+			_mCallAddTriangle = false;
 		}
 		if (_mCallAddQuad) {
 			_mScene.addObject(std::make_shared<Quad>());
 			_mCallAddQuad = false;
 		}
-		if (_mCallAddTriangle) {
-			_mScene.addObject(std::make_shared<Triangle>());
-			_mCallAddTriangle = false;
+		if (_mCallAddCube) {
+			_mScene.addObject(std::make_shared<Cube>());
+			_mCallAddCube = false;
+		}
+		if (_mCallAddSphere) {
+			_mScene.addObject(std::make_shared<Sphere>());
+			_mCallAddSphere = false;
 		}
 		if (_mCallAddModel) {
 			ImGui::OpenPopup("Add Model");

@@ -406,8 +406,8 @@ namespace Engine {
 
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_U, State::PRESS} } }, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_F, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_G, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Z, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
 
 		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECT; } ), "Select ability");
 		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::RELEASE}, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Select ability Stop]");

@@ -99,9 +99,10 @@ namespace Engine {
 
 			bool _mCallAddPerspective = false;
 
-			bool _mCallAddCube     = false;
-			bool _mCallAddQuad     = false;
 			bool _mCallAddTriangle = false;
+			bool _mCallAddQuad     = false;
+			bool _mCallAddCube     = false;
+			bool _mCallAddSphere   = false;
 			bool _mCallAddModel    = false;
 
 			bool _mCallRemove = false;

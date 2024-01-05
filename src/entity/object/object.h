@@ -39,11 +39,13 @@ namespace Engine {
 
 namespace Engine {
 	enum class ObjectType {
-		NONE      = 0,
-		TRIANGLE  = 1,
-		QUAD      = 2,
-		MODEL     = 3,
-		MESH      = 4
+		NONE     = 0,
+		TRIANGLE = 1,
+		QUAD     = 2,
+		CUBE     = 3,
+		SPHERE   = 4,
+		MODEL    = 5,
+		MESH     = 6
 	};
 
 	class Object : public Entity {
