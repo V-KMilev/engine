@@ -15,7 +15,6 @@ struct Camera {
 	float far;
 };
 
-
 uniform Camera uCamera;
 uniform mat4 uModel;
 
@@ -27,9 +26,24 @@ out VS_OUT {
 	vec3 normal;
 } vs_out;
 
+mat4 fixedFovProjection(mat4 projection, float fov, float width, float height) {
+	mat4 viewProjection = projection;
+
+	float aspect = width / height;
+
+	float tanHalfFov = tan(radians(fov / 2.0));
+
+	viewProjection[0][0] = 1.0 / (aspect * tanHalfFov);
+	viewProjection[1][1] = 1.0 / (tanHalfFov);
+
+	return viewProjection;
+}
+
 void main() {
+	mat4 projection = fixedFovProjection(uCamera.projection, 45.0, uCamera.width, uCamera.height);
+
 	vec4 local_position  = vec4(position, 1.0);
-	vec4 position = uModel * mat4(mat3(uCamera.projection * uCamera.view)) * local_position;
+	vec4 position = uModel * mat4(mat3(projection * uCamera.view)) * local_position;
 
 	vs_out.local_position  = local_position;
 	vs_out.position = position;
