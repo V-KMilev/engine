@@ -20,8 +20,10 @@ using json = nlohmann::json;
 namespace Engine {
 	enum class EntityType {
 		NONE   = 0,
-		OBJECT = 1,
-		CAMERA = 2
+		MESH   = 1,
+		OBJECT = 2,
+		CAMERA = 3,
+		LIGHT  = 4
 	};
 
 	class Entity {
@@ -49,11 +51,10 @@ namespace Engine {
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
+			virtual void drawUI() = 0;
 			virtual void draw(const Core::Shader &shader) const = 0;
 
 			virtual void updateShader(const Core::Shader &shader) const = 0;
-
-			virtual void UIWorld() = 0;
 
 		protected:
 			EntityID _mID;

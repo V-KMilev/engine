@@ -19,6 +19,10 @@ namespace Core {
 }
 
 namespace Engine {
+	class Material;
+}
+
+namespace Engine {
 	class Model : public Object {
 		public:
 			Model(const std::string& path);
@@ -37,12 +41,7 @@ namespace Engine {
 				const std::vector<tinyobj::material_t>* materials
 			);
 
-			void load_materials(const std::vector<tinyobj::material_t>* materials);
-
-			void push_mesh(
-				const std::vector<Utils::Vertex>& vertices,
-				const std::vector<unsigned int>& indices
-			);
+			std::shared_ptr<Material> load_material(const std::vector<tinyobj::material_t>* materials);
 
 		private:
 			std::string _mPath;

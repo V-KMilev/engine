@@ -25,14 +25,6 @@ namespace Engine {
 			2, 1, 3
 		};
 
-		// Default texture
-		std::string defaultPath = "../asset/textures/default/texture.png";
-
-		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures()->textures) {
-			texture = std::make_shared<Core::Texture>(defaultPath);
-		}
-
-		// Now, you can pass these vectors to your functions
-		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, _mMaterial));
+		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices));
 	}
 };

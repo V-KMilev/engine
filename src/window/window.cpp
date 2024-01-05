@@ -18,6 +18,7 @@
 #include "model.h"
 #include "cube.h"
 #include "quad.h"
+#include "sphere.h"
 
 #include "gl_error_handle.h"
 #include "gl_shader.h"
@@ -150,7 +151,7 @@ namespace Engine {
 		);
 
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
-		_mScene->addObject(std::make_shared<Cube>());
+		_mScene->addObject(std::make_shared<Sphere>());
 
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\gizmo"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));

@@ -10,9 +10,6 @@
 #include "entity.h"
 
 namespace Engine {
-	class Material;
-
-	class Entity;
 	class Mesh;
 }
 
@@ -44,8 +41,7 @@ namespace Engine {
 		QUAD     = 2,
 		CUBE     = 3,
 		SPHERE   = 4,
-		MODEL    = 5,
-		MESH     = 6
+		MODEL    = 5
 	};
 
 	class Object : public Entity {
@@ -64,19 +60,16 @@ namespace Engine {
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
+			void drawUI() override;
 			void draw(const Core::Shader &shader) const override;
 
 			void updateShader(const Core::Shader &shader) const override;
-
-			void UIWorld() override;
 
 		protected:
 			void updateModel();
 
 		protected:
 			ObjectType _mObjectType;
-
-			std::shared_ptr<Material> _mMaterial;
 
 			std::vector<std::shared_ptr<Mesh>> _mMeshes;
 	};

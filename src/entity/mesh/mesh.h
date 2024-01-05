@@ -7,7 +7,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "object.h"
+#include "entity.h"
 
 #include "utils.h"
 
@@ -18,6 +18,10 @@ namespace Core {
 	class VertexBuffer;
 	class IndexBuffer;
 	class VertexBufferLayout;
+}
+
+namespace Engine {
+	class Material;
 }
 
 // To avoid including the full glad implementation, we redefine GL_TRIANGLES
@@ -42,28 +46,34 @@ namespace Core {
 #define QuadIndicesSize     QuadIndices
 
 namespace Engine {
-	class Mesh : public Object {
+	class Mesh : public Entity {
 		public:
 			Mesh(
 				const std::vector<Utils::Vertex>& vertices,
 				const std::vector<unsigned int>& indices,
-				std::shared_ptr<Material> material
+				std::shared_ptr<Material> && material
 			);
 
-			void load_mesh() override;
+			Mesh(
+				const std::vector<Utils::Vertex>& vertices,
+				const std::vector<unsigned int>& indices
+			);
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
+			void drawUI() override;
 			void draw(const Core::Shader &shader) const override;
 
 			void updateShader(const Core::Shader &shader) const override;
 
-			void UIWorld() override;
 			void UIMaterialTextures();
 			void UIMaterialCoefficients();
 
 		public:
 			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
+
+		private:
+			void init();
 
 		private:
 			std::shared_ptr<Core::VertexArray>        _mVA;
@@ -74,5 +84,7 @@ namespace Engine {
 		private:
 			std::vector<Utils::Vertex>* _mVertices;
 			std::vector<unsigned int>* _mIndices;
+
+			std::shared_ptr<Material> _mMaterial;
 	};
 };

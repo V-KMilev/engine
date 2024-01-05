@@ -104,21 +104,19 @@ namespace Engine {
 				index_offset += fv;
 			}
 
-			load_materials(materials);
+			std::shared_ptr<Material> material = load_material(materials);
 
-			push_mesh(vertices, indices);
+			_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, std::move(material)));
 		}
 	}
 
-	void Model::load_materials(const std::vector<tinyobj::material_t>* materials) {
-		// Default texture
-		std::string defaultPath = "../asset/textures/default/texture.png";
-		std::string rootPath    = _mPath.substr(0, _mPath.find_last_of('/'));
+	std::shared_ptr<Material> Model::load_material(const std::vector<tinyobj::material_t>* materials) {
+		std::shared_ptr<Material> material;
 
-		std::vector<std::string> texturePaths(13, "");
+		std::string rootPath = _mPath.substr(0, _mPath.find_last_of('/'));
 
-		auto& my_material = _mMaterial->getCoefficients();
-		auto& my_textures = _mMaterial->getTextures();
+		auto& my_material = material->getCoefficients();
+		auto& my_textures = material->getTextures();
 
 		// Load the material data
 		for (const tinyobj::material_t& material : materials[0]) {
@@ -155,20 +153,9 @@ namespace Engine {
 				if (texnames[idx] != "") {
 					my_textures->textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
 				}
-				else {
-					my_textures->textures[idx] = std::make_shared<Core::Texture>(defaultPath);
-				}
 			}
 		}
-	}
 
-	void Model::push_mesh(
-		const std::vector<Utils::Vertex>& vertices,
-		const std::vector<unsigned int>& indices
-	) {
-		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, _mMaterial));
-
-		// Reset materials
-		_mMaterial = std::make_shared<Material>();
+		return material;
 	}
 };

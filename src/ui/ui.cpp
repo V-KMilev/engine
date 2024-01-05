@@ -228,7 +228,7 @@ namespace Engine {
 
 		for (auto& entity : entitys) {
 			if (entity->getInteractionState()->isSelected) {
-				entity->UIWorld();
+				entity->drawUI();
 			}
 		}
 
@@ -262,7 +262,7 @@ namespace Engine {
 
 				for(auto& mesh : object->getMeshes()) {
 					if (mesh->getInteractionState()->isSelected) {
-						mesh->UIWorld();
+						mesh->drawUI();
 					}
 				}
 			}

@@ -44,6 +44,18 @@ namespace Engine {
 		updateLookAt();
 	}
 
+	void PerspectiveCamera::drawUI() {
+		std::string sCamera = "Camera: #" + std::to_string(_mID.getID());
+
+		ImGui::SeparatorText(sCamera.c_str());
+
+		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
+
+		ImGui::SeparatorText("Transform");
+
+		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
+	}
+
 	void PerspectiveCamera::draw(const Core::Shader& shader) const {
 		shader.bind();
 
@@ -134,17 +146,5 @@ namespace Engine {
 		else if (transform->fov < transform->minFOV) {
 			transform->fov = transform->minFOV;
 		}
-	}
-
-	void PerspectiveCamera::UIWorld() {
-		std::string sCamera = "Camera: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sCamera.c_str());
-
-		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
-
-		ImGui::SeparatorText("Transform");
-
-		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 	}
 };

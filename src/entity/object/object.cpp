@@ -12,8 +12,6 @@
 
 namespace Engine {
 	Object::Object(ObjectType type) : _mObjectType(type), Entity(EntityType::OBJECT) {
-		_mMaterial = std::make_shared<Material>();
-
 		_mTransform        = std::make_shared<ObjectTransform>();
 		_mInteractionState = std::make_shared<ObjectInteractionState>();
 
@@ -51,6 +49,15 @@ namespace Engine {
 
 			PROFILER_END("Object", "Object Update");
 		}
+	}
+
+	void Object::drawUI() {
+		std::string sObject = "Object: #" + std::to_string(_mID.getID());
+
+		ImGui::SeparatorText(sObject.c_str());
+
+		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
+		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 	}
 
 	void Object::draw(const Core::Shader &shader) const {
@@ -100,14 +107,5 @@ namespace Engine {
 		transform->model = glm::scale(transform->model, transform->scale);
 
 		PROFILER_END("Object", "Object Update Model");
-	}
-
-	void Object::UIWorld() {
-		std::string sObject = "Object: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sObject.c_str());
-
-		if (_mInteractionState->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
-		if (_mTransform->drawUI(_mID.getID())) { _mInteractionState->hasUpdate = true; }
 	}
 };

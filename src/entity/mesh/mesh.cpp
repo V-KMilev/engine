@@ -23,17 +23,30 @@ namespace Engine {
 	Mesh::Mesh(
 		const std::vector<Utils::Vertex>& vertices,
 		const std::vector<unsigned int>& indices,
-		std::shared_ptr<Material> material
-	) : Object(ObjectType::MESH),
+		std::shared_ptr<Material> && material
+	) : Entity(EntityType::MESH),
 		_mVertices(new std::vector<Utils::Vertex>(vertices)),
-		_mIndices(new std::vector<unsigned int>(indices))
+		_mIndices(new std::vector<unsigned int>(indices)),
+		_mMaterial(std::move(material))
 	{
-		// TODO: Check if this is correct
-		_mMaterial = material;
-		load_mesh();
+		init();
 	}
 
-	void Mesh::load_mesh() {
+	Mesh::Mesh(
+		const std::vector<Utils::Vertex>& vertices,
+		const std::vector<unsigned int>& indices
+	) : Entity(EntityType::MESH),
+		_mVertices(new std::vector<Utils::Vertex>(vertices)),
+		_mIndices(new std::vector<unsigned int>(indices)),
+		_mMaterial(std::make_shared<Material>())
+	{
+		init();
+	}
+
+	void Mesh::init() {
+		_mTransform        = std::make_shared<ObjectTransform>();
+		_mInteractionState = std::make_shared<ObjectInteractionState>();
+
 		PROFILER_BEGIN("Mesh", "Mesh Load");
 
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
@@ -86,6 +99,23 @@ namespace Engine {
 		}
 	}
 
+	void Mesh::drawUI() {
+		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
+
+		ImGui::SeparatorText(sMesh.c_str());
+
+		_mInteractionState->drawUI(_mID.getID());
+		_mTransform->drawUI(_mID.getID());
+	}
+
+	void Mesh::UIMaterialTextures() {
+		_mMaterial->UITextures(_mID.getID());
+	}
+
+	void Mesh::UIMaterialCoefficients() {
+		_mMaterial->UICoefficients(_mID.getID());
+	}
+
 	void Mesh::draw(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Draw");
 
@@ -131,22 +161,5 @@ namespace Engine {
 		transform->model *= objectModel;
 
 		PROFILER_END("Mesh", "Mesh Update Model");
-	}
-
-	void Mesh::UIWorld() {
-		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sMesh.c_str());
-
-		_mInteractionState->drawUI(_mID.getID());
-		_mTransform->drawUI(_mID.getID());
-	}
-
-	void Mesh::UIMaterialTextures() {
-		_mMaterial->UITextures(_mID.getID());
-	}
-
-	void Mesh::UIMaterialCoefficients() {
-		_mMaterial->UICoefficients(_mID.getID());
 	}
 };

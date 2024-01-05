@@ -15,6 +15,13 @@ namespace Engine {
 	Material::Material() {
 		_mTextures     = std::make_shared<Textures>();
 		_mCoefficients = std::make_shared<Coefficients>();
+
+		// Default texture
+		std::string defaultPath = "../asset/textures/default/texture.png";
+
+		for (std::shared_ptr<Core::Texture>& texture : _mTextures->textures) {
+			texture = std::make_shared<Core::Texture>(defaultPath);
+		}
 	}
 
 	const std::shared_ptr<Textures>& Material::getTextures() const {
