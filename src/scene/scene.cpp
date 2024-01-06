@@ -90,7 +90,7 @@ namespace Engine {
 		for (const std::shared_ptr<Core::Shader>& shader : _mShaders) {
 			// Update the shader with the active camera's data
 			for (const std::shared_ptr<Camera>& camera : _mCameras) {
-				if (camera->getComponent<Activatable>()->isActive) {
+				if (camera->getComponent<Activatable>()->isActive()) {
 					camera->updateShader(*shader);
 				}
 			}
@@ -184,8 +184,7 @@ namespace Engine {
 		if (_mCameras.size() == 0) {
 			auto active = camera->getComponent<Activatable>();
 
-			active->on_isActive = true;
-			active->setHasUpdate(true);
+			active->setIsActive(true);
 		}
 
 		_mEntitys.push_back(camera);
@@ -296,7 +295,7 @@ namespace Engine {
 		PROFILER_BEGIN("Cameras", "Cameras Draw");
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (!camera->getComponent<Activatable>()->isActive) {
+			if (!camera->getComponent<Activatable>()->isActive()) {
 				camera->draw(*shader);
 			}
 		}
@@ -341,12 +340,12 @@ namespace Engine {
 		float fov            = 0.0f;
 
 		for (const std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getComponent<Activatable>()->isActive) {
+			if (camera->getComponent<Activatable>()->isActive()) {
 				auto cameraView = camera->getComponent<PerspectiveView>();
 
-				projection = cameraView->projection;
-				view       = cameraView->lookAt;
-				fov        = cameraView->fov;
+				projection = cameraView->getProjection();
+				view       = cameraView->getLookAt();
+				fov        = cameraView->getFov();
 			}
 		}
 
@@ -354,7 +353,7 @@ namespace Engine {
 			if (object->isSelected()) {
 				auto transform = object->getComponent<Transform>();
 
-				glm::vec3 position = transform->position;
+				glm::vec3 position = transform->getPosition();
 
 				float x = (float)_mInputManager->getMouse().x;
 				float y = (float)_mSceneWindow.mainWindowHeight - _mInputManager->getMouse().y - 1;
@@ -383,7 +382,7 @@ namespace Engine {
 				// TODO: Find a fix for that, i'm pretty sure its a bug
 				glm::vec4 view_space_intersect = glm::vec4(glm::vec3(rayView) * -viewPosition.z, 1.0f);
 
-				transform->position = glm::inverse(view) * view_space_intersect;
+				transform->setPosition(glm::inverse(view) * view_space_intersect);
 				object->setHasUpdate(true);
 			}
 		}
@@ -391,7 +390,7 @@ namespace Engine {
 
 	void Scene::updateCameras(UpdateEvent event, PositionEvent pEvent) {
 		for (std::shared_ptr<Camera>& camera : _mCameras) {
-			if (camera->getComponent<Activatable>()->isActive) {
+			if (camera->getComponent<Activatable>()->isActive()) {
 				camera->setHasUpdate(true);
 
 				camera->setUpdateEvent(event);

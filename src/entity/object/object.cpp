@@ -46,11 +46,9 @@ namespace Engine {
 				auto meshTransform = mesh->getComponent<Transform>();
 
 				// TODO: Add mesh's transform also
-				meshTransform->on_position = transform->position;
-				meshTransform->on_rotation = transform->rotation;
-				meshTransform->on_scale    = transform->scale;
-
-				meshTransform->setHasUpdate(true);
+				meshTransform->setPosition(transform->getPosition());
+				meshTransform->setRotation(transform->getRotation());
+				meshTransform->setScale(transform->getScale());
 
 				mesh->onUpdate(mouse, deltaTime);
 			}
@@ -81,7 +79,7 @@ namespace Engine {
 
 		auto linesOnly = getComponent<LinesOnly>();
 
-		if (linesOnly->linesOnly) {
+		if (linesOnly->isLinesOnly()) {
 			MY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
 		}
 

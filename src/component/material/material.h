@@ -98,6 +98,35 @@ namespace Engine {
 			Material(Material && other) = delete;
 			Material& operator = (Material && other) = delete;
 
+			const std::vector<std::shared_ptr<Core::Texture>>& getTextures() const;
+			std::vector<std::shared_ptr<Core::Texture>>& getTextures();
+
+			const glm::vec3& getAmbient() const;
+			const glm::vec3& getDiffuse() const;
+			const glm::vec3& getSpecular() const;
+			const glm::vec3& getTransmittance() const;
+			const glm::vec3& getEmission() const;
+
+			float getShininess() const;
+			float getIor() const;
+
+			float getRoughness() const;
+			float getMetallic() const;
+			float getSheen() const;
+
+			void setAmbient(const glm::vec3& value, bool updateInstant = false);
+			void setDiffuse(const glm::vec3& value, bool updateInstant = false);
+			void setSpecular(const glm::vec3& value, bool updateInstant = false);
+			void setTransmittance(const glm::vec3& value, bool updateInstant = false);
+			void setEmission(const glm::vec3& value, bool updateInstant = false);
+
+			void setShininess(float value, bool updateInstant = false);
+			void setIor(float value, bool updateInstant = false);
+
+			void setRoughness(float value, bool updateInstant = false);
+			void setMetallic(float value, bool updateInstant = false);
+			void setSheen(float value, bool updateInstant = false);
+
 			json toJson() const override;
 
 			void onUpdate() override;
@@ -106,11 +135,10 @@ namespace Engine {
 
 			void updateShader(const Core::Shader &shader) const;
 
-		public:
+		private:
 			std::shared_ptr<Textures> textures;
 			std::shared_ptr<Coefficients> coefficients;
 
-		public:
 			mutable std::shared_ptr<Textures> on_textures;
 			mutable std::shared_ptr<Coefficients> on_coefficients;
 	};

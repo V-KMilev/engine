@@ -52,7 +52,7 @@ namespace Engine {
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
 
 		PROFILER_BEGIN("Mesh", "Mesh Texture init");
-		for (std::shared_ptr<Core::Texture>& texture : material->textures->textures) {
+		for (std::shared_ptr<Core::Texture>& texture : material->getTextures()) {
 			texture->init();
 		}
 		PROFILER_END("Mesh", "Mesh Texture init");
@@ -139,7 +139,7 @@ namespace Engine {
 
 		material->updateShader(shader);
 
-		shader.setUniformMatrix4fv("uModel", transform->model);
+		shader.setUniformMatrix4fv("uModel", transform->getModel());
 
 		PROFILER_END("Mesh", "Mesh Shader Update");
 	}

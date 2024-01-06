@@ -317,7 +317,7 @@ namespace Engine {
 		auto& cameras = _mScene.getCameras();
 
 		for (std::shared_ptr<Camera>& camera : cameras) {
-			if (camera->getComponent<Activatable>()->isActive) {
+			if (camera->getComponent<Activatable>()->isActive()) {
 				ImGui::BulletText("Camera");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());

@@ -27,6 +27,61 @@ namespace Engine {
 		}
 	}
 
+	const std::vector<std::shared_ptr<Core::Texture>>& Material::getTextures() const { return textures->textures; }
+	std::vector<std::shared_ptr<Core::Texture>>& Material::getTextures() { return textures->textures; }
+
+	const glm::vec3& Material::getAmbient() const       { return coefficients->ambient; }
+	const glm::vec3& Material::getDiffuse() const       { return coefficients->diffuse; }
+	const glm::vec3& Material::getSpecular() const      { return coefficients->specular; }
+	const glm::vec3& Material::getTransmittance() const { return coefficients->transmittance; }
+	const glm::vec3& Material::getEmission() const      { return coefficients->emission; }
+
+	float Material::getShininess() const { return coefficients->shininess; }
+	float Material::getIor() const       { return coefficients->ior; }
+	float Material::getRoughness() const { return coefficients->roughness; }
+	float Material::getMetallic() const  { return coefficients->metallic; }
+	float Material::getSheen() const     { return coefficients->sheen; }
+
+	void Material::setAmbient(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(coefficients->ambient, on_coefficients->ambient, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setDiffuse(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(coefficients->diffuse, on_coefficients->diffuse, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setSpecular(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(coefficients->specular, on_coefficients->specular, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setTransmittance(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(coefficients->transmittance, on_coefficients->transmittance, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setEmission(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(coefficients->emission, on_coefficients->emission, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setShininess(float value, bool updateInstant) {
+		setValue<float>(coefficients->shininess, on_coefficients->shininess, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setIor(float value, bool updateInstant) {
+		setValue<float>(coefficients->ior, on_coefficients->ior, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setRoughness(float value, bool updateInstant) {
+		setValue<float>(coefficients->roughness, on_coefficients->roughness, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setMetallic(float value, bool updateInstant) {
+		setValue<float>(coefficients->metallic, on_coefficients->metallic, _mHasUpdate, value, updateInstant);
+	}
+
+	void Material::setSheen(float value, bool updateInstant) {
+		setValue<float>(coefficients->sheen, on_coefficients->sheen, _mHasUpdate, value, updateInstant);
+	}
+
 	json Material::toJson() const {
 		json componentJson;
 

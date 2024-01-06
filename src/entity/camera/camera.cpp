@@ -22,10 +22,8 @@ namespace Engine {
 
 		auto visualTransform = _mVisual->getComponent<Transform>();
 
-		visualTransform->on_position = view->position;
-		visualTransform->on_scale    = glm::vec3(0.25f, 0.25f, 0.25f);
-
-		visualTransform->setHasUpdate(true);
+		visualTransform->setPosition(view->getPosition());
+		visualTransform->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
 
 		_mHasUpdate = true;
 	}
@@ -86,20 +84,17 @@ namespace Engine {
 		glm::vec3 moveDirection(0.0f);
 
 		switch (_mPositionEvent) {
-			case PositionEvent::POSX: moveDirection = view->front;  break;
-			case PositionEvent::NEGX: moveDirection = -view->front; break;
-			case PositionEvent::POSY: moveDirection = view->up;     break;
-			case PositionEvent::NEGY: moveDirection = -view->up;    break;
-			case PositionEvent::POSZ: moveDirection = view->right;  break;
-			case PositionEvent::NEGZ: moveDirection = -view->right; break;
+			case PositionEvent::POSX: moveDirection = view->getFront();  break;
+			case PositionEvent::NEGX: moveDirection = -view->getFront(); break;
+			case PositionEvent::POSY: moveDirection = view->getUp();     break;
+			case PositionEvent::NEGY: moveDirection = -view->getUp();    break;
+			case PositionEvent::POSZ: moveDirection = view->getRight();  break;
+			case PositionEvent::NEGZ: moveDirection = -view->getRight(); break;
 			default: moveDirection = glm::vec3(0.0f); break;
 		}
 
-		view->on_position += deltaTime * view->moveSpeed * moveDirection;
-		visualTransform->on_position = view->on_position;
-
-		view->setHasUpdate(true);
-		visualTransform->setHasUpdate(true);
+		view->setPosition(view->getPosition() + deltaTime * view->getMoveSpeed() * moveDirection);
+		visualTransform->setPosition(view->getPosition());
 
 		// Reset
 		_mPositionEvent = PositionEvent::NONE;

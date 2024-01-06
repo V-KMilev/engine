@@ -52,6 +52,23 @@ namespace Engine {
 
 	Transform::Transform() : Component(ComponentType::TRANSFORM) {}
 
+	const glm::vec3& Transform::getPosition() const { return position; }
+	const glm::vec3& Transform::getRotation() const { return rotation; }
+	const glm::vec3& Transform::getScale() const { return scale; }
+	const glm::mat4& Transform::getModel() const { return model; }
+
+	void Transform::setPosition(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(position, on_position, _mHasUpdate, value, updateInstant);
+	}
+
+	void Transform::setRotation(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(rotation, on_rotation, _mHasUpdate, value, updateInstant);
+	}
+
+	void Transform::setScale(const glm::vec3& value, bool updateInstant) {
+		setValue<glm::vec3>(scale, on_scale, _mHasUpdate, value, updateInstant);
+	}
+
 	json Transform::toJson() const {
 		json componentJson;
 
@@ -104,19 +121,25 @@ namespace Engine {
 
 	Activatable::Activatable() : Component(ComponentType::ACTIVATABLE) {}
 
+	bool Activatable::isActive() const { return active; }
+
+	void Activatable::setIsActive(bool value, bool updateInstant) {
+		setValue<bool>(active, on_active, _mHasUpdate, value, updateInstant);
+	}
+
 	json Activatable::toJson() const {
 		json componentJson;
 
 		componentJson = Component::toJson();
 
-		componentJson["isActive"] = isActive;
+		componentJson["active"] = active;
 
 		return componentJson;
 	}
 
 	void Activatable::onUpdate() {
 		if (_mHasUpdate) {
-			isActive = on_isActive;
+			active = on_active;
 
 			// Reset
 			_mHasUpdate = false;
@@ -124,14 +147,20 @@ namespace Engine {
 	}
 
 	void Activatable::drawUI() const {
-		std::string sIsActive = "Is Active##Component"  + std::to_string(_mID);
+		std::string sActive = "Active##Component"  + std::to_string(_mID);
 
 		ImGui::SeparatorText("Activatable");
 
-		if (ImGui::Checkbox(sIsActive.c_str(), &on_isActive)) { _mHasUpdate = true; }
+		if (ImGui::Checkbox(sActive.c_str(), &on_active)) { _mHasUpdate = true; }
 	}
 
 	LinesOnly::LinesOnly() : Component(ComponentType::LINESONLY) {}
+
+	bool LinesOnly::isLinesOnly() const { return linesOnly; }
+
+	void LinesOnly::setLinesOnly(bool value, bool updateInstant) {
+		setValue<bool>(linesOnly, on_linesOnly, _mHasUpdate, value, updateInstant);
+	}
 
 	json LinesOnly::toJson() const {
 		json componentJson;

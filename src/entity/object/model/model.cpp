@@ -111,29 +111,24 @@ namespace Engine {
 	}
 
 	std::shared_ptr<Material> Model::load_material(const std::vector<tinyobj::material_t>* materials) {
-		std::shared_ptr<Material> material = std::make_shared<Material>();
+		std::shared_ptr<Material> my_material = std::make_shared<Material>();
 
 		std::string rootPath = _mPath.substr(0, _mPath.find_last_of('/'));
 
-		auto my_material = material->on_coefficients;
-		auto my_textures = material->textures;
-		// TODO: change material->textures to material->on_textures
-		// auto my_textures = material->on_textures;
-
 		// Load the material data
 		for (const tinyobj::material_t& material : materials[0]) {
-			my_material->ambient       = glm::make_vec3(material.ambient);
-			my_material->diffuse       = glm::make_vec3(material.diffuse);
-			my_material->specular      = glm::make_vec3(material.specular);
-			my_material->transmittance = glm::make_vec3(material.transmittance);
-			my_material->emission      = glm::make_vec3(material.emission);
+			my_material->setAmbient(glm::make_vec3(material.ambient));
+			my_material->setDiffuse(glm::make_vec3(material.diffuse));
+			my_material->setSpecular(glm::make_vec3(material.specular));
+			my_material->setTransmittance(glm::make_vec3(material.transmittance));
+			my_material->setEmission(glm::make_vec3(material.emission));
 
-			my_material->shininess = material.shininess;
-			my_material->ior       = material.ior;
+			my_material->setShininess(material.shininess);
+			my_material->setIor(material.ior);
 
-			my_material->roughness = material.roughness;
-			my_material->metallic  = material.metallic;
-			my_material->sheen     = material.sheen;
+			my_material->setRoughness(material.roughness);
+			my_material->setMetallic(material.metallic);
+			my_material->setSheen(material.sheen);
 
 			std::vector<std::string> texnames = {
 				material.ambient_texname,
@@ -153,13 +148,11 @@ namespace Engine {
 
 			for (int idx = 0; idx < texnames.size(); idx++) {
 				if (texnames[idx] != "") {
-					my_textures->textures[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
+					my_material->getTextures()[idx] = std::make_shared<Core::Texture>(rootPath + "/" + texnames[idx]);
 				}
 			}
 		}
 
-		material->setHasUpdate(true);
-
-		return material;
+		return my_material;
 	}
 };

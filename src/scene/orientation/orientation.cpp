@@ -15,10 +15,8 @@ namespace Engine {
 
 		auto orientationTransform = _mGeometry->getComponent<Transform>();
 
-		orientationTransform->on_position = glm::vec3(0.85f, -0.75f, 0.0f);
-		orientationTransform->on_scale    = glm::vec3(0.07f, 0.07f, 0.07f);
-
-		orientationTransform->setHasUpdate(true);
+		orientationTransform->setPosition(glm::vec3(0.85f, -0.75f, 0.0f));
+		orientationTransform->setScale(glm::vec3(0.07f, 0.07f, 0.07f));
 	}
 
 	void Orientation::draw(const Core::Shader& shader) const {

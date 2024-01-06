@@ -17,16 +17,6 @@ namespace Engine {
 }
 
 namespace Engine {
-	struct GizmoTransform {
-		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-	};
-
-	struct GizmoInteractionState {
-		bool useTranslation = true;
-		bool useRotation    = false;
-	};
-
 	class Gizmo {
 		public:
 			Gizmo();
@@ -38,20 +28,11 @@ namespace Engine {
 			Gizmo(Gizmo && other) = delete;
 			Gizmo& operator = (Gizmo && other) = delete;
 
-			const GizmoTransform& getTransform() const;
-			GizmoTransform& getTransform();
-
-			const GizmoInteractionState& getInteractionState() const;
-			GizmoInteractionState& getInteractionState();
-
 			void onUpdate(const Mouse* mouse, float deltaTime, const Object& object);
 
 			void draw(const Core::Shader &shader) const;
 
 		private:
 			std::shared_ptr<Object> _mGeometry;
-
-			GizmoTransform _mWolrdData;
-			GizmoInteractionState _mInteractionState;
 	};
 };

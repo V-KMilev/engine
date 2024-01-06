@@ -36,6 +36,16 @@ namespace Engine {
 		}
 	}
 
+	template<typename T>
+	static void setValue(T& member, T& on_member, bool& hasUpdate, const T& value, bool updateInstant = false) {
+		if (updateInstant) {
+			member = value;
+		}
+		on_member = value;
+
+		hasUpdate = true;
+	}
+
 	class Component {
 		public:
 			Component(ComponentType type);
@@ -71,6 +81,15 @@ namespace Engine {
 		public:
 			Transform();
 
+			const glm::vec3& getPosition() const;
+			const glm::vec3& getRotation() const;
+			const glm::vec3& getScale() const;
+			const glm::mat4& getModel() const;
+
+			void setPosition(const glm::vec3& value, bool updateInstant = false);
+			void setRotation(const glm::vec3& value, bool updateInstant = false);
+			void setScale(const glm::vec3& value, bool updateInstant = false);
+
 			json toJson() const override;
 
 			void onUpdate() override;
@@ -80,14 +99,13 @@ namespace Engine {
 		private:
 			void updateModel();
 
-		public:
+		private:
 			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 scale    = glm::vec3(1.0f, 1.0f, 1.0f);
 
 			glm::mat4 model = glm::mat4(1.0f);
 
-		public:
 			mutable glm::vec3 on_position = position;
 			mutable glm::vec3 on_rotation = rotation;
 			mutable glm::vec3 on_scale    = scale;
@@ -97,33 +115,39 @@ namespace Engine {
 		public:
 			Activatable();
 
+			bool isActive() const;
+
+			void setIsActive(bool value, bool updateInstant = false);
+
 			json toJson() const override;
 
 			void onUpdate() override;
 
 			void drawUI() const override;
 
-		public:
-			bool isActive = false;
+		private:
+			bool active = false;
 
-		public:
-			mutable bool on_isActive = isActive;
+			mutable bool on_active = active;
 	};
 
 	class LinesOnly : public Component {
 		public:
 			LinesOnly();
 
+			bool isLinesOnly() const;
+
+			void setLinesOnly(bool value, bool updateInstant = false);
+
 			json toJson() const override;
 
 			void onUpdate() override;
 
 			void drawUI() const override;
 
-		public:
+		private:
 			bool linesOnly = false;
-		
-		public:
+
 			mutable bool on_linesOnly = linesOnly;
 	};
 };
