@@ -1,93 +1,107 @@
 #include "camera.h"
 
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+#include <imgui.h>
+
 #include "error_handle.h"
 #include "tracer.h"
 
 #include "input_manager.h"
 
-#include "cube.h"
+#include "view.h"
+#include "sphere.h"
 
 namespace Engine {
 	Camera::Camera(CameraType Type) : _mCameraType(Type), Entity(EntityType::CAMERA) {
-		// TODO: Fix this when you add more cameras
-		_mTransform        = std::make_shared<PerspectiveCameraTransform>();
-		_mInteractionState = std::make_shared<PerspectiveCameraInteractionState>();
+		// TODO: Fix this when we have more cameras
+		auto view = addComponent<PerspectiveView>();
+		addComponent<Activatable>();
 
-		_mVisual = std::make_shared<Cube>();
+		_mVisual = std::make_shared<Sphere>();
 
-		auto visualTransform = static_cast<ObjectTransform*>(_mVisual->getTransform().get());
+		auto visualTransform = _mVisual->getComponent<Transform>();
 
-		auto transform = static_cast<CameraTransform*>(_mTransform.get());
+		visualTransform->on_position = view->position;
+		visualTransform->on_scale    = glm::vec3(0.25f, 0.25f, 0.25f);
 
-		visualTransform->position = transform->position;
-		visualTransform->scale    = glm::vec3(0.25f, 0.25f, 0.25f);
+		visualTransform->setHasUpdate(true);
 
-		_mVisual->getInteractionState()->hasUpdate = true;
-		_mInteractionState->hasUpdate = true;
+		_mHasUpdate = true;
 	}
 
 	CameraType Camera::getCameraType() const {
 		return _mCameraType;
 	}
 
+	void Camera::setUpdateEvent(UpdateEvent event) {
+		_mUpdateEvent = event;
+	}
+
+	void Camera::setPositionEvent(PositionEvent event) {
+		_mPositionEvent = event;
+	}
+
 	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
-		if (_mInteractionState->hasUpdate) {
-			PROFILER_BEGIN("Camera", "Camera Update");
+		for(const auto& component : _mComponents) {
+			if (component.second->hasUpdate()) {
+				_mHasUpdate = true;
 
-			auto interactionState = static_cast<CameraInteractionState*>(_mInteractionState.get());
-
-			switch (interactionState->updateEvent) {
-				case UpdateEvent::POSITION: updatePosition(deltaTime);    break;
-				case UpdateEvent::TARGET: updateTarget(mouse, deltaTime); break;
-				case UpdateEvent::FOV: zoom(mouse, deltaTime);            break;
-				default: break;
+				// TODO: think of better "hack"
+				if(component.second->getType() == ComponentType::VIEW) {
+					if (_mUpdateEvent == UpdateEvent::NONE) {
+						_mUpdateEvent = UpdateEvent::POSITION;
+					}
+				}
 			}
 
-			updateProjection();
-			updateLookAt();
+			component.second->onUpdate();
+		}
 
-			// TODO: Think of way to update the visual from the UI
+		if (_mHasUpdate) {
+			PROFILER_BEGIN("Camera", "Camera Update");
+
+			switch (_mUpdateEvent) {
+				case UpdateEvent::POSITION: updatePosition(deltaTime);      break;
+				case UpdateEvent::TARGET:   updateTarget(mouse, deltaTime); break;
+				case UpdateEvent::FOV:      zoom(mouse, deltaTime);         break;
+				default:                                                    break;
+			}
 
 			_mVisual->onUpdate(mouse, deltaTime);
 
 			// Reset the update event
-			interactionState->updateEvent = UpdateEvent::NONE;
-			interactionState->hasUpdate = false;
+			_mUpdateEvent = UpdateEvent::NONE;
+			_mHasUpdate = false;
 
 			PROFILER_END("Camera", "Camera Update");
 		}
 	}
 
 	void Camera::updatePosition(float deltaTime) {
-		auto transform        = static_cast<CameraTransform*>(_mTransform.get());
-		auto interactionState = static_cast<CameraInteractionState*>(_mInteractionState.get());
+		auto visualTransform = _mVisual->getComponent<Transform>();
 
-		auto visualTransform = static_cast<ObjectTransform*>(_mVisual->getTransform().get());
+		auto view = getComponent<PerspectiveView>();
 
 		glm::vec3 moveDirection(0.0f);
 
-		switch (interactionState->positionEvent) {
-			case PositionEvent::POSX: moveDirection = transform->front;  break;
-			case PositionEvent::NEGX: moveDirection = -transform->front; break;
-			case PositionEvent::POSY: moveDirection = transform->up;     break;
-			case PositionEvent::NEGY: moveDirection = -transform->up;    break;
-			case PositionEvent::POSZ: moveDirection = transform->right;  break;
-			case PositionEvent::NEGZ: moveDirection = -transform->right; break;
+		switch (_mPositionEvent) {
+			case PositionEvent::POSX: moveDirection = view->front;  break;
+			case PositionEvent::NEGX: moveDirection = -view->front; break;
+			case PositionEvent::POSY: moveDirection = view->up;     break;
+			case PositionEvent::NEGY: moveDirection = -view->up;    break;
+			case PositionEvent::POSZ: moveDirection = view->right;  break;
+			case PositionEvent::NEGZ: moveDirection = -view->right; break;
 			default: moveDirection = glm::vec3(0.0f); break;
 		}
 
-		transform->position += deltaTime * interactionState->moveSpeed * moveDirection;
+		view->on_position += deltaTime * view->moveSpeed * moveDirection;
+		visualTransform->on_position = view->on_position;
 
-		// Update the visual representation
-		visualTransform->position = transform->position;
-		_mVisual->getInteractionState()->hasUpdate = true;
+		view->setHasUpdate(true);
+		visualTransform->setHasUpdate(true);
 
-		interactionState->positionEvent = PositionEvent::NONE;
-	}
-
-	void Camera::updateLookAt() {
-		auto transform = static_cast<CameraTransform*>(_mTransform.get());
-
-		transform->lookAt = glm::lookAt(transform->position, transform->target, transform->up);
+		// Reset
+		_mPositionEvent = PositionEvent::NONE;
 	}
 };

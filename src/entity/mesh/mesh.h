@@ -48,10 +48,13 @@ namespace Engine {
 namespace Engine {
 	class Mesh : public Entity {
 		public:
+			Mesh() = delete;
+			~Mesh() = default;
+
 			Mesh(
 				const std::vector<Utils::Vertex>& vertices,
 				const std::vector<unsigned int>& indices,
-				std::shared_ptr<Material> && material
+				const std::shared_ptr<Material>& material
 			);
 
 			Mesh(
@@ -61,19 +64,13 @@ namespace Engine {
 
 			void onUpdate(const Mouse* mouse, float deltaTime) override;
 
-			void drawUI() override;
+			void drawUI() const override;
 			void draw(const Core::Shader &shader) const override;
 
 			void updateShader(const Core::Shader &shader) const override;
 
-			void UIMaterialTextures();
-			void UIMaterialCoefficients();
-
-		public:
-			void updateModel(glm::mat4 objectModel = glm::mat4(1.0f));
-
 		private:
-			void init();
+			void init(const std::shared_ptr<Material>& material);
 
 		private:
 			std::shared_ptr<Core::VertexArray>        _mVA;
@@ -84,7 +81,5 @@ namespace Engine {
 		private:
 			std::vector<Utils::Vertex>* _mVertices;
 			std::vector<unsigned int>* _mIndices;
-
-			std::shared_ptr<Material> _mMaterial;
 	};
 };

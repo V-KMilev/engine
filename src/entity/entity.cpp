@@ -1,5 +1,9 @@
 #include "entity.h"
 
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+#include <imgui.h>
+
 namespace Engine {
 	Entity::Entity(EntityType type) : _mType(type) {
 		_mID.updateID(_mType);
@@ -13,39 +17,45 @@ namespace Engine {
 		return _mType;
 	}
 
-	const std::shared_ptr<Transform>& Entity::getTransform() const {
-		return _mTransform;
+	bool Entity::isSelected() const {
+		return _mIsSelected;
 	}
 
-	std::shared_ptr<Transform>& Entity::getTransform() {
-		return _mTransform;
+	bool Entity::hasUpdate() const {
+		return _mHasUpdate;
 	}
 
-	const std::shared_ptr<InteractionState>& Entity::getInteractionState() const {
-		return _mInteractionState;
+	void Entity::setIsSelected(bool value) {
+		_mIsSelected = value;
 	}
 
-	std::shared_ptr<InteractionState>& Entity::getInteractionState() {
-		return _mInteractionState;
+	void Entity::setHasUpdate(bool value) {
+		_mHasUpdate = value;
 	}
 
 	json Entity::toJson() const {
 		json entityJson;
 
-		// Add entity properties to the JSON object
-		entityJson["id"] = _mID.getID();
-		entityJson["type"] = static_cast<int>(_mType);
+		entityJson["id"]         = _mID.getID();
+		entityJson["type"]       = static_cast<int>(_mType);
+		entityJson["isSelected"] = _mIsSelected;
+		entityJson["hasUpdate"]  = _mHasUpdate;
 
-		// Add transform properties
-		if (_mTransform) {
-			entityJson["transform"] = _mTransform->toJson();
-		}
-
-		// Add interaction state properties
-		if (_mInteractionState) {
-			entityJson["interactionState"] = _mInteractionState->toJson();
+		for(const auto& component : _mComponents) {
+			entityJson[component.second->getName()] = component.second->toJson();
 		}
 
 		return entityJson;
+	}
+
+	void Entity::drawUI() const {
+		std::string sIsSelected = "Is Selected##Component" + std::to_string(_mID.getID());
+		std::string sHasUpdate  = "Has Update##Component"  + std::to_string(_mID.getID());
+
+		ImGui::Checkbox(sIsSelected.c_str(), &_mIsSelected);
+
+		ImGui::SameLine();
+
+		ImGui::Checkbox(sHasUpdate.c_str(), &_mHasUpdate);
 	}
 };

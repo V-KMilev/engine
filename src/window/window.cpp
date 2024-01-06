@@ -80,7 +80,7 @@ namespace Engine {
 		glfwMakeContextCurrent(_mWindow);
 		gladLoadGL(glfwGetProcAddress);
 		// FPS cap
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		input_config();
 
@@ -152,6 +152,8 @@ namespace Engine {
 
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 		_mScene->addObject(std::make_shared<Sphere>());
+		// _mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
+		// _mScene->addObject(std::make_shared<Model>("../asset/models/airplane/11805_airplane_v2_L2.obj"));
 
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\gizmo"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\infinite_grid"));

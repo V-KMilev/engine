@@ -49,7 +49,7 @@ namespace Engine {
 			void draw(const Core::Shader &shader) const;
 
 		private:
-			std::shared_ptr<Object> _mCube;
+			std::shared_ptr<Object> _mGeometry;
 
 			GizmoTransform _mWolrdData;
 			GizmoInteractionState _mInteractionState;

@@ -19,17 +19,18 @@
 #include "material.h"
 #include "utils.h"
 
+#include "component.h"
+
 namespace Engine {
 	Mesh::Mesh(
 		const std::vector<Utils::Vertex>& vertices,
 		const std::vector<unsigned int>& indices,
-		std::shared_ptr<Material> && material
+		const std::shared_ptr<Material>& material
 	) : Entity(EntityType::MESH),
 		_mVertices(new std::vector<Utils::Vertex>(vertices)),
-		_mIndices(new std::vector<unsigned int>(indices)),
-		_mMaterial(std::move(material))
+		_mIndices(new std::vector<unsigned int>(indices))
 	{
-		init();
+		init(material);
 	}
 
 	Mesh::Mesh(
@@ -37,22 +38,21 @@ namespace Engine {
 		const std::vector<unsigned int>& indices
 	) : Entity(EntityType::MESH),
 		_mVertices(new std::vector<Utils::Vertex>(vertices)),
-		_mIndices(new std::vector<unsigned int>(indices)),
-		_mMaterial(std::make_shared<Material>())
+		_mIndices(new std::vector<unsigned int>(indices))
 	{
-		init();
+		init(nullptr);
 	}
 
-	void Mesh::init() {
-		_mTransform        = std::make_shared<ObjectTransform>();
-		_mInteractionState = std::make_shared<ObjectInteractionState>();
-
+	void Mesh::init(const std::shared_ptr<Material>& new_material) {
 		PROFILER_BEGIN("Mesh", "Mesh Load");
+
+		auto transform = addComponent<Transform>();
+		auto material  = addComponent<Material>(new_material);
 
 		M_ASSERT(!_mVertices->empty() && !_mIndices->empty());
 
 		PROFILER_BEGIN("Mesh", "Mesh Texture init");
-		for (std::shared_ptr<Core::Texture>& texture : _mMaterial->getTextures()->textures) {
+		for (std::shared_ptr<Core::Texture>& texture : material->textures->textures) {
 			texture->init();
 		}
 		PROFILER_END("Mesh", "Mesh Texture init");
@@ -82,38 +82,41 @@ namespace Engine {
 		_mIndices->clear();
 		_mIndices->shrink_to_fit();
 
-		updateModel();
+		transform->setHasUpdate(true);
+		material->setHasUpdate(true);
 
 		PROFILER_END("Mesh", "Mesh Load");
 	}
 
 	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
-		// TODO: Think of what we can do in this situation
-		if (_mInteractionState->hasUpdate) {
+		for(const auto& component : _mComponents) {
+			if (component.second->hasUpdate()) {
+				_mHasUpdate = true;
+			}
+
+			component.second->onUpdate();
+		}
+
+		if (_mHasUpdate) {
 			PROFILER_BEGIN("Mesh", "Mesh Update");
 
 			// Reset the update event
-			_mInteractionState->hasUpdate = false;
+			_mHasUpdate = false;
 
 			PROFILER_END("Mesh", "Mesh Update");
 		}
 	}
 
-	void Mesh::drawUI() {
+	void Mesh::drawUI() const {
 		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
 
 		ImGui::SeparatorText(sMesh.c_str());
 
-		_mInteractionState->drawUI(_mID.getID());
-		_mTransform->drawUI(_mID.getID());
-	}
+		Entity::drawUI();
 
-	void Mesh::UIMaterialTextures() {
-		_mMaterial->UITextures(_mID.getID());
-	}
-
-	void Mesh::UIMaterialCoefficients() {
-		_mMaterial->UICoefficients(_mID.getID());
+		for(const auto& component : _mComponents) {
+			component.second->drawUI();
+		}
 	}
 
 	void Mesh::draw(const Core::Shader &shader) const {
@@ -129,37 +132,15 @@ namespace Engine {
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Shader Update");
 
-		auto transform = static_cast<ObjectTransform*>(_mTransform.get());
+		auto transform = getComponent<Transform>();
+		auto material = getComponent<Material>();
 
 		shader.bind();
 
-		// TODO: Fix the material
-
-		_mMaterial->updateShader(shader);
+		material->updateShader(shader);
 
 		shader.setUniformMatrix4fv("uModel", transform->model);
 
 		PROFILER_END("Mesh", "Mesh Shader Update");
-	}
-
-	void Mesh::updateModel(glm::mat4 objectModel) {
-		PROFILER_BEGIN("Mesh", "Mesh Update Model");
-
-		auto transform = static_cast<ObjectTransform*>(_mTransform.get());
-
-		transform->model = glm::mat4(1.0f);
-
-		transform->model = glm::translate(transform->model, transform->position);
-
-		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-		transform->model = glm::rotate(transform->model, glm::radians(transform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-
-		transform->model = glm::scale(transform->model, transform->scale);
-
-		// TODO: Think if we can fix the "problem"
-		transform->model *= objectModel;
-
-		PROFILER_END("Mesh", "Mesh Update Model");
 	}
 };

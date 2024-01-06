@@ -187,8 +187,8 @@ namespace Engine {
 				labe = "Camera #" + std::to_string(entity->getID());
 			}
 
-			if (ImGui::Selectable(labe.c_str(), entity->getInteractionState()->isSelected)) {
-				entity->getInteractionState()->isSelected = !entity->getInteractionState()->isSelected;
+			if (ImGui::Selectable(labe.c_str(), entity->isSelected())) {
+				entity->setIsSelected(!entity->isSelected());
 			}
 		}
 
@@ -200,13 +200,13 @@ namespace Engine {
 
 		for (auto& object : objects) {
 
-			if (object->getInteractionState()->isSelected) {
+			if (object->isSelected()) {
 
 				for(auto& mesh : object->getMeshes()) {
 					std::string labe = "Mesh #" + std::to_string(mesh->getID());
 
-					if (ImGui::Selectable(labe.c_str(), mesh->getInteractionState()->isSelected)) {
-						mesh->getInteractionState()->isSelected = !mesh->getInteractionState()->isSelected;
+					if (ImGui::Selectable(labe.c_str(), mesh->isSelected())) {
+						mesh->setIsSelected(!mesh->isSelected());
 					}
 				}
 			}
@@ -227,7 +227,7 @@ namespace Engine {
 		auto& entitys = _mScene.getEntitys();
 
 		for (auto& entity : entitys) {
-			if (entity->getInteractionState()->isSelected) {
+			if (entity->isSelected()) {
 				entity->drawUI();
 			}
 		}
@@ -258,11 +258,11 @@ namespace Engine {
 
 		for (auto& object : objects) {
 
-			if (object->getInteractionState()->isSelected) {
+			if (object->isSelected()) {
 
 				for(auto& mesh : object->getMeshes()) {
-					if (mesh->getInteractionState()->isSelected) {
-						mesh->drawUI();
+					if (mesh->isSelected()) {
+						// TODO:
 					}
 				}
 			}
@@ -294,11 +294,11 @@ namespace Engine {
 
 		for (auto& object : objects) {
 
-			if (object->getInteractionState()->isSelected) {
+			if (object->isSelected()) {
 
 				for(auto& mesh : object->getMeshes()) {
-					if (mesh->getInteractionState()->isSelected) {
-						mesh->UIMaterialCoefficients();
+					if (mesh->isSelected()) {
+						// TODO:
 					}
 				}
 			}
@@ -317,7 +317,7 @@ namespace Engine {
 		auto& cameras = _mScene.getCameras();
 
 		for (std::shared_ptr<Camera>& camera : cameras) {
-			if (camera->getInteractionState()->isActive) {
+			if (camera->getComponent<Activatable>()->isActive) {
 				ImGui::BulletText("Camera");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
@@ -354,11 +354,11 @@ namespace Engine {
 
 		for (auto& object : objects) {
 
-			if (object->getInteractionState()->isSelected) {
+			if (object->isSelected()) {
 
 				for(auto& mesh : object->getMeshes()) {
-					if (mesh->getInteractionState()->isSelected) {
-						mesh->UIMaterialTextures();
+					if (mesh->isSelected()) {
+						mesh->drawUI();
 					}
 				}
 			}
@@ -461,7 +461,7 @@ namespace Engine {
 					labe = "Camera #" + std::to_string(entity->getID());
 				}
 
-				if (entity->getInteractionState()->isSelected) {
+				if (entity->isSelected()) {
 					Utils::UI::ColoredBulletText("", labe, ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
 				}
 			}

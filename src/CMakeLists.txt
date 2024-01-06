@@ -11,6 +11,7 @@ set(SOURCES
 
 	${ENGINE_SRC_DIR}/component/component.cpp
 	${ENGINE_SRC_DIR}/component/material/material.cpp
+	${ENGINE_SRC_DIR}/component/view/view.cpp
 	
 	${ENGINE_SRC_DIR}/entity/mesh/mesh.cpp
 
@@ -47,6 +48,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	
 	${ENGINE_SRC_DIR}/component
 	${ENGINE_SRC_DIR}/component/material
+	${ENGINE_SRC_DIR}/component/view
 	
 	${ENGINE_SRC_DIR}/entity
 	${ENGINE_SRC_DIR}/entity/mesh

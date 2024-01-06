@@ -12,11 +12,13 @@
 
 namespace Engine {
 	Gizmo::Gizmo() {
-		_mCube = std::make_shared<Cube>();
+		_mGeometry = std::make_shared<Cube>();
 
-		auto cubeTransform = static_cast<ObjectTransform*>(_mCube->getTransform().get());
+		auto transform = _mGeometry->getComponent<Transform>();
 
-		cubeTransform->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+		transform->on_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+		transform->setHasUpdate(true);
 	}
 
 	const GizmoTransform& Gizmo::getTransform() const {
@@ -37,12 +39,12 @@ namespace Engine {
 
 	void Gizmo::draw(const Core::Shader &shader) const {
 		// TODO: Fix depth render index, so it goes above the selected object
-		_mCube->draw(shader);
+		_mGeometry->draw(shader);
 	}
 
 	void Gizmo::onUpdate(const Mouse* mouse, float deltaTime, const Object& object) {
-		auto cubeTransform   = static_cast<ObjectTransform*>(_mCube->getTransform().get());
-		auto objectTransform = static_cast<ObjectTransform*>(object.getTransform().get());
+		auto cubeTransform   = _mGeometry->getComponent<Transform>();
+		auto objectTransform = object.getComponent<Transform>();
 
 		glm::vec3& position = cubeTransform->position;
 		glm::vec3& rotation = cubeTransform->rotation;
@@ -52,14 +54,14 @@ namespace Engine {
 
 		if (position != objPosition) {
 			position = objPosition;
-			_mCube->getInteractionState()->hasUpdate = true;
+			_mGeometry->setHasUpdate(true);
 		}
 		else if (rotation != objRotation) {
 			rotation = objRotation;
-			_mCube->getInteractionState()->hasUpdate = true;
+			_mGeometry->setHasUpdate(true);
 		}
 
-		_mCube->onUpdate(mouse, deltaTime);
+		_mGeometry->onUpdate(mouse, deltaTime);
 
 		if (_mInteractionState.useTranslation) {
 			_mInteractionState.useRotation = false;

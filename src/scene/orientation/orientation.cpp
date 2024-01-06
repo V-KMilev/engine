@@ -11,21 +11,23 @@
 
 namespace Engine {
 	Orientation::Orientation() {
-		_mOrientation = std::make_shared<Cube>();
+		_mGeometry = std::make_shared<Cube>();
 
-		auto orientationTransform = static_cast<ObjectTransform*>(_mOrientation->getTransform().get());
+		auto orientationTransform = _mGeometry->getComponent<Transform>();
 
-		orientationTransform->position = glm::vec3(0.85f, -0.75f, 0.0f);
-		orientationTransform->scale    = glm::vec3(0.07f, 0.07f, 0.07f);
+		orientationTransform->on_position = glm::vec3(0.85f, -0.75f, 0.0f);
+		orientationTransform->on_scale    = glm::vec3(0.07f, 0.07f, 0.07f);
+
+		orientationTransform->setHasUpdate(true);
 	}
 
 	void Orientation::draw(const Core::Shader& shader) const {
 		shader.bind();
 
-		_mOrientation->draw(shader);
+		_mGeometry->draw(shader);
 	}
 
 	void Orientation::onUpdate(const Mouse* mouse, float deltaTime) {
-		_mOrientation->onUpdate(mouse, deltaTime);
+		_mGeometry->onUpdate(mouse, deltaTime);
 	}
 };

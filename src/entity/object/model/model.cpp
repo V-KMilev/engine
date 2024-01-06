@@ -106,17 +106,19 @@ namespace Engine {
 
 			std::shared_ptr<Material> material = load_material(materials);
 
-			_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, std::move(material)));
+			_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices, material));
 		}
 	}
 
 	std::shared_ptr<Material> Model::load_material(const std::vector<tinyobj::material_t>* materials) {
-		std::shared_ptr<Material> material;
+		std::shared_ptr<Material> material = std::make_shared<Material>();
 
 		std::string rootPath = _mPath.substr(0, _mPath.find_last_of('/'));
 
-		auto& my_material = material->getCoefficients();
-		auto& my_textures = material->getTextures();
+		auto my_material = material->on_coefficients;
+		auto my_textures = material->textures;
+		// TODO: change material->textures to material->on_textures
+		// auto my_textures = material->on_textures;
 
 		// Load the material data
 		for (const tinyobj::material_t& material : materials[0]) {
@@ -155,6 +157,8 @@ namespace Engine {
 				}
 			}
 		}
+
+		material->setHasUpdate(true);
 
 		return material;
 	}

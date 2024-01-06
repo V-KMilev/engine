@@ -29,6 +29,6 @@ namespace Engine {
 			void onUpdate(const Mouse* mouse, float deltaTime);
 
 		private:
-			std::shared_ptr<Object> _mOrientation;
+			std::shared_ptr<Object> _mGeometry;
 	};
 };
