@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include "logger.h"
+
 namespace fs = std::filesystem;
 
 namespace Profiler {
@@ -19,6 +21,10 @@ namespace Profiler {
 			printf("[ERROR] Failed to create directory: %s\n", _mFolder.c_str());
 			exit(-1);
 		}
+
+#ifdef MTR_ENABLED
+		Engine::LOG("Starting with Profiler...", Engine::LOG_LEVEL::L_INFO);
+#endif
 
 		std::string filePath = _mFolder + "/" + _mFileName;
 

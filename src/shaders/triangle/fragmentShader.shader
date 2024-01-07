@@ -13,7 +13,7 @@ struct Camera {
 	float far;
 };
 
-struct Material {
+struct MaterialTextures {
 	sampler2D Ambient;
 	sampler2D Diffuse;
 	sampler2D Specular;
@@ -27,6 +27,26 @@ struct Material {
 	sampler2D Sheen;
 	sampler2D Emissive;
 	sampler2D Normal;
+};
+
+struct MaterialCoefficients {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	vec3 transmittance;
+	vec3 emission;
+
+	float shininess;
+	float ior;
+
+	float roughness;
+	float metallic;
+	float sheen;
+};
+
+struct Material {
+	MaterialTextures textures;
+	MaterialCoefficients coefficients;
 };
 
 in VS_OUT {
@@ -48,5 +68,5 @@ uniform Material uMaterial;
 void main() {
 	gl_FragDepth = fs_in.depth;
 
-	outColor = texture(uMaterial.Diffuse, fs_in.texCoords);// + vec4(fs_in.local_position.xyz, 1.0);
+	outColor = texture(uMaterial.textures.Diffuse, fs_in.texCoords) * vec4(uMaterial.coefficients.diffuse, 1.0);
 }

@@ -319,15 +319,16 @@ namespace Engine {
 		unsigned int x = _mInputManager->getMouse().x;
 		unsigned int y = _mSceneWindow.mainWindowHeight - _mInputManager->getMouse().y - 1;
 
-		// Clamp if out of scene window
-		x = std::clamp(x, _mSceneWindow.startX, _mSceneWindow.startX + _mSceneWindow.width);
-		y = std::clamp(y, _mSceneWindow.startY, _mSceneWindow.startY + _mSceneWindow.height);
+		if (x < _mSceneWindow.startX || x > _mSceneWindow.startX + _mSceneWindow.width ||
+			y < _mSceneWindow.startY || y > _mSceneWindow.startY + _mSceneWindow.height) {
+			return;
+		}
 
 		Core::PixelInfo pixel = _mPickTexture->readPixel(x, y);
 
 		if (pixel.objectID > 0) {
 			for (const std::shared_ptr<Object>& object : _mObjects) {
-				object->setIsSelected((object->getID() == pixel.objectID && !object->isSelected()) ? true : false);
+				object->setIsSelected((object->getID() == pixel.objectID ? !object->isSelected() : false));
 			}
 		}
 

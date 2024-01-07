@@ -213,10 +213,23 @@ namespace Engine {
 		for (int idx = 0; idx < textures->textures.size(); idx++) {
 			textures->textures[idx]->bind(idx);
 
-			std::string material = "uMaterial." + getNameFromType(TextureType(idx));
+			std::string material = "uMaterial.textures." + getNameFromType(TextureType(idx));
 
 			shader.setUniform1i(material, idx);
 		}
+
+		shader.setUniform3fv("uMaterial.coefficients.ambient", coefficients->ambient);
+		shader.setUniform3fv("uMaterial.coefficients.diffuse", coefficients->diffuse);
+		shader.setUniform3fv("uMaterial.coefficients.specular", coefficients->specular);
+		shader.setUniform3fv("uMaterial.coefficients.transmittance", coefficients->transmittance);
+		shader.setUniform3fv("uMaterial.coefficients.emission", coefficients->emission);
+
+		shader.setUniform1f("uMaterial.coefficients.shininess", coefficients->shininess);
+		shader.setUniform1f("uMaterial.coefficients.ior", coefficients->ior);
+
+		shader.setUniform1f("uMaterial.coefficients.roughness", coefficients->roughness);
+		shader.setUniform1f("uMaterial.coefficients.metallic", coefficients->metallic);
+		shader.setUniform1f("uMaterial.coefficients.sheen", coefficients->sheen);
 
 		PROFILER_END("Material", "Material Shader Update");
 	}
