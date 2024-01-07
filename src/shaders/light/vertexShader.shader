@@ -15,10 +15,24 @@ struct Camera {
 	float far;
 };
 
+struct Light {
+	vec3 position;
+	vec3 color;
+};
 
 uniform Camera uCamera;
+uniform Light uLight;
 uniform mat4 uModel;
 
+out VS_OUT {
+	float depth;
+} vs_out;
+
 void main() {
-	gl_Position = uCamera.projection * uCamera.view * uModel * vec4(position, 1.0);
+	vec4 local_position = vec4(position, 1.0);
+	vec4 mvp_position = uCamera.projection * uCamera.view * uModel * local_position;
+
+	vs_out.depth = mvp_position.z / mvp_position.w;
+
+	gl_Position = mvp_position;
 }

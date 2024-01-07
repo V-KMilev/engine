@@ -42,7 +42,13 @@ namespace Engine {
 			Camera() = delete;
 			~Camera() = default;
 
-			Camera(CameraType Type = CameraType::NONE);
+			Camera(CameraType Type);
+
+			Camera(const Camera& other) = delete;
+			Camera& operator = (const Camera& other) = delete;
+
+			Camera(Camera && other) = delete;
+			Camera& operator = (Camera && other) = delete;
 
 			CameraType getCameraType() const;
 

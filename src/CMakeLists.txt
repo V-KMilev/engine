@@ -10,9 +10,15 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/common/profiler/tracer.cpp
 
 	${ENGINE_SRC_DIR}/component/component.cpp
+	${ENGINE_SRC_DIR}/component/emit/emit.cpp
 	${ENGINE_SRC_DIR}/component/material/material.cpp
 	${ENGINE_SRC_DIR}/component/view/view.cpp
-	
+
+	${ENGINE_SRC_DIR}/entity/camera/camera.cpp
+	${ENGINE_SRC_DIR}/entity/camera/perspective/perspective_camera.cpp
+
+	${ENGINE_SRC_DIR}/entity/light/light.cpp
+
 	${ENGINE_SRC_DIR}/entity/mesh/mesh.cpp
 
 	${ENGINE_SRC_DIR}/entity/object/object.cpp
@@ -21,9 +27,6 @@ set(SOURCES
 	${ENGINE_SRC_DIR}/entity/object/quad/quad.cpp
 	${ENGINE_SRC_DIR}/entity/object/sphere/sphere.cpp
 	${ENGINE_SRC_DIR}/entity/object/model/model.cpp
-
-	${ENGINE_SRC_DIR}/entity/camera/camera.cpp
-	${ENGINE_SRC_DIR}/entity/camera/perspective/perspective_camera.cpp
 
 	${ENGINE_SRC_DIR}/entity/entity_id.cpp
 	${ENGINE_SRC_DIR}/entity/entity.cpp
@@ -47,23 +50,25 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/common/profiler
 	
 	${ENGINE_SRC_DIR}/component
+	${ENGINE_SRC_DIR}/component/emit
 	${ENGINE_SRC_DIR}/component/material
 	${ENGINE_SRC_DIR}/component/view
 	
 	${ENGINE_SRC_DIR}/entity
-	${ENGINE_SRC_DIR}/entity/mesh
+
+	${ENGINE_SRC_DIR}/entity/camera
+	${ENGINE_SRC_DIR}/entity/camera/perspective
 	
+	${ENGINE_SRC_DIR}/entity/light
+
+	${ENGINE_SRC_DIR}/entity/mesh
+
 	${ENGINE_SRC_DIR}/entity/object
 	${ENGINE_SRC_DIR}/entity/object/triangle
 	${ENGINE_SRC_DIR}/entity/object/cube
 	${ENGINE_SRC_DIR}/entity/object/quad
 	${ENGINE_SRC_DIR}/entity/object/sphere
 	${ENGINE_SRC_DIR}/entity/object/model
-	
-	${ENGINE_SRC_DIR}/entity/camera
-	${ENGINE_SRC_DIR}/entity/camera/perspective
-	
-	${ENGINE_SRC_DIR}/entity/light
 	
 	${ENGINE_SRC_DIR}/event
 	

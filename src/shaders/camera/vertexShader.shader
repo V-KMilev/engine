@@ -19,28 +19,16 @@ uniform Camera uCamera;
 uniform mat4 uModel;
 
 out VS_OUT {
-	vec4 local_position;
-	vec4 world_position;
-	vec4 mvp_position;
-
-	vec2 texCoords;
 	vec3 normal;
-
 	float depth;
 } vs_out;
 
 void main() {
 	vec4 local_position = vec4(position, 1.0);
-	vec4 world_position = uModel * local_position;
-	vec4 mvp_position   = uCamera.projection * uCamera.view * world_position;
-
-	vs_out.local_position = local_position;
-	vs_out.world_position = world_position;
-	vs_out.mvp_position   = mvp_position;
-
-	vs_out.texCoords = texCoords;
+	vec4 mvp_position = uCamera.projection * uCamera.view * uModel * local_position;
 
 	vs_out.depth = mvp_position.z / mvp_position.w;
+	vs_out.normal = normal;
 
 	gl_Position = mvp_position;
 }

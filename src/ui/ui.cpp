@@ -11,6 +11,8 @@
 #include "camera.h"
 #include "perspective_camera.h"
 
+#include "light.h"
+
 #include "object.h"
 #include "mesh.h"
 
@@ -151,6 +153,7 @@ namespace Engine {
 					}
 
 					if (ImGui::BeginMenu("Lights")) {
+						ImGui::MenuItem("Light", nullptr, &_mCallAddLight);
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenu();
@@ -185,6 +188,9 @@ namespace Engine {
 			}
 			else if (type == EntityType::CAMERA) {
 				labe = "Camera #" + std::to_string(entity->getID());
+			}
+			else if (type == EntityType::LIGHT) {
+				labe = "Light #" + std::to_string(entity->getID());
 			}
 
 			if (ImGui::Selectable(labe.c_str(), entity->isSelected())) {
@@ -380,25 +386,35 @@ namespace Engine {
 			_mScene.addCamera(std::make_shared<PerspectiveCamera>(_mData.width, _mData.height));
 			_mCallAddPerspective = false;
 		}
+
 		if (_mCallAddTriangle) {
 			_mScene.addObject(std::make_shared<Triangle>());
 			_mCallAddTriangle = false;
 		}
+
 		if (_mCallAddQuad) {
 			_mScene.addObject(std::make_shared<Quad>());
 			_mCallAddQuad = false;
 		}
+
 		if (_mCallAddCube) {
 			_mScene.addObject(std::make_shared<Cube>());
 			_mCallAddCube = false;
 		}
+
 		if (_mCallAddSphere) {
 			_mScene.addObject(std::make_shared<Sphere>());
 			_mCallAddSphere = false;
 		}
+
 		if (_mCallAddModel) {
 			ImGui::OpenPopup("Add Model");
 			_mCallAddModel = false;
+		}
+
+		if (_mCallAddLight) {
+			_mScene.addLight(std::make_shared<Light>());
+			_mCallAddLight = false;
 		}
 
 		if (_mCallRemove) {

@@ -20,6 +20,8 @@
 #include "quad.h"
 #include "sphere.h"
 
+#include "light.h"
+
 #include "gl_error_handle.h"
 #include "gl_shader.h"
 
@@ -152,6 +154,7 @@ namespace Engine {
 
 		_mScene->addCamera(std::make_shared<PerspectiveCamera>(_mWidth, _mHeight));
 		_mScene->addObject(std::make_shared<Sphere>());
+		_mScene->addLight(std::make_shared<Light>());
 		// _mScene->addObject(std::make_shared<Model>("../asset/models/wolf/Wolf_One_obj.obj"));
 		// _mScene->addObject(std::make_shared<Model>("../asset/models/airplane/11805_airplane_v2_L2.obj"));
 
@@ -160,8 +163,8 @@ namespace Engine {
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\orientation"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\pick"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\selected"));
-		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\simple_color"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\camera"));
+		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\light"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
 
 		while(!glfwWindowShouldClose(_mWindow)) {

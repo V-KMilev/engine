@@ -23,7 +23,11 @@ namespace Engine {
 	class Gizmo;
 	class Grid;
 
+	class Entity;
 	class Object;
+	// TODO:
+	// class Camera;
+	class Light;
 }
 
 #define GLFW_INCLUDE_NONE
@@ -89,6 +93,7 @@ namespace Engine {
 
 			void addObject(std::shared_ptr<Object> && object);
 			void addCamera(std::shared_ptr<Camera> && camera);
+			void addLight(std::shared_ptr<Light> && light);
 			void addShader(std::shared_ptr<Core::Shader> && shader);
 
 			const std::vector<std::shared_ptr<Entity>>& getEntitys() const;
@@ -112,6 +117,7 @@ namespace Engine {
 			void drawSelected(const std::shared_ptr<Core::Shader>& shader) const;
 
 			void drawCameras(const std::shared_ptr<Core::Shader>& shader) const;
+			void drawLights(const std::shared_ptr<Core::Shader>& shader) const;
 			void drawGeometry(const std::shared_ptr<Core::Shader>& shader) const;
 
 			void pickEntity();
@@ -139,6 +145,7 @@ namespace Engine {
 			std::vector<std::shared_ptr<Entity>> _mEntitys;
 			std::vector<std::shared_ptr<Object>> _mObjects;
 			std::vector<std::shared_ptr<Camera>> _mCameras;
+			std::vector<std::shared_ptr<Light>> _mLights;
 
 			SceneWindow _mSceneWindow;
 

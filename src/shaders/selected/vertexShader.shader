@@ -17,15 +17,9 @@ struct Camera {
 
 uniform Camera uCamera;
 uniform mat4 uModel;
-uniform int uSelected;
 
 out VS_OUT {
-	vec4 local_position;
-	vec4 world_position;
 	vec4 mvp_position;
-
-	vec2 texCoords;
-	vec3 normal;
 
 	float depth;
 } vs_out;
@@ -45,15 +39,9 @@ void main() {
 	mat4 model = uModel * scaleMatrix;
 
 	vec4 local_position = vec4(position, 1.0);
-	vec4 world_position = model * local_position;
-	vec4 mvp_position   = uCamera.projection * uCamera.view * world_position;
+	vec4 mvp_position = uCamera.projection * uCamera.view * model * local_position;
 
-
-	vs_out.local_position = local_position;
-	vs_out.world_position = world_position;
-	vs_out.mvp_position   = mvp_position;
-
-	vs_out.texCoords = texCoords;
+	vs_out.mvp_position = mvp_position;
 
 	vs_out.depth = mvp_position.z / mvp_position.w;
 

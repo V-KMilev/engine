@@ -16,8 +16,8 @@ namespace Engine {
 		std::vector<Utils::Vertex> vertices;
 		std::vector<unsigned int> indices;
 
-		int stacks = 25;
-		int slices = 25;
+		int stacks = 50;
+		int slices = 50;
 
 		float radius = 1.0f;
 
@@ -55,6 +55,13 @@ namespace Engine {
 				indices.push_back(p2);
 				indices.push_back(p3);
 			}
+		}
+
+		std::vector<glm::vec3> normals = getNormals(vertices, indices);
+
+		for (int idx = 0; idx < vertices.size(); idx++) {
+			// Inverting the normals because its a sphere
+			vertices[idx].normal = normals[idx] * glm::vec3(-1.0f);
 		}
 
 		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices));

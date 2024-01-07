@@ -15,32 +15,49 @@ struct Camera {
 	float far;
 };
 
+struct Light {
+	vec3 position;
+	vec3 color;
+};
+
 uniform Camera uCamera;
+uniform Light uLight;
 uniform mat4 uModel;
 
 out VS_OUT {
-	vec4 local_position;
-	vec4 world_position;
+	vec4 l_position;
+	vec4 m_position;
+	vec4 vm_position;
 	vec4 mvp_position;
+
+	vec4 lightPosition;
 
 	vec2 texCoords;
 	vec3 normal;
-
 	float depth;
+
+	// For flat shading
+	// flat vec3 normal;
 } vs_out;
 
 void main() {
-	vec4 local_position = vec4(position, 1.0);
-	vec4 world_position = uModel * local_position;
-	vec4 mvp_position   = uCamera.projection * uCamera.view * world_position;
+	vec4 l_position   = vec4(position, 1.0);
+	vec4 m_position   = uModel * l_position;
+	vec4 vm_position  = uCamera.view * m_position;
+	vec4 mvp_position = uCamera.projection * vm_position;
 
-	vs_out.local_position = local_position;
-	vs_out.world_position = world_position;
-	vs_out.mvp_position   = mvp_position;
+	mat3 normal_matrix = mat3(transpose(inverse(uCamera.view * uModel)));
+
+	vs_out.l_position   = l_position;
+	vs_out.m_position   = m_position;
+	vs_out.vm_position  = vm_position;
+	vs_out.mvp_position = mvp_position;
 
 	vs_out.texCoords = texCoords;
+	vs_out.normal    = normal_matrix * normal;
+	vs_out.depth     = mvp_position.z / mvp_position.w;
 
-	vs_out.depth = mvp_position.z / mvp_position.w;
+	vs_out.lightPosition = uCamera.view * vec4(uLight.position, 1.0);
 
 	gl_Position = mvp_position;
 }

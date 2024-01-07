@@ -51,6 +51,12 @@ namespace Engine {
 
 			Object(ObjectType type);
 
+			Object(const Object& other) = delete;
+			Object& operator = (const Object& other) = delete;
+
+			Object(Object && other) = delete;
+			Object& operator = (Object && other) = delete;
+
 			ObjectType getObjectType() const;
 
 			const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
@@ -66,7 +72,7 @@ namespace Engine {
 			void updateShader(const Core::Shader &shader) const override;
 
 		protected:
-			ObjectType _mObjectType;
+			ObjectType _mObjectType = ObjectType::NONE;
 
 			std::vector<std::shared_ptr<Mesh>> _mMeshes;
 	};

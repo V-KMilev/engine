@@ -105,6 +105,8 @@ namespace Engine {
 			bool _mCallAddSphere   = false;
 			bool _mCallAddModel    = false;
 
+			bool _mCallAddLight = false;
+
 			bool _mCallRemove = false;
 	};
 };

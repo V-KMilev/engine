@@ -10,11 +10,6 @@
 
 #include "component.h"
 
-namespace Core {
-	class Shader;
-	class Texture;
-}
-
 namespace Engine {
 	class Mouse;
 }

@@ -33,7 +33,10 @@
 #include "camera.h"
 #include "perspective_camera.h"
 
+#include "entity.h"
 #include "object.h"
+#include "camera.h"
+#include "light.h"
 
 namespace Engine {
 	SceneWindow::SceneWindow(unsigned int mainWindowWidth, unsigned int mainWindowHeight) {
@@ -113,6 +116,9 @@ namespace Engine {
 			else if (shader->getName() == "camera") {
 				drawCameras(shader);
 			}
+			else if (shader->getName() == "light") {
+				drawLights(shader);
+			}
 			else if (shader->getName() == "triangle") {
 				drawGeometry(shader);
 			}
@@ -189,6 +195,11 @@ namespace Engine {
 
 		_mEntitys.push_back(camera);
 		_mCameras.push_back(camera);
+	}
+
+	void Scene::addLight(std::shared_ptr<Light> && light) {
+		_mEntitys.push_back(light);
+		_mLights.push_back(light);
 	}
 
 	void Scene::addShader(std::shared_ptr<Core::Shader> && shader) {
@@ -303,8 +314,23 @@ namespace Engine {
 		PROFILER_END("Cameras", "Cameras Draw");
 	}
 
+	void Scene::drawLights(const std::shared_ptr<Core::Shader>& shader) const {
+		PROFILER_BEGIN("Lights", "Lights Draw");
+
+		for (const std::shared_ptr<Light>& light : _mLights) {
+			light->updateShader(*shader);
+			light->draw(*shader);
+		}
+
+		PROFILER_END("Lights", "Lights Draw");
+	}
+
 	void Scene::drawGeometry(const std::shared_ptr<Core::Shader>& shader) const {
 		PROFILER_BEGIN("Geometry", "Geometry Draw");
+
+		for (const std::shared_ptr<Light>& light : _mLights) {
+			light->updateShader(*shader);
+		}
 
 		for (const std::shared_ptr<Object>& object : _mObjects) {
 			object->draw(*shader);
