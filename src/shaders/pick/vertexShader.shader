@@ -7,6 +7,8 @@ struct Camera {
 	mat4 projection;
 	mat4 view;
 
+	vec3 position;
+
 	float FOV;
 	float width;
 	float height;
@@ -14,7 +16,6 @@ struct Camera {
 	float near;
 	float far;
 };
-
 
 uniform Camera uCamera;
 uniform mat4 uModel;

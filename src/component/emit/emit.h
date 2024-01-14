@@ -28,10 +28,10 @@ namespace Engine {
 			virtual void drawUI() const override;
 
 		protected:
-			glm::vec3 position = glm::vec3(1.0f, 1.0f, -3.0f);
+			glm::vec3 position = glm::vec3(1.0f, 2.0f, 2.0f);
 			glm::vec3 color    = glm::vec3(1.0f, 1.0f, 1.0f);
 
 			mutable glm::vec3 on_position = position;
-			mutable glm::vec3 on_color   = color;
+			mutable glm::vec3 on_color    = color;
 	};
 };

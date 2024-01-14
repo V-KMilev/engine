@@ -36,6 +36,8 @@ namespace Engine {
 		shader.setUniformMatrix4fv("uCamera.view", view->getLookAt());
 		shader.setUniformMatrix4fv("uCamera.projection", view->getProjection());
 
+		shader.setUniform3fv("uCamera.position", view->getPosition());
+
 		shader.setUniform1f("uCamera.FOV", view->getFov());
 		shader.setUniform1f("uCamera.width", (float)view->getWidth());
 		shader.setUniform1f("uCamera.height", (float)view->getHeight());

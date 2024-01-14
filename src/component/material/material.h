@@ -78,7 +78,7 @@ namespace Engine {
 			glm::vec3 transmittance = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 emission      = glm::vec3(0.0f, 0.0f, 0.0f);
 
-			float shininess = 0.0f;
+			float shininess = 32.0f;
 			// index of refraction
 			float ior       = 0.0f;
 

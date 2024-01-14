@@ -101,6 +101,9 @@ namespace Engine {
 		MY_GL_CHECK(glEnable(GL_DEPTH_TEST));
 		MY_GL_CHECK(glDepthFunc(GL_LESS));
 
+		// Hardware Gamma correction (Do not use)
+		// MY_GL_CHECK(glEnable(GL_FRAMEBUFFER_SRGB));
+
 		// Properly filter across cubemap faces
 		MY_GL_CHECK(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
 

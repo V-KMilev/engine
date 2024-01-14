@@ -90,7 +90,6 @@ namespace Engine {
 		shader.bind();
 
 		shader.setUniform1ui("uObjectID", _mID.getID());
-		shader.setUniform1i("uSelected", _mIsSelected);
 
 		PROFILER_END("Object", "Object Shader Update");
 	}

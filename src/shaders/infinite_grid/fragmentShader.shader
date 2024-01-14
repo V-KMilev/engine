@@ -5,6 +5,8 @@ struct Camera {
 	mat4 projection;
 	mat4 view;
 
+	vec3 position;
+
 	float FOV;
 	float width;
 	float height;
@@ -42,10 +44,10 @@ vec4 grid(vec3 fragmentPosition3D, float scale, vec4 gridColor) {
 	}
 
 	if (abs(fragmentPosition3D.x) < 0.1 * minimumx) {
-		color.r = 1.0;
+		color.b = 1.0;
 	}
 	if (abs(fragmentPosition3D.z) < 0.1 * minimumz) {
-		color.b = 1.0;
+		color.r = 1.0;
 	}
 
 	return color;

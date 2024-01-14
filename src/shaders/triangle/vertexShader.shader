@@ -7,6 +7,8 @@ struct Camera {
 	mat4 projection;
 	mat4 view;
 
+	vec3 position;
+
 	float FOV;
 	float width;
 	float height;
@@ -15,13 +17,7 @@ struct Camera {
 	float far;
 };
 
-struct Light {
-	vec3 position;
-	vec3 color;
-};
-
 uniform Camera uCamera;
-uniform Light uLight;
 uniform mat4 uModel;
 
 out VS_OUT {
@@ -29,8 +25,6 @@ out VS_OUT {
 	vec4 m_position;
 	vec4 vm_position;
 	vec4 mvp_position;
-
-	vec4 lightPosition;
 
 	vec2 texCoords;
 	vec3 normal;
@@ -56,8 +50,6 @@ void main() {
 	vs_out.texCoords = texCoords;
 	vs_out.normal    = normal_matrix * normal;
 	vs_out.depth     = mvp_position.z / mvp_position.w;
-
-	vs_out.lightPosition = uCamera.view * vec4(uLight.position, 1.0);
 
 	gl_Position = mvp_position;
 }

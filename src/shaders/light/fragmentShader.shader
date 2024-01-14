@@ -5,6 +5,8 @@ struct Camera {
 	mat4 projection;
 	mat4 view;
 
+	vec3 position;
+
 	float FOV;
 	float width;
 	float height;
@@ -18,16 +20,20 @@ struct Light {
 	vec3 color;
 };
 
+uniform Camera uCamera;
+uniform Light uLight;
 
 in VS_OUT {
 	float depth;
 } fs_in;
 
-uniform Camera uCamera;
-uniform Light uLight;
-
 void main() {
+	const float gamma = 2.2;
+
 	gl_FragDepth = fs_in.depth;
 
-	outColor = vec4(uLight.color, 1.0);
+	// Gamma correction
+	vec3 color = pow(uLight.color, vec3(1.0 / gamma));
+
+	outColor = vec4(color, 1.0);
 }
