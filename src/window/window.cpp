@@ -170,7 +170,7 @@ namespace Engine {
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\light"));
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
 
-		while(!glfwWindowShouldClose(_mWindow)) {
+		while (!glfwWindowShouldClose(_mWindow)) {
 			_mInputManager->processMouse(_mWindow);
 
 			_mScene->onUpdate(time_tick());

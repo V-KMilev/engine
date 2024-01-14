@@ -16,33 +16,37 @@ namespace Engine {
 		std::vector<Utils::Vertex> vertices;
 		std::vector<unsigned int> indices;
 
-		int stacks = 50;
-		int slices = 50;
+		const float PI = glm::pi<float>();
 
-		float radius = 1.0f;
+		const unsigned int STACKS = 32;
+		const unsigned int SLICES = 32;
 
-		for (int i = 0; i <= stacks; i++) {
-			float phi = static_cast<float>(i) / stacks * glm::pi<float>();
+		const float radius = 1.0f;
 
-			for (int j = 0; j <= slices; j++) {
-				float theta = static_cast<float>(j) / slices * 2.0f * glm::pi<float>();
+		for (unsigned int segmentX = 0; segmentX <= STACKS; segmentX++) {
+			float u = (float)segmentX / STACKS;
+			float phi = u * 2.0f * PI;
 
-				float x = std::sin(phi) * std::cos(theta);
-				float y = std::cos(phi);
+			for (unsigned int segmentY = 0; segmentY <= SLICES; segmentY++) {
+				float v = (float)segmentY / SLICES;
+				float theta = v * PI;
+
+				float x = std::cos(phi) * std::sin(theta);
+				float y = std::cos(theta);
 				float z = std::sin(phi) * std::sin(theta);
 
 				glm::vec3 position = radius * glm::vec3(x, y, z);
-				glm::vec3 normal = glm::normalize(position);
-				glm::vec2 uv(static_cast<float>(j) / slices, static_cast<float>(i) / stacks);
+				glm::vec3 normal   = position;
+				glm::vec2 uv       = glm::vec2(u, v);
 
 				vertices.emplace_back(Utils::Vertex(position, normal, uv));
 			}
 		}
 
-		for (int i = 0; i < stacks; i++) {
-			for (int j = 0; j < slices; j++) {
-				int p0 = i * (slices + 1) + j;
-				int p1 = p0 + slices + 1;
+		for (int i = 0; i < STACKS; i++) {
+			for (int j = 0; j < SLICES; j++) {
+				int p0 = i * (STACKS + 1) + j;
+				int p1 = p0 + SLICES + 1;
 
 				int p2 = p1 + 1;
 				int p3 = p0 + 1;
@@ -55,13 +59,6 @@ namespace Engine {
 				indices.push_back(p2);
 				indices.push_back(p3);
 			}
-		}
-
-		std::vector<glm::vec3> normals = getNormals(vertices, indices);
-
-		for (int idx = 0; idx < vertices.size(); idx++) {
-			// Inverting the normals because its a sphere
-			vertices[idx].normal = normals[idx] * glm::vec3(-1.0f);
 		}
 
 		_mMeshes.push_back(std::make_shared<Mesh>(vertices, indices));
