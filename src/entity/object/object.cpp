@@ -64,18 +64,6 @@ namespace Engine {
 		}
 	}
 
-	void Object::drawUI() const {
-		std::string sObject = "Object: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sObject.c_str());
-
-		Entity::drawUI();
-
-		for(const auto& component : _mComponents) {
-			component.second->drawUI();
-		}
-	}
-
 	void Object::draw(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Object", "Object Draw");
 

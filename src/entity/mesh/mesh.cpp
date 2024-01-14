@@ -107,18 +107,6 @@ namespace Engine {
 		}
 	}
 
-	void Mesh::drawUI() const {
-		std::string sMesh = "Mesh: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sMesh.c_str());
-
-		Entity::drawUI();
-
-		for(const auto& component : _mComponents) {
-			component.second->drawUI();
-		}
-	}
-
 	void Mesh::draw(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Draw");
 

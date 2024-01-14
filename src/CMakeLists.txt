@@ -53,7 +53,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${ENGINE_SRC_DIR}/component/emit
 	${ENGINE_SRC_DIR}/component/material
 	${ENGINE_SRC_DIR}/component/view
-	
+
 	${ENGINE_SRC_DIR}/entity
 
 	${ENGINE_SRC_DIR}/entity/camera
@@ -84,6 +84,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 	${ENGINE_SRC_DIR}/utils
 )
-	
-	target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
-	
+
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})

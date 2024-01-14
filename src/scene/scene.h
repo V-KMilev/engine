@@ -25,15 +25,14 @@ namespace Engine {
 
 	class Entity;
 	class Object;
-	// TODO:
-	// class Camera;
+	class Camera;
 	class Light;
+
+	enum class UpdateEvent;
+	enum class PositionEvent;
 }
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#include "camera.h"
+struct GLFWwindow;
 
 namespace Engine {
 	enum class SelectState {
@@ -124,9 +123,9 @@ namespace Engine {
 			void moveEntity();
 
 		private:
-			void updateCameras(UpdateEvent event, PositionEvent pEvent = PositionEvent::NONE);
+			void updateCameras(UpdateEvent event, PositionEvent pEvent);
 
-			void keyBinds();
+			void keyBinds(GLFWwindow* window);
 
 		private:
 			std::shared_ptr<SceneManager> _mSceneManager;

@@ -158,8 +158,6 @@ namespace Engine {
 		std::string sMouseSpeed = "Mouse Speed##Component" + std::to_string(_mID);
 		std::string sZoomSpeed  = "Zoom Speed##Component"  + std::to_string(_mID);
 
-		ImGui::SeparatorText("View");
-
 		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], _mDragSpeed)) { _mHasUpdate = true; }
 		if (ImGui::DragFloat3(sTarget.c_str(),   &on_target[0],   _mDragSpeed)) { _mHasUpdate = true; }
 
@@ -263,8 +261,6 @@ namespace Engine {
 		std::string sMinFov = "Min Fov##Component" + std::to_string(_mID);
 
 		CameraView::drawUI();
-
-		ImGui::SeparatorText("Perspective View");
 
 		if (ImGui::DragFloat(sFov.c_str(), &on_fov, _mDragSpeed, minFOV, maxFOV)) { _mHasUpdate = true; }
 

@@ -49,13 +49,48 @@ namespace Engine {
 	}
 
 	void Entity::drawUI() const {
-		std::string sIsSelected = "Is Selected##Component" + std::to_string(_mID.getID());
-		std::string sHasUpdate  = "Has Update##Component"  + std::to_string(_mID.getID());
+		std::string sIsSelected = "Is Selected##Entity" + std::to_string(_mID.getID());
+		std::string sHasUpdate  = "Has Update##Entity"  + std::to_string(_mID.getID());
+
+		std::string sEntityType = "Entity #" + std::to_string(_mID.getID());
+
+		if (_mType == EntityType::CAMERA) {
+			sEntityType = "Camera #" + std::to_string(_mID.getID());
+		}
+		else if (_mType == EntityType::LIGHT) {
+			sEntityType = "Light #" + std::to_string(_mID.getID());
+		}
+		else if (_mType == EntityType::OBJECT) {
+			sEntityType = "Object #" + std::to_string(_mID.getID());
+		}
+		else if (_mType == EntityType::MESH) {
+			sEntityType = "Mesh #" + std::to_string(_mID.getID());
+		}
+
+		ImGui::SeparatorText(sEntityType.c_str());
 
 		ImGui::Checkbox(sIsSelected.c_str(), &_mIsSelected);
 
 		ImGui::SameLine();
 
 		ImGui::Checkbox(sHasUpdate.c_str(), &_mHasUpdate);
+
+		for(const auto& component : _mComponents) {
+			std::string sComponentName = component.second->getName() + "##Entity" + std::to_string(_mID.getID());
+
+			if (ImGui::TreeNode((sComponentName.c_str()))) {
+				component.second->drawUI();
+				ImGui::TreePop();
+			}
+		}
+
+		ImGui::NewLine();
+		ImGui::SameLine(180.0f);
+
+		if(ImGui::Button("Add Component")) {
+			// TODO
+		}
+
+		ImGui::SeparatorText("");
 	}
 };

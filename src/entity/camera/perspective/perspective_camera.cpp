@@ -20,18 +20,6 @@ namespace Engine {
 		view->calculateInitView(width, height);
 	}
 
-	void PerspectiveCamera::drawUI() const {
-		std::string sCamera = "Camera: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sCamera.c_str());
-
-		Entity::drawUI();
-
-		for(const auto& component : _mComponents) {
-			component.second->drawUI();
-		}
-	}
-
 	void PerspectiveCamera::draw(const Core::Shader& shader) const {
 		shader.bind();
 

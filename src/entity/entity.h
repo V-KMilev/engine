@@ -93,7 +93,7 @@ namespace Engine {
 
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
-			virtual void drawUI() const;
+			void drawUI() const;
 			virtual void draw(const Core::Shader &shader) const = 0;
 
 			virtual void updateShader(const Core::Shader &shader) const = 0;

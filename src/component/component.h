@@ -23,7 +23,8 @@ namespace Engine {
 		MATERIAL    = 2,
 		ACTIVATABLE = 3,
 		LINESONLY   = 4,
-		VIEW        = 5
+		VIEW        = 5,
+		EMIT        = 6
 	};
 
 	static std::string getNameFromType(ComponentType type) {
@@ -32,6 +33,8 @@ namespace Engine {
 			case ComponentType::MATERIAL:    return "Material";
 			case ComponentType::ACTIVATABLE: return "Activatable";
 			case ComponentType::LINESONLY:   return "Linesonly";
+			case ComponentType::VIEW:        return "View";
+			case ComponentType::EMIT:        return "Emit";
 			default:                         return "Invalid";
 		}
 	}

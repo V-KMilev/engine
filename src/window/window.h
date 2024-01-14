@@ -7,9 +7,7 @@ namespace Engine {
 	class InputManager;
 }
 
-#include <glad/gl.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 namespace Engine {
 	struct DeltaTime {

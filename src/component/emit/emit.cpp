@@ -9,7 +9,7 @@
 #include "input_manager.h"
 
 namespace Engine {
-	Emit::Emit() : Component(ComponentType::VIEW) {}
+	Emit::Emit() : Component(ComponentType::EMIT) {}
 
 	const glm::vec3& Emit::getPosition() const { return position; }
 	const glm::vec3& Emit::getColor() const { return color; }
@@ -47,9 +47,7 @@ namespace Engine {
 		std::string sPosition = "Position##Component" + std::to_string(_mID);
 		std::string sColor    = "Color##Component"    + std::to_string(_mID);
 
-		ImGui::SeparatorText("Emit");
-
-		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], 1)) { _mHasUpdate = true; }
-		if (ImGui::DragFloat3(sColor.c_str(), &on_color[0], 1))       { _mHasUpdate = true; }
+		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], _mDragSpeed)) { _mHasUpdate = true; }
+		if (ImGui::ColorEdit3(sColor.c_str(), &on_color[0]))                    { _mHasUpdate = true; }
 	}
 };

@@ -81,7 +81,7 @@ namespace Engine {
 		_mGrid        = std::make_shared<Grid>();
 		_mGizmo       = std::make_shared<Gizmo>();
 
-		keyBinds();
+		keyBinds(window);
 	}
 
 	void Scene::render() const {
@@ -426,7 +426,7 @@ namespace Engine {
 		}
 	}
 
-	void Scene::keyBinds() {
+	void Scene::keyBinds(GLFWwindow* window) {
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_W, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_S, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Q, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
@@ -436,8 +436,9 @@ namespace Engine {
 
 		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_U, State::PRESS} } }, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::TARGET); } ), "View");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Z, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV); } ), "Zoom");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::PRESS} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); updateCameras(UpdateEvent::TARGET, PositionEvent::NONE); } ), "View");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::RELEASE} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); } ), "View");
+		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Z, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV, PositionEvent::NONE); } ), "Zoom");
 
 		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECT; } ), "Select ability");
 		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::RELEASE}, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Select ability Stop]");

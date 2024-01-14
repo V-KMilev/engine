@@ -5,6 +5,8 @@
 
 #include "json.hpp"
 
+#include "entity.h"
+
 #include "logger.h"
 
 namespace fs = std::filesystem;

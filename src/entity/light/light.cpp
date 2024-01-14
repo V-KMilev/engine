@@ -65,18 +65,6 @@ namespace Engine {
 		}
 	}
 
-	void Light::drawUI() const {
-		std::string sObject = "Light: #" + std::to_string(_mID.getID());
-
-		ImGui::SeparatorText(sObject.c_str());
-
-		Entity::drawUI();
-
-		for(const auto& component : _mComponents) {
-			component.second->drawUI();
-		}
-	}
-
 	void Light::draw(const Core::Shader &shader) const {
 		shader.bind();
 	

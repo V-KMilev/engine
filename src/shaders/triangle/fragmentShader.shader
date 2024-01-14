@@ -100,9 +100,9 @@ vec3 calculateADS(float ambientStrength, float specularStrength, vec3 positionMV
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec      = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 
-	vec3 ambient  = ambientStrength * lightColor;
-	vec3 diffuse  = diff * lightColor;
-	vec3 specular = specularStrength * spec * lightColor;
+	vec3 ambient  = ambientStrength         * lightColor * uMaterial.coefficients.ambient;
+	vec3 diffuse  = diff                    * lightColor * uMaterial.coefficients.diffuse;
+	vec3 specular = specularStrength * spec * lightColor * uMaterial.coefficients.specular;
 
 	return (ambient + diffuse + specular);
 }
