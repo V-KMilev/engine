@@ -60,10 +60,10 @@ namespace Engine {
 			PROFILER_BEGIN("Camera", "Camera Update");
 
 			switch (_mUpdateEvent) {
-				case UpdateEvent::POSITION: updatePosition(deltaTime);      break;
-				case UpdateEvent::TARGET:   updateTarget(mouse, deltaTime); break;
-				case UpdateEvent::FOV:      zoom(mouse, deltaTime);         break;
-				default:                                                    break;
+				case UpdateEvent::POSITION: updatePosition();    break;
+				case UpdateEvent::TARGET:   updateTarget(mouse); break;
+				case UpdateEvent::FOV:      zoom(mouse);         break;
+				default:                                         break;
 			}
 
 			_mVisual->onUpdate(mouse, deltaTime);
@@ -76,7 +76,7 @@ namespace Engine {
 		}
 	}
 
-	void Camera::updatePosition(float deltaTime) {
+	void Camera::updatePosition() {
 		auto visualTransform = _mVisual->getComponent<Transform>();
 
 		auto view = getComponent<PerspectiveView>();
@@ -93,7 +93,7 @@ namespace Engine {
 			default: moveDirection = glm::vec3(0.0f); break;
 		}
 
-		view->setPosition(view->getPosition() + deltaTime * view->getMoveSpeed() * moveDirection);
+		view->setPosition(view->getPosition() + view->getMoveSpeed() * moveDirection);
 		visualTransform->setPosition(view->getPosition());
 
 		// Reset

@@ -303,10 +303,10 @@ namespace Engine {
 		_mHasUpdate = true;
 	}
 
-	void PerspectiveView::updateTarget(const Mouse* mouse, float deltaTime) {
+	void PerspectiveView::updateTarget(const Mouse* mouse) {
 		// Calculate the mouse movement angles
-		float horizontalDelta = deltaTime * mouseSpeed * (width / 2.0f - mouse->x);
-		float verticalDelta = deltaTime * mouseSpeed * (height / 2.0f - mouse->y);
+		float horizontalDelta = mouseSpeed * (width / 2.0f - mouse->x);
+		float verticalDelta   = mouseSpeed * (height / 2.0f - mouse->y);
 
 		// Update the horizontal & vertical angle
 		on_horizontalAngle += horizontalDelta;
@@ -328,9 +328,9 @@ namespace Engine {
 		_mHasUpdate = true;
 	}
 
-	void PerspectiveView::zoom(const Mouse* mouse, float deltaTime) {
+	void PerspectiveView::zoom(const Mouse* mouse) {
 		if (mouse->hasUpdate) {
-			on_fov -= deltaTime * zoomSpeed * mouse->scrollY;
+			on_fov -= zoomSpeed * mouse->scrollY;
 		}
 
 		if (fov > maxFOV) {

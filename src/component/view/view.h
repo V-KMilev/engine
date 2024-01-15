@@ -87,9 +87,9 @@ namespace Engine {
 
 			float maxUpAngle = 1.57f;
 
-			float moveSpeed  = 10.0f;
-			float mouseSpeed = 0.05f;
-			float zoomSpeed  = 500.0f;
+			float moveSpeed  = 0.1f;
+			float mouseSpeed = 0.0001f;
+			float zoomSpeed  = 5.0f;
 
 			mutable glm::vec3 on_position = position;
 			mutable glm::vec3 on_target   = target;
@@ -139,8 +139,8 @@ namespace Engine {
 
 			void calculateInitView(unsigned int width, unsigned int height) override;
 
-			void updateTarget(const Mouse* mouse, float deltaTime);
-			void zoom(const Mouse* mouse, float deltaTime);
+			void updateTarget(const Mouse* mouse);
+			void zoom(const Mouse* mouse);
 
 		private:
 			void updateProjection() override;

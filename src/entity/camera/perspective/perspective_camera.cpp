@@ -48,15 +48,15 @@ namespace Engine {
 		PROFILER_END("Camera", "Camera Update Shader");
 	}
 
-	void PerspectiveCamera::updateTarget(const Mouse* mouse, float deltaTime) {
+	void PerspectiveCamera::updateTarget(const Mouse* mouse) {
 		auto view = getComponent<PerspectiveView>();
 
-		view->updateTarget(mouse, deltaTime);
+		view->updateTarget(mouse);
 	}
 
-	void PerspectiveCamera::zoom(const Mouse* mouse, float deltaTime) {
+	void PerspectiveCamera::zoom(const Mouse* mouse) {
 		auto view = getComponent<PerspectiveView>();
 
-		view->zoom(mouse, deltaTime);
+		view->zoom(mouse);
 	}
 };

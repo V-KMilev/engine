@@ -91,6 +91,7 @@ namespace Engine {
 
 			json toJson() const;
 
+			// TODO: Remove the mouse & deltaTime (Make them global)
 			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
 
 			void drawUI() const;

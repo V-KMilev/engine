@@ -18,8 +18,8 @@ namespace Engine {
 			void updateShader(const Core::Shader &shader) const override;
 
 		private:
-			void updateTarget(const Mouse* mouse, float deltaTime) override;
+			void updateTarget(const Mouse* mouse) override;
 
-			void zoom(const Mouse* mouse, float deltaTime) override;
+			void zoom(const Mouse* mouse) override;
 	};
 };

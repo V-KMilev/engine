@@ -62,11 +62,11 @@ namespace Engine {
 			virtual void updateShader(const Core::Shader &shader) const override = 0;
 
 		protected:
-			void updatePosition(float deltaTime);
+			void updatePosition();
 
-			virtual void updateTarget(const Mouse* mouse, float deltaTime) = 0;
+			virtual void updateTarget(const Mouse* mouse) = 0;
 
-			virtual void zoom(const Mouse* mouse, float deltaTime) = 0;
+			virtual void zoom(const Mouse* mouse) = 0;
 
 		protected:
 			CameraType _mCameraType = CameraType::NONE;
