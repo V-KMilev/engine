@@ -13,7 +13,10 @@
 #include "logger.h"
 
 #include "material.h"
+
 #include "mesh.h"
+
+#include "utils.h"
 
 namespace Engine {
 	Model::Model(const std::string& path) : _mPath(path), Object(ObjectType::MODEL) {

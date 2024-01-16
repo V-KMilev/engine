@@ -6,8 +6,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
-#include "gl_texture.h"
-
 #include "utils.h"
 
 namespace Engine {

@@ -103,7 +103,7 @@ vec3 calculateADS(vec3 fragmentPosition, vec3 normal, vec3 lightPosition, vec3 l
 	float diff = max(dot(lightDir, normal), 0.0);
 	float spec = pow(max(dot(normal, halfwayDir), 0.0), uMaterial.coefficients.shininess);
 
-	vec3 ambient  =        lightColor;
+	vec3 ambient  = 0.3  * lightColor;
 	vec3 diffuse  = diff * lightColor;
 	vec3 specular = spec * lightColor;
 

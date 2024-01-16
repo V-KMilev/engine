@@ -16,7 +16,7 @@ namespace Engine {
 	}
 
 	bool Logger::init() {
-		const std::string time = Engine::Utils::get_current_time("%Y-%m-%d_%H-%M-%S");
+		const std::string time = Utils::Time::get_current_time("%Y-%m-%d_%H-%M-%S");
 
 		_mFolder = "log";
 
@@ -83,7 +83,7 @@ namespace Engine {
 		const char* file,
 		const int line
 	) const {
-		const std::string time = Engine::Utils::get_current_time();
+		const std::string time = Utils::Time::get_current_time();
 
 		std::string leveled_message = time + "\t";
 

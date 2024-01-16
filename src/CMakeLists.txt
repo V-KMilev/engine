@@ -41,6 +41,8 @@ set(SOURCES
 
 	${ENGINE_SRC_DIR}/ui/ui.cpp
 
+	${ENGINE_SRC_DIR}/utils/utils.cpp
+
 	${ENGINE_SRC_DIR}/window/window.cpp
 )
 

@@ -1,20 +1,23 @@
 #include "ui.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
 #include "gl_error_handle.h"
 
+#include "utils.h"
+
 #include "scene_manager.h"
 
-#include "camera.h"
 #include "perspective_camera.h"
 
 #include "light.h"
 
 #include "object.h"
-#include "mesh.h"
 
 #include "triangle.h"
 #include "quad.h"
@@ -22,7 +25,9 @@
 #include "sphere.h"
 #include "model.h"
 
-#include "utils.h"
+#include "mesh.h"
+
+#include "component.h"
 
 const ImGuiWindowFlags staticWindow = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing;
 namespace Engine {
@@ -285,7 +290,7 @@ namespace Engine {
 		ImGui::Begin("##LowRight", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
 		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("Soon 0")) {
+			if (ImGui::BeginMenu("Render")) {
 			}
 			if (ImGui::BeginMenu("Soon 1")) {
 			}
@@ -322,17 +327,45 @@ namespace Engine {
 
 		auto& cameras = _mScene.getCameras();
 
+		ImGui::BeginGroup();
+
 		for (std::shared_ptr<Camera>& camera : cameras) {
 			if (camera->getComponent<Activatable>()->isActive()) {
-				ImGui::BulletText("Camera");
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%u", camera->getID());
+				Utils::UI::ColoredBulletText("Camera", std::to_string(camera->getID()), ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
 			}
+			else {
+				Utils::UI::ColoredBulletText("Camera", std::to_string(camera->getID()), ImVec4(0.50f, 0.50f, 0.50f, 1.0f));
+			}
+			ImGui::SameLine();
 		}
 
-		ImGui::BulletText("FPS");
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "%f", ImGui::GetIO().Framerate);
+		ImGui::NewLine();
+		// TODO: Update this when we have more render types
+		Utils::UI::ColoredBulletText("Render", "ADS", ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
+
+		ImGui::EndGroup();
+
+		ImGui::SameLine(_mData.width * 2 / 4 - 85);
+
+		ImVec4 fpsColor = ImVec4(0.75f, 0.30f, 0.30f, 1.0f);
+
+		if (Utils::Time::FPS < 10) {
+			fpsColor = ImVec4(0.30f, 0.30f, 0.30f, 1.0f);
+		}
+		else if (Utils::Time::FPS < 30) {
+			fpsColor = ImVec4(0.40f, 0.30f, 0.30f, 1.0f);
+		}
+		else if (Utils::Time::FPS < 60) {
+			fpsColor = ImVec4(0.55f, 0.30f, 0.30f, 1.0f);
+		}
+
+		ImGui::BeginGroup();
+
+		Utils::UI::ColoredBulletText("FPS", std::to_string(Utils::Time::FPS), fpsColor);
+
+		Utils::UI::ColoredBulletText("UI ", std::to_string(int(ImGui::GetIO().Framerate)), fpsColor);
+
+		ImGui::EndGroup();
 
 		ImGui::End();
 	}

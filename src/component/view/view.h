@@ -11,10 +11,6 @@
 #include "component.h"
 
 namespace Engine {
-	class Mouse;
-}
-
-namespace Engine {
 	class CameraView : public Component {
 		public:
 			CameraView();
@@ -64,6 +60,8 @@ namespace Engine {
 			virtual void drawUI() const override;
 
 			virtual void calculateInitView(unsigned int width, unsigned int height) = 0;
+			virtual void updateTarget() = 0;
+			virtual void zoom() = 0;
 
 		protected:
 			virtual void updateProjection();
@@ -138,9 +136,8 @@ namespace Engine {
 			void drawUI() const override;
 
 			void calculateInitView(unsigned int width, unsigned int height) override;
-
-			void updateTarget(const Mouse* mouse);
-			void zoom(const Mouse* mouse);
+			void updateTarget() override;
+			void zoom() override;
 
 		private:
 			void updateProjection() override;

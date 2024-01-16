@@ -12,14 +12,14 @@
 #include "gl_error_handle.h"
 #include "tracer.h"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 
 #include "gl_pick_texture.h"
 #include "gl_texture.h"
 
+#include "utils.h"
+
 #include "scene_manager.h"
-#include "input_manager.h"
 #include "event_manager.h"
 
 #include "ui.h"
@@ -28,15 +28,15 @@
 #include "grid.h"
 #include "gizmo.h"
 
-#include "view.h"
-
-#include "camera.h"
-#include "perspective_camera.h"
-
 #include "entity.h"
 #include "object.h"
 #include "camera.h"
 #include "light.h"
+
+#include "perspective_camera.h"
+
+#include "component.h"
+#include "view.h"
 
 namespace Engine {
 	SceneWindow::SceneWindow(unsigned int mainWindowWidth, unsigned int mainWindowHeight) {
@@ -56,11 +56,9 @@ namespace Engine {
 	Scene::Scene(
 		GLFWwindow* window,
 		const char* gl_version,
-		std::shared_ptr<InputManager> InputManager,
 		unsigned int width,
 		unsigned int height
 	) :
-		_mInputManager(InputManager),
 		_mObjects({}),
 		_mCameras({}),
 		_mShaders({}),
@@ -85,11 +83,10 @@ namespace Engine {
 	}
 
 	void Scene::render() const {
-		renderer.clearColor();
-		renderer.clear();
+		Utils::Render::renderer.clearColor();
+		Utils::Render::renderer.clear();
 
 		// TODO: Think of way to update the shaders only if there is a change
-
 		for (const std::shared_ptr<Core::Shader>& shader : _mShaders) {
 			// Update the shader with the active camera's data
 			for (const std::shared_ptr<Camera>& camera : _mCameras) {
@@ -137,16 +134,16 @@ namespace Engine {
 		PROFILER_END("UI", "UI Draw");
 	}
 
-	void Scene::onUpdate(float deltaTime) {
+	void Scene::onUpdate() {
 		PROFILER_BEGIN("Scene", "Scene Update check");
 
 		for (const std::shared_ptr<Entity>& entity : _mEntitys) {
-			entity->onUpdate(&_mInputManager->getMouse(), deltaTime);
+			entity->onUpdate();
 		}
 
-		// _mGizmo->onUpdate(&_mInputManager->getMouse(), deltaTime, *object);
+		// _mGizmo->onUpdate(*object);
 
-		_mOrientation->onUpdate(&_mInputManager->getMouse(), deltaTime);
+		_mOrientation->onUpdate();
 
 		if (_mSelectState == SelectState::SELECT) {
 			pickEntity();
@@ -156,7 +153,7 @@ namespace Engine {
 		}
 
 		// Reset the update event
-		_mInputManager->getMouse().hasUpdate = false;
+		Utils::IO::inputManager.getMouse().hasUpdate = false;
 
 		PROFILER_END("Scene", "Scene Update check");
 	}
@@ -271,7 +268,7 @@ namespace Engine {
 
 		_mPickTexture->enableWriting();
 
-		renderer.clear();
+		Utils::Render::renderer.clear();
 
 		shader->bind();
 
@@ -342,8 +339,8 @@ namespace Engine {
 	void Scene::pickEntity() {
 		PROFILER_BEGIN("Pick Entity", "Entity Pick");
 
-		unsigned int x = _mInputManager->getMouse().x;
-		unsigned int y = _mSceneWindow.mainWindowHeight - _mInputManager->getMouse().y - 1;
+		unsigned int x = Utils::IO::inputManager.getMouse().x;
+		unsigned int y = _mSceneWindow.mainWindowHeight - Utils::IO::inputManager.getMouse().y - 1;
 
 		if (x < _mSceneWindow.startX || x > _mSceneWindow.startX + _mSceneWindow.width ||
 			y < _mSceneWindow.startY || y > _mSceneWindow.startY + _mSceneWindow.height) {
@@ -382,8 +379,8 @@ namespace Engine {
 
 				glm::vec3 position = transform->getPosition();
 
-				float x = (float)_mInputManager->getMouse().x;
-				float y = (float)_mSceneWindow.mainWindowHeight - _mInputManager->getMouse().y - 1;
+				float x = (float)Utils::IO::inputManager.getMouse().x;
+				float y = (float)_mSceneWindow.mainWindowHeight - Utils::IO::inputManager.getMouse().y - 1;
 
 				// Lock the x and y so the entity will not fly out of screen
 				x = std::clamp(x, (float)_mSceneWindow.startX, (float)_mSceneWindow.startX + _mSceneWindow.width);
@@ -427,23 +424,23 @@ namespace Engine {
 	}
 
 	void Scene::keyBinds(GLFWwindow* window) {
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_W, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_S, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Q, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_E, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_A, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_D, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_W, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSX); } ), "+x");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_S, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGX); } ), "-x");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Q, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSY); } ), "+y");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_E, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGY); } ), "-y");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_A, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::POSZ); } ), "+z");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_D, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::POSITION, PositionEvent::NEGZ); } ), "-z");
 
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_U, State::PRESS} } }, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_U, State::PRESS} } }, std::function<void()>( [this] { _mUI->showUI(); } ), "Activate UI");
 
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::PRESS} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); updateCameras(UpdateEvent::TARGET, PositionEvent::NONE); } ), "View");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::RELEASE} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); } ), "View");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Z, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV, PositionEvent::NONE); } ), "Zoom");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::PRESS} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); updateCameras(UpdateEvent::TARGET, PositionEvent::NONE); } ), "View");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_V, State::RELEASE} } }, std::function<void()>( [this, window] { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); } ), "View");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_Z, State::PRESS} } }, std::function<void()>( [this] { updateCameras(UpdateEvent::FOV, PositionEvent::NONE); } ), "Zoom");
 
-		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECT; } ), "Select ability");
-		_mInputManager->mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::RELEASE}, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Select ability Stop]");
+		Utils::IO::inputManager.mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::PRESS}, std::function<void()>( [this] { _mSelectState = SelectState::SELECT; } ), "Select ability");
+		Utils::IO::inputManager.mapInputKeyToEvent({GLFW_MOUSE_BUTTON_LEFT, State::RELEASE}, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Select ability Stop]");
 
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::PRESS} } }, std::function<void()>( [this] { _mSelectState = SelectState::MOVE; } ), "Move ability");
-		_mInputManager->mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::RELEASE} } }, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Move ability Stop]");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::PRESS} } }, std::function<void()>( [this] { _mSelectState = SelectState::MOVE; } ), "Move ability");
+		Utils::IO::inputManager.mapKeyCombinationToEvent({ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_MOUSE_BUTTON_LEFT, State::RELEASE} } }, std::function<void()>( [this] { _mSelectState = SelectState::IDLE; } ), "Hint [Move ability Stop]");
 	}
 };

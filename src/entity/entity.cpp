@@ -4,6 +4,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "error_handle.h"
+
+#include "component.h"
+
 namespace Engine {
 	Entity::Entity(EntityType type) : _mType(type) {
 		_mID.updateID(_mType);

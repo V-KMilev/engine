@@ -6,7 +6,6 @@
 
 #include "tracer.h"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 
 #include "gl_error_handle.h"
@@ -33,7 +32,7 @@ namespace Engine {
 		return _mMeshes;
 	}
 
-	void Object::onUpdate(const Mouse* mouse, float deltaTime) {
+	void Object::onUpdate() {
 		for(const auto& component : _mComponents) {
 			if (component.second->hasUpdate()) {
 				_mHasUpdate = true;
@@ -54,7 +53,7 @@ namespace Engine {
 				meshTransform->setRotation(transform->getRotation());
 				meshTransform->setScale(transform->getScale());
 
-				mesh->onUpdate(mouse, deltaTime);
+				mesh->onUpdate();
 			}
 
 			// Reset the update event

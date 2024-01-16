@@ -3,12 +3,10 @@
 #include <memory>
 
 namespace Core {
-	class Renderer;
 	class Shader;
 }
 
 namespace Engine {
-	struct Mouse;
 	class Object;
 }
 
@@ -26,7 +24,7 @@ namespace Engine {
 
 			void draw(const Core::Shader &shader) const;
 
-			void onUpdate(const Mouse* mouse, float deltaTime);
+			void onUpdate();
 
 		private:
 			std::shared_ptr<Object> _mGeometry;

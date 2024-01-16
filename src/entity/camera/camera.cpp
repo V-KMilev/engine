@@ -7,9 +7,8 @@
 #include "error_handle.h"
 #include "tracer.h"
 
-#include "input_manager.h"
-
 #include "view.h"
+
 #include "sphere.h"
 
 namespace Engine {
@@ -40,7 +39,7 @@ namespace Engine {
 		_mPositionEvent = event;
 	}
 
-	void Camera::onUpdate(const Mouse* mouse, float deltaTime) {
+	void Camera::onUpdate() {
 		for(const auto& component : _mComponents) {
 			if (component.second->hasUpdate()) {
 				_mHasUpdate = true;
@@ -60,13 +59,13 @@ namespace Engine {
 			PROFILER_BEGIN("Camera", "Camera Update");
 
 			switch (_mUpdateEvent) {
-				case UpdateEvent::POSITION: updatePosition();    break;
-				case UpdateEvent::TARGET:   updateTarget(mouse); break;
-				case UpdateEvent::FOV:      zoom(mouse);         break;
-				default:                                         break;
+				case UpdateEvent::POSITION: updatePosition(); break;
+				case UpdateEvent::TARGET:   updateTarget();   break;
+				case UpdateEvent::FOV:      zoom();           break;
+				default:                                      break;
 			}
 
-			_mVisual->onUpdate(mouse, deltaTime);
+			_mVisual->onUpdate();
 
 			// Reset the update event
 			_mUpdateEvent = UpdateEvent::NONE;

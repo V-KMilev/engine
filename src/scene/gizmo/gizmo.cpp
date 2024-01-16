@@ -1,14 +1,10 @@
 #include "gizmo.h"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 
-#include "gl_error_handle.h"
-
-#include "input_manager.h"
-
-#include "object.h"
 #include "cube.h"
+
+#include "component.h"
 
 namespace Engine {
 	Gizmo::Gizmo() {
@@ -24,6 +20,6 @@ namespace Engine {
 		_mGeometry->draw(shader);
 	}
 
-	void Gizmo::onUpdate(const Mouse* mouse, float deltaTime, const Object& object) {
+	void Gizmo::onUpdate(const Object& object) {
 	}
 };

@@ -5,10 +5,6 @@
 #include "camera.h"
 
 namespace Engine {
-	class PerspectiveView;
-}
-
-namespace Engine {
 	class PerspectiveCamera : public Camera {
 		public:
 			PerspectiveCamera(unsigned int width, unsigned int height);
@@ -18,8 +14,8 @@ namespace Engine {
 			void updateShader(const Core::Shader &shader) const override;
 
 		private:
-			void updateTarget(const Mouse* mouse) override;
+			void updateTarget() override;
 
-			void zoom(const Mouse* mouse) override;
+			void zoom() override;
 	};
 };

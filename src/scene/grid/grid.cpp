@@ -4,7 +4,6 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 
 #include "quad.h"
@@ -20,7 +19,7 @@ namespace Engine {
 		_mGrid->draw(shader);
 	}
 
-	void Grid::onUpdate(const Mouse* mouse, float deltaTime) {
-		_mGrid->onUpdate(mouse, deltaTime);
+	void Grid::onUpdate() {
+		_mGrid->onUpdate();
 	}
 };

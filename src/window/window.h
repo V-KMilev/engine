@@ -3,10 +3,6 @@
 #include <string>
 #include <memory>
 
-namespace Engine {
-	class InputManager;
-}
-
 struct GLFWwindow;
 
 namespace Engine {
@@ -43,14 +39,12 @@ namespace Engine {
 
 			void input_config();
 
-			float time_tick();
+			void time_tick();
 
 			void set_close(bool flag);
 
 		private:
 			GLFWwindow* _mWindow;
-
-			std::shared_ptr<InputManager> _mInputManager;
 
 			DeltaTime _mDelta;
 

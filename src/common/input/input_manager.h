@@ -6,8 +6,7 @@
 #include "input_key.h"
 #include "input_key_combination.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 namespace Engine {
 	struct Mouse {

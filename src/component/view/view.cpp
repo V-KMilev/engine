@@ -4,9 +4,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include "logger.h"
+
 #include "tracer.h"
 
-#include "input_manager.h"
+#include "utils.h"
 
 namespace Engine {
 	CameraView::CameraView() : Component(ComponentType::VIEW) {}
@@ -186,7 +188,13 @@ namespace Engine {
 	}
 
 	void CameraView::updateProjection() {
-		// TODO: Fix this
+		static bool lock = false;
+
+		if(!lock) {
+			LOG("Component #%d uses default camera view", LOG_LEVEL::L_WARN, _mID);
+			lock = true;
+		}
+
 		return;
 	}
 
@@ -303,10 +311,12 @@ namespace Engine {
 		_mHasUpdate = true;
 	}
 
-	void PerspectiveView::updateTarget(const Mouse* mouse) {
+	void PerspectiveView::updateTarget() {
+		const auto& mouse = Utils::IO::inputManager.getMouse();
+
 		// Calculate the mouse movement angles
-		float horizontalDelta = mouseSpeed * (width / 2.0f - mouse->x);
-		float verticalDelta   = mouseSpeed * (height / 2.0f - mouse->y);
+		float horizontalDelta = mouseSpeed * (width / 2.0f - mouse.x);
+		float verticalDelta   = mouseSpeed * (height / 2.0f - mouse.y);
 
 		// Update the horizontal & vertical angle
 		on_horizontalAngle += horizontalDelta;
@@ -328,9 +338,11 @@ namespace Engine {
 		_mHasUpdate = true;
 	}
 
-	void PerspectiveView::zoom(const Mouse* mouse) {
-		if (mouse->hasUpdate) {
-			on_fov -= zoomSpeed * mouse->scrollY;
+	void PerspectiveView::zoom() {
+		const auto& mouse = Utils::IO::inputManager.getMouse();
+
+		if (mouse.hasUpdate) {
+			on_fov -= zoomSpeed * mouse.scrollY;
 		}
 
 		if (fov > maxFOV) {

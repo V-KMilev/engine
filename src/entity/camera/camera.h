@@ -10,8 +10,6 @@
 
 namespace Engine {
 	class Object;
-
-	struct Mouse;
 };
 
 namespace Engine {
@@ -55,7 +53,7 @@ namespace Engine {
 			void setUpdateEvent(UpdateEvent event);
 			void setPositionEvent(PositionEvent event);
 
-			void onUpdate(const Mouse* mouse, float deltaTime) override;
+			void onUpdate() override;
 
 			virtual void draw(const Core::Shader &shader) const override = 0;
 
@@ -64,9 +62,9 @@ namespace Engine {
 		protected:
 			void updatePosition();
 
-			virtual void updateTarget(const Mouse* mouse) = 0;
+			virtual void updateTarget() = 0;
 
-			virtual void zoom(const Mouse* mouse) = 0;
+			virtual void zoom() = 0;
 
 		protected:
 			CameraType _mCameraType = CameraType::NONE;

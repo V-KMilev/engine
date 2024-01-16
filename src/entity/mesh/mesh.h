@@ -62,7 +62,7 @@ namespace Engine {
 				const std::vector<unsigned int>& indices
 			);
 
-			void onUpdate(const Mouse* mouse, float deltaTime) override;
+			void onUpdate() override;
 
 			void draw(const Core::Shader &shader) const override;
 

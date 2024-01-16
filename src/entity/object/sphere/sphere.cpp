@@ -2,9 +2,8 @@
 
 #include "mesh.h"
 
-#include "gl_texture.h"
-
 #include "material.h"
+
 #include "utils.h"
 
 namespace Engine {

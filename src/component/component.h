@@ -10,10 +10,6 @@
 
 #include "json.hpp"
 
-namespace Core {
-	class Texture;
-};
-
 using json = nlohmann::json;
 
 namespace Engine {

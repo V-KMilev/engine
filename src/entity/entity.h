@@ -2,9 +2,6 @@
 
 #include <memory>
 
-#include "error_handle.h"
-
-#include "component.h"
 #include "entity_id.h"
 
 #include "json.hpp"
@@ -14,8 +11,8 @@ namespace Core {
 }
 
 namespace Engine {
-	struct Mouse;
-};
+	class Component;
+}
 
 using json = nlohmann::json;
 
@@ -49,50 +46,19 @@ namespace Engine {
 			void setHasUpdate(bool value);
 
 			template<typename T>
-			std::shared_ptr<T> Entity::addComponent(std::shared_ptr<T> newComponent = nullptr) {
-				if (newComponent) {
-					// Initialize the component with the provided newComponent
-					auto component = std::make_shared<T>(*newComponent);
-
-					_mComponents[typeid(T).hash_code()] = component;
-
-					return component;
-				} else {
-					// Create a new component without specific initialization
-					auto component = std::make_shared<T>();
-
-					_mComponents[typeid(T).hash_code()] = component;
-
-					return component;
-				}
-			}
+			std::shared_ptr<T> addComponent(std::shared_ptr<T> newComponent = nullptr);
 
 			template<typename T>
-			std::shared_ptr<T> Entity::getComponent() {
-				auto it = _mComponents.find(typeid(T).hash_code());
-
-				if (it != _mComponents.end()) {
-					return std::static_pointer_cast<T>(it->second);
-				}
-
-				return nullptr;
-			}
+			std::shared_ptr<T> getComponent();
 
 			template<typename T>
-			std::shared_ptr<T> Entity::getComponent() const {
-				auto it = _mComponents.find(typeid(T).hash_code());
-
-				if (it != _mComponents.end()) {
-					return std::static_pointer_cast<T>(it->second);
-				}
-
-				return nullptr;
-			}
+			std::shared_ptr<T> getComponent() const;
 
 			json toJson() const;
 
-			// TODO: Remove the mouse & deltaTime (Make them global)
-			virtual void onUpdate(const Mouse* mouse, float deltaTime) = 0;
+			virtual void onUpdate() = 0;
+			// TODO:
+			// virtual void onFixUpdate() = 0;
 
 			void drawUI() const;
 			virtual void draw(const Core::Shader &shader) const = 0;
@@ -108,4 +74,45 @@ namespace Engine {
 
 			std::unordered_map<size_t, std::shared_ptr<Component>> _mComponents;
 	};
+
+	template<typename T>
+	std::shared_ptr<T> Entity::addComponent(std::shared_ptr<T> newComponent) {
+		if (newComponent) {
+			// Initialize the component with the provided newComponent
+			auto component = std::make_shared<T>(*newComponent);
+
+			_mComponents[typeid(T).hash_code()] = component;
+
+			return component;
+		} else {
+			// Create a new component without specific initialization
+			auto component = std::make_shared<T>();
+
+			_mComponents[typeid(T).hash_code()] = component;
+
+			return component;
+		}
+	}
+
+	template<typename T>
+	std::shared_ptr<T> Entity::getComponent() {
+		auto it = _mComponents.find(typeid(T).hash_code());
+
+		if (it != _mComponents.end()) {
+			return std::static_pointer_cast<T>(it->second);
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	std::shared_ptr<T> Entity::getComponent() const {
+		auto it = _mComponents.find(typeid(T).hash_code());
+
+		if (it != _mComponents.end()) {
+			return std::static_pointer_cast<T>(it->second);
+		}
+
+		return nullptr;
+	}
 };

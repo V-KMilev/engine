@@ -8,22 +8,22 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "gl_error_handle.h"
+#include "gl_shader.h"
+
 #include "logger.h"
 
-#include "input_manager.h"
+#include "utils.h"
+
 #include "event_manager.h"
-#include "scene.h"
 
 #include "perspective_camera.h"
-#include "model.h"
-#include "cube.h"
-#include "quad.h"
-#include "sphere.h"
 
 #include "light.h"
 
-#include "gl_error_handle.h"
-#include "gl_shader.h"
+#include "sphere.h"
+
+#include "scene.h"
 
 namespace Engine {
 	Window::Window(
@@ -112,17 +112,16 @@ namespace Engine {
 	}
 
 	void Window::input_config() {
-		_mInputManager = std::make_shared<InputManager>();
 
-		glfwSetKeyCallback(_mWindow, _mInputManager->keyCallback);
-		glfwSetMouseButtonCallback(_mWindow, _mInputManager->mouseButtonCallback);
-		glfwSetScrollCallback(_mWindow, _mInputManager->mouseScrollCallback);
+		glfwSetKeyCallback(_mWindow, Utils::IO::inputManager.keyCallback);
+		glfwSetMouseButtonCallback(_mWindow, Utils::IO::inputManager.mouseButtonCallback);
+		glfwSetScrollCallback(_mWindow, Utils::IO::inputManager.mouseScrollCallback);
 
 		// TODO: Find better "hack" for this to work
-		glfwSetWindowUserPointer(_mWindow, _mInputManager.get());
+		glfwSetWindowUserPointer(_mWindow, &Utils::IO::inputManager);
 
 		// Mapping exit button
-		_mInputManager->mapKeyCombinationToEvent(
+		Utils::IO::inputManager.mapKeyCombinationToEvent(
 			{ { {GLFW_KEY_LEFT_CONTROL, State::PRESS}, {GLFW_KEY_C, State::PRESS} } },
 			std::function<void()>(
 				[this] { set_close(true); }
@@ -131,12 +130,14 @@ namespace Engine {
 		);
 	}
 
-	float Window::time_tick() {
+	void Window::time_tick() {
 		_mDelta.currentTime = (float)glfwGetTime();
 		_mDelta.deltaTime   = _mDelta.currentTime - _mDelta.lastTime;
 		_mDelta.lastTime    = _mDelta.currentTime;
 
-		return _mDelta.deltaTime;
+		Utils::Time::deltaTime = _mDelta.deltaTime;
+		Utils::Time::FPS = 1.0f / Utils::Time::deltaTime;
+		Utils::Time::frame++;
 	}
 
 	void Window::set_close(bool flag) {
@@ -150,7 +151,6 @@ namespace Engine {
 		std::shared_ptr<Scene> _mScene = std::make_shared<Scene>(
 			_mWindow,
 			"#version 330",
-			_mInputManager,
 			_mWidth,
 			_mHeight
 		);
@@ -171,9 +171,11 @@ namespace Engine {
 		_mScene->addShader(std::make_shared<Core::Shader>("..\\src\\shaders\\triangle"));
 
 		while (!glfwWindowShouldClose(_mWindow)) {
-			_mInputManager->processMouse(_mWindow);
+			time_tick();
 
-			_mScene->onUpdate(time_tick());
+			Utils::IO::inputManager.processMouse(_mWindow);
+
+			_mScene->onUpdate();
 
 			_mScene->render();
 			_mScene->renderUI();

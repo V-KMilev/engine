@@ -4,17 +4,12 @@
 #include <memory>
 
 namespace Core {
-	class Texture;
 	class PickTexture;
-
-	class Renderer;
 	class Shader;
-	class FrameBuffer;
 }
 
 namespace Engine {
 	class SceneManager;
-	class InputManager;
 	class EventManager;
 
 	class UI;
@@ -68,7 +63,6 @@ namespace Engine {
 			Scene(
 				GLFWwindow* window,
 				const char* gl_version,
-				std::shared_ptr<InputManager> InputManagerr,
 				unsigned int width,
 				unsigned int height
 			);
@@ -82,7 +76,7 @@ namespace Engine {
 			void render() const;
 			void renderUI();
 
-			void onUpdate(float deltaTime);
+			void onUpdate();
 
 			void removeSelectedEntitys();
 
@@ -129,7 +123,6 @@ namespace Engine {
 
 		private:
 			std::shared_ptr<SceneManager> _mSceneManager;
-			std::shared_ptr<InputManager> _mInputManager;
 			std::shared_ptr<EventManager> _mEventManager;
 
 			std::shared_ptr<UI> _mUI;

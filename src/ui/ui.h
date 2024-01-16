@@ -1,19 +1,11 @@
 #pragma once
 
-#include <vector>
-
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #define MainBarWidth 20
 #define ActivityBarWidth 20
 
-#include "scene.h"
+struct GLFWwindow;
 
-namespace Engine {
-	class Object;
-	class Camera;
-}
+#include "scene.h"
 
 namespace Engine {
 	struct uiData {

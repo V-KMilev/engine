@@ -4,10 +4,11 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 
 #include "cube.h"
+
+#include "component.h"
 
 namespace Engine {
 	Orientation::Orientation() {
@@ -25,7 +26,7 @@ namespace Engine {
 		_mGeometry->draw(shader);
 	}
 
-	void Orientation::onUpdate(const Mouse* mouse, float deltaTime) {
-		_mGeometry->onUpdate(mouse, deltaTime);
+	void Orientation::onUpdate() {
+		_mGeometry->onUpdate();
 	}
 };

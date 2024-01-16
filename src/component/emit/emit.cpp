@@ -6,8 +6,6 @@
 
 #include "tracer.h"
 
-#include "input_manager.h"
-
 namespace Engine {
 	Emit::Emit() : Component(ComponentType::EMIT) {}
 

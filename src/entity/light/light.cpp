@@ -6,11 +6,9 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
-#include "tracer.h"
-
-#include "input_manager.h"
-
 #include "gl_shader.h"
+
+#include "tracer.h"
 
 #include "emit.h"
 
@@ -43,7 +41,7 @@ namespace Engine {
 		_mHasUpdate = true;
 	}
 
-	void Light::onUpdate(const Mouse* mouse, float deltaTime) {
+	void Light::onUpdate() {
 		for(const auto& component : _mComponents) {
 			if (component.second->hasUpdate()) {
 				_mHasUpdate = true;
@@ -58,7 +56,7 @@ namespace Engine {
 
 			visualTransform->setPosition(emit->getPosition());
 
-			_mVisual->onUpdate(mouse, deltaTime);
+			_mVisual->onUpdate();
 
 			// Reset
 			_mHasUpdate = false;

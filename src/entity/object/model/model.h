@@ -6,8 +6,6 @@
 
 #include "object.h"
 
-#include "utils.h"
-
 namespace tinyobj {
 	struct attrib_t;
 	struct shape_t;

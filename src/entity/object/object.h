@@ -64,7 +64,7 @@ namespace Engine {
 
 			virtual void load_mesh() = 0;
 
-			void onUpdate(const Mouse* mouse, float deltaTime) override;
+			void onUpdate() override;
 
 			void draw(const Core::Shader &shader) const override;
 

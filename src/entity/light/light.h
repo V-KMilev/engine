@@ -4,8 +4,6 @@
 
 namespace Engine {
 	class Object;
-
-	class Mouse;
 }
 
 namespace Core {
@@ -32,7 +30,7 @@ namespace Engine {
 			Light(Light && other) = delete;
 			Light& operator = (Light && other) = delete;
 
-			void onUpdate(const Mouse* mouse, float deltaTime) override;
+			void onUpdate() override;
 
 			void draw(const Core::Shader &shader) const override;
 

@@ -8,9 +8,8 @@
 
 #include "gl_shader.h"
 
-#include "input_manager.h"
-
 #include "view.h"
+
 #include "object.h"
 
 namespace Engine {
@@ -48,15 +47,15 @@ namespace Engine {
 		PROFILER_END("Camera", "Camera Update Shader");
 	}
 
-	void PerspectiveCamera::updateTarget(const Mouse* mouse) {
+	void PerspectiveCamera::updateTarget() {
 		auto view = getComponent<PerspectiveView>();
 
-		view->updateTarget(mouse);
+		view->updateTarget();
 	}
 
-	void PerspectiveCamera::zoom(const Mouse* mouse) {
+	void PerspectiveCamera::zoom() {
 		auto view = getComponent<PerspectiveView>();
 
-		view->zoom(mouse);
+		view->zoom();
 	}
 };

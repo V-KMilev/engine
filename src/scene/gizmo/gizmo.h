@@ -7,12 +7,10 @@
 #include <memory>
 
 namespace Core {
-	class Renderer;
 	class Shader;
 }
 
 namespace Engine {
-	struct Mouse;
 	class Object;
 }
 
@@ -28,7 +26,7 @@ namespace Engine {
 			Gizmo(Gizmo && other) = delete;
 			Gizmo& operator = (Gizmo && other) = delete;
 
-			void onUpdate(const Mouse* mouse, float deltaTime, const Object& object);
+			void onUpdate(const Object& object);
 
 			void draw(const Core::Shader &shader) const;
 

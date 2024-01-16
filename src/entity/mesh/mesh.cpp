@@ -4,20 +4,18 @@
 #include <imgui_impl_glfw.h>
 #include <imgui.h>
 
-#include "error_handle.h"
-#include "tracer.h"
-
 #include "gl_vertex_array.h"
 #include "gl_vertex_buffer.h"
 #include "gl_index_buffer.h"
 #include "gl_vertex_buffer_layout.h"
 
-#include "gl_render.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
 
+#include "error_handle.h"
+#include "tracer.h"
+
 #include "material.h"
-#include "utils.h"
 
 #include "component.h"
 
@@ -88,7 +86,7 @@ namespace Engine {
 		PROFILER_END("Mesh", "Mesh Load");
 	}
 
-	void Mesh::onUpdate(const Mouse* mouse, float deltaTime) {
+	void Mesh::onUpdate() {
 		for(const auto& component : _mComponents) {
 			if (component.second->hasUpdate()) {
 				_mHasUpdate = true;
@@ -112,7 +110,7 @@ namespace Engine {
 
 		updateShader(shader);
 
-		renderer.draw(*_mVA, *_mIB, shader);
+		Utils::Render::renderer.draw(*_mVA, *_mIB, shader);
 
 		PROFILER_END("Mesh", "Mesh Draw");
 	}
