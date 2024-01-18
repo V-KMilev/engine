@@ -1,20 +1,24 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
-#include "input_handler.h"
-
-// To avoid including the full GLFW implementation, we forward declaration GLFWwindow
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace Engine {
+	struct DeltaTime {
+		float lastTime    = 0.0f;
+		float currentTime = 0.0f;
+		float deltaTime   = 0.0f;
+	};
+
 	class Window {
 		public:
 			Window(
 				const std::string& title,
-				uint32_t width,
-				uint32_t height,
-				uint32_t antiAliasing,
+				unsigned int width,
+				unsigned int height,
+				unsigned int antiAliasing,
 				bool fullscreen
 			);
 			~Window();
@@ -31,22 +35,27 @@ namespace Engine {
 			void main_loop();
 
 		private:
-			void set_close(bool flag);
+			void gl_config();
 
 			void input_config();
 
+			void time_tick();
+
+			void set_close(bool flag);
+
 		private:
-			GLFWwindow* _window;
+			GLFWwindow* _mWindow;
 
-			std::string _title;
-			uint32_t _width;
-			uint32_t _height;
+			DeltaTime _mDelta;
 
-			uint32_t _AA;
+			std::string _mTitle = "";
 
-			bool _fullscreen;
-			bool _close;
+			unsigned int _mWidth  = 0;
+			unsigned int _mHeight = 0;
 
-			InputHandle _input;
+			unsigned int _mAA = 0;
+
+			bool _mFullscreen = false;
+			bool _mClose      = false;
 	};
 };

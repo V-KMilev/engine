@@ -2,13 +2,17 @@
 
 #include "window.h"
 
-int main(void) {
-	printf("Staring..\n");
+#include "tracer.h"
 
-	const uint32_t width  = 800;
-	const uint32_t hight  = 400;
-	const uint32_t AA     = 4;
-	const bool fullscreen = false;
+int main(void) {
+	printf("Staring...\n");
+
+	Profiler::Tracer tracer("tracer.json", "Engine Process", "Main Thread");
+
+	const uint32_t width  = 1920;
+	const uint32_t hight  = 1080;
+	const uint32_t AA     = 8;
+	const bool fullscreen = true;
 
 	Engine::Window window("VKM Engine", width, hight, AA, fullscreen);
 
@@ -18,7 +22,7 @@ int main(void) {
 
 	window.main_loop();
 
-	printf("Ending..\n");
+	printf("Ending...\n");
 
 	return 0;
 }
