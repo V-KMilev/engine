@@ -42,8 +42,8 @@ namespace Engine {
 	}
 
 	void Emit::drawUI() const {
-		std::string sPosition = "Position##Component" + std::to_string(_mID);
-		std::string sColor    = "Color##Component"    + std::to_string(_mID);
+		static std::string sPosition = "Position##Component" + std::to_string(_mID);
+		static std::string sColor    = "Color##Component"    + std::to_string(_mID);
 
 		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], _mDragSpeed)) { _mHasUpdate = true; }
 		if (ImGui::ColorEdit3(sColor.c_str(), &on_color[0]))                    { _mHasUpdate = true; }

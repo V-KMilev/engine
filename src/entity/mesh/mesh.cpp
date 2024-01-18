@@ -118,6 +118,8 @@ namespace Engine {
 	void Mesh::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Mesh", "Mesh Shader Update");
 
+		static std::string sModel = "uModel";
+
 		auto transform = getComponent<Transform>();
 		auto material = getComponent<Material>();
 
@@ -125,7 +127,7 @@ namespace Engine {
 
 		material->updateShader(shader);
 
-		shader.setUniformMatrix4fv("uModel", transform->getModel());
+		shader.setUniformMatrix4fv(sModel, transform->getModel());
 
 		PROFILER_END("Mesh", "Mesh Shader Update");
 	}

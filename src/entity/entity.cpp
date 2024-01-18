@@ -53,10 +53,10 @@ namespace Engine {
 	}
 
 	void Entity::drawUI() const {
-		std::string sIsSelected = "Is Selected##Entity" + std::to_string(_mID.getID());
-		std::string sHasUpdate  = "Has Update##Entity"  + std::to_string(_mID.getID());
+		static std::string sIsSelected = "Is Selected##Entity" + std::to_string(_mID.getID());
+		static std::string sHasUpdate  = "Has Update##Entity"  + std::to_string(_mID.getID());
 
-		std::string sEntityType = "Entity #" + std::to_string(_mID.getID());
+		static std::string sEntityType = "Entity #" + std::to_string(_mID.getID());
 
 		if (_mType == EntityType::CAMERA) {
 			sEntityType = "Camera #" + std::to_string(_mID.getID());

@@ -75,6 +75,10 @@ in VS_OUT {
 } fs_in;
 
 vec3 calculateADS(vec3 fragmentPosition, vec3 normal, vec3 lightPosition, vec3 lightColor, const float gamma);
+// TODO
+// vec3 calculatePBR();
+// vec3 calculateRT();
+// vec3 calculateNVRTX();
 
 void main() {
 	const float gamma = 2.2;

@@ -28,21 +28,30 @@ namespace Engine {
 	void PerspectiveCamera::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Camera", "Camera Update Shader");
 
-		shader.bind();
-
 		auto view = getComponent<PerspectiveView>();
 
-		shader.setUniformMatrix4fv("uCamera.view", view->getLookAt());
-		shader.setUniformMatrix4fv("uCamera.projection", view->getProjection());
+		static std::string sView       = "uCamera.view";
+		static std::string sProjection = "uCamera.projection";
+		static std::string sPosition   = "uCamera.position";
+		static std::string sFOV        = "uCamera.FOV";
+		static std::string sWidth      = "uCamera.width";
+		static std::string sHeight     = "uCamera.height";
+		static std::string sNear       = "uCamera.near";
+		static std::string sFar        = "uCamera.far";
 
-		shader.setUniform3fv("uCamera.position", view->getPosition());
+		shader.bind();
 
-		shader.setUniform1f("uCamera.FOV", view->getFov());
-		shader.setUniform1f("uCamera.width", (float)view->getWidth());
-		shader.setUniform1f("uCamera.height", (float)view->getHeight());
+		shader.setUniformMatrix4fv(sView, view->getLookAt());
+		shader.setUniformMatrix4fv(sProjection, view->getProjection());
 
-		shader.setUniform1f("uCamera.near", view->getNear());
-		shader.setUniform1f("uCamera.far", view->getFar());
+		shader.setUniform3fv(sPosition, view->getPosition());
+
+		shader.setUniform1f(sFOV, view->getFov());
+		shader.setUniform1f(sWidth, (float)view->getWidth());
+		shader.setUniform1f(sHeight, (float)view->getHeight());
+
+		shader.setUniform1f(sNear, view->getNear());
+		shader.setUniform1f(sFar, view->getFar());
 
 		PROFILER_END("Camera", "Camera Update Shader");
 	}

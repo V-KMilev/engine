@@ -86,6 +86,7 @@ namespace Engine {
 		json componentJson;
 
 		json texturesArray;
+
 		for (int i = 0; i < textures->textures.size(); ++i) {
 			componentJson.push_back(textures->textures[i]->getPath());
 		}
@@ -122,12 +123,29 @@ namespace Engine {
 	void Material::drawUI() const {
 		bool hasUpdate = false;
 
+		static std::string sTextureType = "Texture Type:";
+		static std::string sTexture     = "Texture:";
+		static std::string sData        = "Data:";
+
+		static std::string sID     = "ID:";
+		static std::string sWidth  = "Width:";
+		static std::string sHeight = "Height:";
+		static std::string sPath   = "Path:";
+		static std::string sName   = "Name:";
+
+		static std::string sTarget         = "Target:";
+		static std::string sLevel          = "Level:";
+		static std::string sInternalFormat = "Internal Format:";
+		static std::string sBorder         = "Border:";
+		static std::string sFormat         = "Format:";
+		static std::string sType           = "Type:";
+
 		static ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersH | ImGuiTableFlags_RowBg;
 
 		if (ImGui::BeginTable("table1", 3, tableFlags)) {
-			ImGui::TableSetupColumn("Texture Type:");
-			ImGui::TableSetupColumn("Texture:");
-			ImGui::TableSetupColumn("Data:");
+			ImGui::TableSetupColumn(sTextureType.c_str());
+			ImGui::TableSetupColumn(sTexture.c_str());
+			ImGui::TableSetupColumn(sData.c_str());
 
 			ImGui::TableHeadersRow();
 
@@ -149,22 +167,21 @@ namespace Engine {
 
 				ImGui::TableSetColumnIndex(2);
 
-				Utils::UI::ColoredBulletText("ID:", std::to_string(texture->getID()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-				Utils::UI::ColoredBulletText("Width:", std::to_string(texture->getWidth()), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-				Utils::UI::ColoredBulletText("Height:", std::to_string(texture->getHeight()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-				Utils::UI::ColoredBulletText("Path:", texture->getPath(), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-				Utils::UI::ColoredBulletText("Name:", texture->getName(), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+				Utils::UI::ColoredBulletText(sID, std::to_string(texture->getID()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+				Utils::UI::ColoredBulletText(sWidth, std::to_string(texture->getWidth()), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+				Utils::UI::ColoredBulletText(sHeight, std::to_string(texture->getHeight()), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+				Utils::UI::ColoredBulletText(sPath, texture->getPath(), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+				Utils::UI::ColoredBulletText(sName, texture->getName(), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
 
 				if (ImGui::TreeNodeEx("OpenGL Data", ImGuiTreeNodeFlags_Selected)) {
 					const auto& tParams = texture->getParams();
 
-					Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Target:", std::to_string(tParams.target), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Level:", std::to_string(tParams.level), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Internal Format:", std::to_string(tParams.internalFormat), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Border:", std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Format:", std::to_string(tParams.format), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
-					Utils::UI::ColoredBulletText("Type:", std::to_string(tParams.type), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sTarget, std::to_string(tParams.target), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sLevel, std::to_string(tParams.level), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sInternalFormat, std::to_string(tParams.internalFormat), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sBorder, std::to_string(tParams.border), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sFormat, std::to_string(tParams.format), ImVec4(0.76f, 0.26f, 0.26f, 1.00f));
+					Utils::UI::ColoredBulletText(sType, std::to_string(tParams.type), ImVec4(0.86f, 0.26f, 0.26f, 1.00f));
 
 					ImGui::TreePop();
 				}
@@ -172,18 +189,18 @@ namespace Engine {
 			ImGui::EndTable();
 		}
 
-		std::string sAmbient       = "Ambient##Object"       + std::to_string(_mID);
-		std::string sDiffuse       = "Diffuse##Object"       + std::to_string(_mID);
-		std::string sSpecular      = "Specular##Object"      + std::to_string(_mID);
-		std::string sTransmittance = "Transmittance##Object" + std::to_string(_mID);
-		std::string sEmission      = "Emission##Object"      + std::to_string(_mID);
+		static std::string sAmbient       = "Ambient##Object"       + std::to_string(_mID);
+		static std::string sDiffuse       = "Diffuse##Object"       + std::to_string(_mID);
+		static std::string sSpecular      = "Specular##Object"      + std::to_string(_mID);
+		static std::string sTransmittance = "Transmittance##Object" + std::to_string(_mID);
+		static std::string sEmission      = "Emission##Object"      + std::to_string(_mID);
 
-		std::string sShininess = "Shininess##Object" + std::to_string(_mID);
-		std::string sIOR       = "Ior##Object"       + std::to_string(_mID);
+		static std::string sShininess = "Shininess##Object" + std::to_string(_mID);
+		static std::string sIOR       = "Ior##Object"       + std::to_string(_mID);
 
-		std::string sRoughness = "Roughness##Object" + std::to_string(_mID);
-		std::string sMetallic  = "Metallic##Object"  + std::to_string(_mID);
-		std::string sSheen     = "Sheen##Object"     + std::to_string(_mID);
+		static std::string sRoughness = "Roughness##Object" + std::to_string(_mID);
+		static std::string sMetallic  = "Metallic##Object"  + std::to_string(_mID);
+		static std::string sSheen     = "Sheen##Object"     + std::to_string(_mID);
 
 		ImGui::SeparatorText("Diffuse");
 
@@ -208,28 +225,56 @@ namespace Engine {
 	void Material::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Material", "Material Shader Update");
 
+		static std::vector<std::string> sTextures {
+			"uMaterial.textures.Ambient",
+			"uMaterial.textures.Diffuse",
+			"uMaterial.textures.Specular",
+			"uMaterial.textures.Specular_highlight",
+			"uMaterial.textures.Bump",
+			"uMaterial.textures.Displacement",
+			"uMaterial.textures.Alpha",
+			"uMaterial.textures.Reflection",
+			"uMaterial.textures.Roughness",
+			"uMaterial.textures.Metallic",
+			"uMaterial.textures.Sheen",
+			"uMaterial.textures.Emissive",
+			"uMaterial.textures.Normal"
+		};
+
 		shader.bind();
 
 		for (int idx = 0; idx < textures->textures.size(); idx++) {
 			textures->textures[idx]->bind(idx);
+			// std::string sTexture = "uMaterial.textures." + getNameFromType(TextureType(idx));
 
-			std::string material = "uMaterial.textures." + getNameFromType(TextureType(idx));
-
-			shader.setUniform1i(material, idx);
+			shader.setUniform1i(sTextures[idx], idx);
 		}
 
-		shader.setUniform3fv("uMaterial.coefficients.ambient", coefficients->ambient);
-		shader.setUniform3fv("uMaterial.coefficients.diffuse", coefficients->diffuse);
-		shader.setUniform3fv("uMaterial.coefficients.specular", coefficients->specular);
-		shader.setUniform3fv("uMaterial.coefficients.transmittance", coefficients->transmittance);
-		shader.setUniform3fv("uMaterial.coefficients.emission", coefficients->emission);
+		static std::string sAmbient       = "uMaterial.coefficients.ambient";
+		static std::string sDiffuse       = "uMaterial.coefficients.diffuse";
+		static std::string sSpecular      = "uMaterial.coefficients.specular";
+		static std::string sTransmittance = "uMaterial.coefficients.transmittance";
+		static std::string sEmission      = "uMaterial.coefficients.emission";
 
-		shader.setUniform1f("uMaterial.coefficients.shininess", coefficients->shininess);
-		shader.setUniform1f("uMaterial.coefficients.ior", coefficients->ior);
+		static std::string sShininess = "uMaterial.coefficients.shininess";
+		static std::string sIor       = "uMaterial.coefficients.ior";
 
-		shader.setUniform1f("uMaterial.coefficients.roughness", coefficients->roughness);
-		shader.setUniform1f("uMaterial.coefficients.metallic", coefficients->metallic);
-		shader.setUniform1f("uMaterial.coefficients.sheen", coefficients->sheen);
+		static std::string sRoughness = "uMaterial.coefficients.roughness";
+		static std::string sMetallic  = "uMaterial.coefficients.metallic";
+		static std::string sSheen     = "uMaterial.coefficients.sheen";
+
+		shader.setUniform3fv(sAmbient, coefficients->ambient);
+		shader.setUniform3fv(sDiffuse, coefficients->diffuse);
+		shader.setUniform3fv(sSpecular, coefficients->specular);
+		shader.setUniform3fv(sTransmittance, coefficients->transmittance);
+		shader.setUniform3fv(sEmission, coefficients->emission);
+
+		shader.setUniform1f(sShininess, coefficients->shininess);
+		shader.setUniform1f(sIor, coefficients->ior);
+
+		shader.setUniform1f(sRoughness, coefficients->roughness);
+		shader.setUniform1f(sMetallic, coefficients->metallic);
+		shader.setUniform1f(sSheen, coefficients->sheen);
 
 		PROFILER_END("Material", "Material Shader Update");
 	}

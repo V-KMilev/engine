@@ -74,10 +74,13 @@ namespace Engine {
 
 		auto emit = getComponent<Emit>();
 
+		static std::string sPosition = "uLight.position";
+		static std::string sColor    = "uLight.color";
+
 		shader.bind();
 
-		shader.setUniform3fv("uLight.position", emit->getPosition());
-		shader.setUniform3fv("uLight.color", emit->getColor());
+		shader.setUniform3fv(sPosition, emit->getPosition());
+		shader.setUniform3fv(sColor, emit->getColor());
 
 		PROFILER_END("Light", "Light Update Shader");
 	}

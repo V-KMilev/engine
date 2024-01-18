@@ -48,6 +48,10 @@ vec4 grid(vec3 fragmentPosition3D, float scale, vec4 gridColor) {
 	}
 	if (abs(fragmentPosition3D.z) < 0.1 * minimumz) {
 		color.r = 1.0;
+
+		if (color.b == 1.0) {
+			color = vec4(0.0, 1.0, 0.0, 1.0);
+		}
 	}
 
 	return color;

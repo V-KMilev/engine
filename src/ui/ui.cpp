@@ -181,12 +181,15 @@ namespace Engine {
 		auto& entitys = _mScene.getEntitys();
 		auto& objects = _mScene.getObjects();
 
-		ImGui::BeginChild("Entity list", ImVec2(_mData.width * 1 / 9, 0), true);
+		static std::string sEntityList = "Entity list";
+		static std::string sMeshList   = "Mesh list";
+
+		ImGui::BeginChild(sEntityList.c_str(), ImVec2(_mData.width * 1 / 9, 0), true);
 
 		for (auto& entity : entitys) {
 			EntityType type = entity->getType();
 
-			std::string labe = "Entity #" + std::to_string(entity->getID());
+			static std::string labe = "Entity #" + std::to_string(entity->getID());
 
 			if (type == EntityType::OBJECT) {
 				labe = "Object #" + std::to_string(entity->getID());
@@ -207,14 +210,14 @@ namespace Engine {
 
 		ImGui::SameLine();
 
-		ImGui::BeginChild("Mesh list", ImVec2(_mData.width * 1 / 8, 0), true);
+		ImGui::BeginChild(sMeshList.c_str(), ImVec2(_mData.width * 1 / 8, 0), true);
 
 		for (auto& object : objects) {
 
 			if (object->isSelected()) {
 
 				for(auto& mesh : object->getMeshes()) {
-					std::string labe = "Mesh #" + std::to_string(mesh->getID());
+					static std::string labe = "Mesh #" + std::to_string(mesh->getID());
 
 					if (ImGui::Selectable(labe.c_str(), mesh->isSelected())) {
 						mesh->setIsSelected(!mesh->isSelected());
@@ -323,7 +326,14 @@ namespace Engine {
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, ActivityBarWidth * 2), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
-		ImGui::Begin("##Top", nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
+		static std::string sTop    = "##Top";
+		static std::string sCamera = "Camera";
+		static std::string sRender = "Render";
+		static std::string sADS    = "ADS";
+		static std::string sFPS    = "FPS";
+		static std::string sUI     = "UI ";
+
+		ImGui::Begin(sTop.c_str(), nullptr, staticWindow | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse);
 
 		auto& cameras = _mScene.getCameras();
 
@@ -331,17 +341,17 @@ namespace Engine {
 
 		for (std::shared_ptr<Camera>& camera : cameras) {
 			if (camera->getComponent<Activatable>()->isActive()) {
-				Utils::UI::ColoredBulletText("Camera", std::to_string(camera->getID()), ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
+				Utils::UI::ColoredBulletText(sCamera, std::to_string(camera->getID()), ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
 			}
 			else {
-				Utils::UI::ColoredBulletText("Camera", std::to_string(camera->getID()), ImVec4(0.50f, 0.50f, 0.50f, 1.0f));
+				Utils::UI::ColoredBulletText(sCamera, std::to_string(camera->getID()), ImVec4(0.50f, 0.50f, 0.50f, 1.0f));
 			}
 			ImGui::SameLine();
 		}
 
 		ImGui::NewLine();
 		// TODO: Update this when we have more render types
-		Utils::UI::ColoredBulletText("Render", "ADS", ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
+		Utils::UI::ColoredBulletText(sRender, sADS, ImVec4(0.75f, 0.30f, 0.30f, 1.0f));
 
 		ImGui::EndGroup();
 
@@ -361,9 +371,9 @@ namespace Engine {
 
 		ImGui::BeginGroup();
 
-		Utils::UI::ColoredBulletText("FPS", std::to_string(Utils::Time::FPS), fpsColor);
+		Utils::UI::ColoredBulletText(sFPS, std::to_string(Utils::Time::FPS), fpsColor);
 
-		Utils::UI::ColoredBulletText("UI ", std::to_string(int(ImGui::GetIO().Framerate)), fpsColor);
+		Utils::UI::ColoredBulletText(sUI, std::to_string(int(ImGui::GetIO().Framerate)), fpsColor);
 
 		ImGui::EndGroup();
 
@@ -375,17 +385,11 @@ namespace Engine {
 		ImGui::SetNextWindowSize(ImVec2(_mData.width * 2 / 4, _mData.height * 1 / 4 + MainBarWidth * 4), ImGuiCond_Once);
 		ImGui::SetNextWindowBgAlpha(1.0f);
 
-		ImGui::Begin("##Bot", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
+		static std::string sBot = "##Bot";
+
+		ImGui::Begin(sBot.c_str(), nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
 		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("Soon 0")) {
-			}
-			if (ImGui::BeginMenu("Soon 1")) {
-			}
-			if (ImGui::BeginMenu("Soon 2")) {
-			}
-			if (ImGui::BeginMenu("Soon 3")) {
-			}
 			ImGui::EndMenuBar();
 		}
 
@@ -501,7 +505,7 @@ namespace Engine {
 			for (auto& entity : entitys) {
 				EntityType type = entity->getType();
 
-				std::string labe = "Entity #" + std::to_string(entity->getID());
+				static std::string labe = "Entity #" + std::to_string(entity->getID());
 
 				if (type == EntityType::OBJECT) {
 					labe = "Object #" + std::to_string(entity->getID());

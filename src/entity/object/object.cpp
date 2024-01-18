@@ -86,9 +86,11 @@ namespace Engine {
 	void Object::updateShader(const Core::Shader &shader) const {
 		PROFILER_BEGIN("Object", "Object Shader Update");
 
+		static std::string sObjectID = "uObjectID";
+
 		shader.bind();
 
-		shader.setUniform1ui("uObjectID", _mID.getID());
+		shader.setUniform1ui(sObjectID, _mID.getID());
 
 		PROFILER_END("Object", "Object Shader Update");
 	}

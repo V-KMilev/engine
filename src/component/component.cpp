@@ -93,9 +93,9 @@ namespace Engine {
 	}
 
 	void Transform::drawUI() const {
-		std::string sPosition = "Position##Component" + std::to_string(_mID);
-		std::string sRotation = "Rotation##Component" + std::to_string(_mID);
-		std::string sScale    = "Scale##Component"    + std::to_string(_mID);
+		static std::string sPosition = "Position##Component" + std::to_string(_mID);
+		static std::string sRotation = "Rotation##Component" + std::to_string(_mID);
+		static std::string sScale    = "Scale##Component"    + std::to_string(_mID);
 
 		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], _mDragSpeed)) { _mHasUpdate = true; }
 		if (ImGui::DragFloat3(sRotation.c_str(), &on_rotation[0], _mDragSpeed)) { _mHasUpdate = true; }
@@ -143,7 +143,7 @@ namespace Engine {
 	}
 
 	void Activatable::drawUI() const {
-		std::string sActive = "Active##Component" + std::to_string(_mID);
+		static std::string sActive = "Active##Component" + std::to_string(_mID);
 
 		if (ImGui::Checkbox(sActive.c_str(), &on_active)) { _mHasUpdate = true; }
 	}
@@ -176,7 +176,7 @@ namespace Engine {
 	}
 
 	void LinesOnly::drawUI() const {
-		std::string sLinesOnly = "Lines Only##Component" + std::to_string(_mID);
+		static std::string sLinesOnly = "Lines Only##Component" + std::to_string(_mID);
 
 		if (ImGui::Checkbox(sLinesOnly.c_str(), &on_linesOnly)) { _mHasUpdate = true; }
 	}

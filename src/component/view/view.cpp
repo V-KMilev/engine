@@ -142,23 +142,23 @@ namespace Engine {
 	}
 
 	void CameraView::drawUI() const {
-		std::string sPosition = "Position##Component" + std::to_string(_mID);
-		std::string sTarget   = "Target##Component"   + std::to_string(_mID);
+		static std::string sPosition = "Position##Component" + std::to_string(_mID);
+		static std::string sTarget   = "Target##Component"   + std::to_string(_mID);
 
-		std::string sFar  = "Far##Component"  + std::to_string(_mID);
-		std::string sNear = "Near##Component" + std::to_string(_mID);
+		static std::string sFar  = "Far##Component"  + std::to_string(_mID);
+		static std::string sNear = "Near##Component" + std::to_string(_mID);
 
-		std::string sFront = "Front##Component" + std::to_string(_mID);
-		std::string sRight = "Right##Component" + std::to_string(_mID);
-		std::string sUp    = "Up##Component"    + std::to_string(_mID);
+		static std::string sFront = "Front##Component" + std::to_string(_mID);
+		static std::string sRight = "Right##Component" + std::to_string(_mID);
+		static std::string sUp    = "Up##Component"    + std::to_string(_mID);
 
-		std::string sHorizontalAngle = "Horizontal Angle##Component" + std::to_string(_mID);
-		std::string sVerticalAngle   = "Vertical Angle##Component"   + std::to_string(_mID);
-		std::string sMaxUpAngle      = "Max Up Angle##Component"     + std::to_string(_mID);
+		static std::string sHorizontalAngle = "Horizontal Angle##Component" + std::to_string(_mID);
+		static std::string sVerticalAngle   = "Vertical Angle##Component"   + std::to_string(_mID);
+		static std::string sMaxUpAngle      = "Max Up Angle##Component"     + std::to_string(_mID);
 
-		std::string sMoveSpeed  = "Move Speed##Component"  + std::to_string(_mID);
-		std::string sMouseSpeed = "Mouse Speed##Component" + std::to_string(_mID);
-		std::string sZoomSpeed  = "Zoom Speed##Component"  + std::to_string(_mID);
+		static std::string sMoveSpeed  = "Move Speed##Component"  + std::to_string(_mID);
+		static std::string sMouseSpeed = "Mouse Speed##Component" + std::to_string(_mID);
+		static std::string sZoomSpeed  = "Zoom Speed##Component"  + std::to_string(_mID);
 
 		if (ImGui::DragFloat3(sPosition.c_str(), &on_position[0], _mDragSpeed)) { _mHasUpdate = true; }
 		if (ImGui::DragFloat3(sTarget.c_str(),   &on_target[0],   _mDragSpeed)) { _mHasUpdate = true; }
@@ -262,11 +262,11 @@ namespace Engine {
 	}
 
 	void PerspectiveView::drawUI() const {
-		std::string sFov    = "Fov##Component"     + std::to_string(_mID);
-		std::string sWidth  = "Width##Component"   + std::to_string(_mID);
-		std::string sHeight = "Height##Component"  + std::to_string(_mID);
-		std::string sMaxFov = "Max Fov##Component" + std::to_string(_mID);
-		std::string sMinFov = "Min Fov##Component" + std::to_string(_mID);
+		static std::string sFov    = "Fov##Component"     + std::to_string(_mID);
+		static std::string sWidth  = "Width##Component"   + std::to_string(_mID);
+		static std::string sHeight = "Height##Component"  + std::to_string(_mID);
+		static std::string sMaxFov = "Max Fov##Component" + std::to_string(_mID);
+		static std::string sMinFov = "Min Fov##Component" + std::to_string(_mID);
 
 		CameraView::drawUI();
 
