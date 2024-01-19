@@ -107,9 +107,9 @@ vec3 calculateADS(vec3 fragmentPosition, vec3 normal, vec3 lightPosition, vec3 l
 	float diff = max(dot(lightDir, normal), 0.0);
 	float spec = pow(max(dot(normal, halfwayDir), 0.0), uMaterial.coefficients.shininess);
 
-	vec3 ambient  = 0.3  * lightColor;
-	vec3 diffuse  = diff * lightColor;
-	vec3 specular = spec * lightColor;
+	vec3 ambient  = 0.3        * lightColor;
+	vec3 diffuse  =       diff * lightColor;
+	vec3 specular = 0.5 * spec * lightColor;
 
 	// Gamma correct the textures
 	ambient  *= uMaterial.coefficients.ambient  * pow(texture(uMaterial.textures.Ambient, fs_in.texCoords).rgb, vec3(gamma));

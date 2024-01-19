@@ -98,6 +98,9 @@ namespace Engine {
 			const std::vector<std::shared_ptr<Camera>>& getCameras() const;
 			std::vector<std::shared_ptr<Camera>>& getCameras();
 
+			const std::vector<std::shared_ptr<Core::Shader>>& getShader() const;
+			std::vector<std::shared_ptr<Core::Shader>>& getShader();
+
 			const std::shared_ptr<SceneManager>& getSceneManager() const;
 			std::shared_ptr<SceneManager>& getSceneManager();
 

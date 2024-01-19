@@ -231,6 +231,13 @@ namespace Engine {
 		return _mCameras;
 	}
 
+	const std::vector<std::shared_ptr<Core::Shader>>& Scene::getShader() const {
+		return _mShaders;
+	}
+	std::vector<std::shared_ptr<Core::Shader>>& Scene::getShader() {
+		return _mShaders;
+	}
+
 	void Scene::drawOrientation(const std::shared_ptr<Core::Shader>& shader) const {
 		PROFILER_BEGIN("Orientation", "Orientation Draw");
 

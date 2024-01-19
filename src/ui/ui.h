@@ -75,6 +75,8 @@ namespace Engine {
 			void save();
 			void load();
 
+			void showShaders();
+
 		private:
 			void setStyle();
 

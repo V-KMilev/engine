@@ -258,12 +258,16 @@ namespace Engine {
 
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("Soon 0")) {
+				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Soon 1")) {
+				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Soon 2")) {
+				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Soon 3")) {
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
 		}
@@ -292,30 +296,34 @@ namespace Engine {
 
 		ImGui::Begin("##LowRight", nullptr, staticWindow | ImGuiWindowFlags_MenuBar);
 
+		static int option = 0;
+
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("Render")) {
+				option = 0;
+				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Soon 1")) {
+			if (ImGui::BeginMenu("Shaders")) {
+				option = 1;
+				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Soon 2")) {
+				option = 2;
+				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Soon 3")) {
+				option = 3;
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
 		}
 
-		auto& objects = _mScene.getObjects();
-
-		for (auto& object : objects) {
-
-			if (object->isSelected()) {
-
-				for(auto& mesh : object->getMeshes()) {
-					if (mesh->isSelected()) {
-						// TODO:
-					}
-				}
-			}
+		switch (option) {
+			case 0: break;
+			case 1: showShaders(); break;
+			case 2: break;
+			case 3: break;
+			default: break;
 		}
 
 		ImGui::End();
@@ -608,6 +616,18 @@ namespace Engine {
 
 			ImGui::EndPopup();
 		}
+	}
+
+	void UI::showShaders() {
+		auto& shaders = _mScene.getShader();
+
+		ImGui::BeginGroup();
+		for (auto& shader : shaders) {
+			if (ImGui::Button(shader->getName().c_str())) {
+				shader->reCompleShader();
+			}
+		}
+		ImGui::EndGroup();
 	}
 
 	void UI::setStyle() {

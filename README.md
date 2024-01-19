@@ -3,7 +3,6 @@
 VKM is an open-source 3D rendering engine designed for efficient graphics rendering using the OpenGL API. It supports advanced rendering techniques such as ADS (Ambient, Diffuse, Specular) shading, PBR (Physically Based Rendering), and upcoming support for Nvidia RTX for ray tracing.
 
 ## Features
-
 - **OpenGL Integration:** Utilizes the OpenGL graphics API for rendering.
 - **Modern C++ Codebase:** Developed with modern C++ standards and practices.
 - **Cross-Platform:** Designed to work seamlessly across various platforms, including Windows, Linux.
@@ -15,7 +14,6 @@ VKM is an open-source 3D rendering engine designed for efficient graphics render
 ## Getting Started
 
 ### Prerequisites
-
 - C++17 compiler
 - OpenGL SDK
 - CMake (3.21.0)
@@ -25,7 +23,6 @@ VKM is an open-source 3D rendering engine designed for efficient graphics render
 - STBimage
 - TinyObjLoader
 - Nlohmann
-
 
 ### Installing
 ```
