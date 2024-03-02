@@ -125,11 +125,16 @@ namespace Engine {
 	void Scene::renderUI() {
 		PROFILER_BEGIN("UI", "UI Draw");
 
+		_mUI->newFrame();
+
 		if (_mUI->getData().isActive) {
-			_mUI->newFrame();
 			_mUI->ui();
-			_mUI->render();
 		}
+		else {
+			_mUI->fullscreen();
+		}
+
+		_mUI->render();
 
 		PROFILER_END("UI", "UI Draw");
 	}

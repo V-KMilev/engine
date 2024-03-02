@@ -104,6 +104,38 @@ namespace Engine {
 		saveOrLoadScene();
 	}
 
+	void UI::fullscreen() {
+		mainManu();
+
+		ImGuiWindowFlags window_flags = 
+			ImGuiWindowFlags_NoDecoration    | ImGuiWindowFlags_AlwaysAutoResize   |
+			ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+			ImGuiWindowFlags_NoNav;
+
+		const float PAD = 10.0f;
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
+		ImVec2 work_size = viewport->WorkSize;
+		ImVec2 window_pos, window_pos_pivot;
+
+		window_pos.x = (2 & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
+		window_pos.y = (2 & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
+		window_pos_pivot.x = (2 & 1) ? 1.0f : 0.0f;
+		window_pos_pivot.y = (2 & 2) ? 1.0f : 0.0f;
+
+		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+
+		ImGui::SetNextWindowBgAlpha(0.35f);
+		if(ImGui::Begin("Info overlay", NULL, window_flags)) {
+				ImGui::Text("VKM - Build v0.01");
+				ImGui::Separator();
+				ImGui::Text("Render: %.3f ms | %d FPS", 1000.0f / Utils::Time::FPS, Utils::Time::FPS);
+				ImGui::Text("UI:     %.3f ms | %d FPS", 1000.0f / ImGui::GetIO().Framerate, (int)ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+	}
+
 	void UI::showUI() {
 		if (!_mData.isActive) {
 			_mData.isActive = true;

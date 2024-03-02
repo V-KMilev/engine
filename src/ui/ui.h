@@ -50,6 +50,7 @@ namespace Engine {
 			void render();
 
 			void ui();
+			void fullscreen();
 
 			void showUI();
 
